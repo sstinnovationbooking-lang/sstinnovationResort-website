@@ -1,5 +1,5 @@
 {
-  "name": "booking-website-001",
+  "name": "sstinnovationresort-website",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -23,3 +23,4 @@
     "typescript": "^5.9.3"
   }
 }
+
