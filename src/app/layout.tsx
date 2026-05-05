@@ -3,19 +3,22 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Resort Multi-tenant Template",
-  description: "Next.js 16 multi-tenant resort website template"
+  title: {
+    default: "Resort Multi-tenant Platform",
+    template: "%s | Resort Platform"
+  },
+  description: "Production-ready Next.js 16 multi-tenant resort website with BFF architecture."
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="th">
+    <html lang="en">
       <body>
         <header className="site-header">
           <div className="shell header-row">
-            <div className="brand">Resort Template</div>
+            <div className="brand">SST Innovation Resort</div>
             <nav>
-              <a href="#contact">ติดต่อ</a>
+              <a href="#contact">Contact</a>
             </nav>
           </div>
         </header>

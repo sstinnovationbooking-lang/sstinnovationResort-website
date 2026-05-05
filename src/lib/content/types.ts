@@ -1,7 +1,7 @@
-import type { LeadRequestDTO, RoomCardDTO, SiteHomeDTO, TenantContext } from "@/types/site";
+import type { LeadRequestDTO, LeadResponseDTO, RoomCardDTO, SiteHomeDTO } from "@/lib/types/site";
 
 export interface ContentAdapter {
-  getHome(tenant: TenantContext): Promise<SiteHomeDTO>;
-  getRooms(tenant: TenantContext): Promise<RoomCardDTO[]>;
-  submitLead(tenant: TenantContext, payload: LeadRequestDTO): Promise<{ ok: true; referenceId: string }>;
+  getSiteHome(tenantSlug?: string | null): Promise<SiteHomeDTO>;
+  getRooms(tenantSlug?: string | null): Promise<RoomCardDTO[]>;
+  submitLead(tenantSlug: string | null | undefined, payload: LeadRequestDTO): Promise<LeadResponseDTO>;
 }

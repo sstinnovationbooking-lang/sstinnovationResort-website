@@ -1,9 +1,20 @@
 import { getBaseDomain, getDefaultTenantSlug, getTenantFallbackPolicy } from "@/lib/env";
-import { getTenantBySlug, isKnownTenantSlug } from "@/lib/tenants/registry";
-import type { TenantContext } from "@/types/site";
+import {
+  getTenantByExactHost,
+  getTenantBySlug,
+  isKnownTenantSlug
+} from "@/lib/tenants/registry";
+import type { TenantContext } from "@/lib/types/site";
+
+interface ResolveTenantInput {
+  rawHost?: string | null;
+  tenantSlug?: string | null;
+  enforceHostTenant?: boolean;
+}
 
 function normalizeHost(rawHost: string | null | undefined): string {
   return String(rawHost ?? "")
+    .split(",")[0]
     .trim()
     .toLowerCase()
     .replace(/^https?:\/\//, "")
@@ -11,11 +22,21 @@ function normalizeHost(rawHost: string | null | undefined): string {
     .split(":")[0];
 }
 
+function normalizeTenantSlug(rawTenantSlug: string | null | undefined): string | null {
+  const normalized = String(rawTenantSlug ?? "").trim().toLowerCase();
+  return normalized || null;
+}
+
 function inferTenantSlugFromHost(host: string): string | null {
   if (!host) return null;
 
+  const directHostMatch = getTenantByExactHost(host);
+  if (directHostMatch) {
+    return directHostMatch.tenantSlug;
+  }
+
   if (host === "localhost" || host === "127.0.0.1") {
-    return getDefaultTenantSlug();
+    return null;
   }
 
   const baseDomain = getBaseDomain();
@@ -45,4 +66,26 @@ export function resolveTenantFromHost(rawHost: string | null | undefined): Tenan
   }
 
   return null;
+}
+
+export function resolveTenant(input: ResolveTenantInput): TenantContext | null {
+  const host = normalizeHost(input.rawHost);
+  const hostTenantSlug = inferTenantSlugFromHost(host);
+  const requestedSlug = normalizeTenantSlug(input.tenantSlug);
+
+  if (requestedSlug) {
+    if (!isKnownTenantSlug(requestedSlug)) return null;
+
+    if (input.enforceHostTenant && hostTenantSlug && requestedSlug !== hostTenantSlug) {
+      return null;
+    }
+
+    return getTenantBySlug(requestedSlug);
+  }
+
+  if (hostTenantSlug && isKnownTenantSlug(hostTenantSlug)) {
+    return getTenantBySlug(hostTenantSlug);
+  }
+
+  return getTenantBySlug(getDefaultTenantSlug());
 }

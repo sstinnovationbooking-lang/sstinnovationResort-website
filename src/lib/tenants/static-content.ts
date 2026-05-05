@@ -1,5 +1,6 @@
 import { getTenantBySlug } from "@/lib/tenants/registry";
-import type { PackageCardDTO, RoomCardDTO, SiteHomeDTO } from "@/types/site";
+import { toTenantDTO } from "@/lib/tenants/registry";
+import type { PackageCardDTO, RoomCardDTO, SiteHomeDTO } from "@/lib/types/site";
 
 interface TenantStaticContent {
   home: Omit<SiteHomeDTO, "tenant">;
@@ -182,6 +183,51 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
         lineId: "@lakeserenity"
       }
     }
+  },
+  "demo-resort": {
+    rooms: forestRooms.slice(0, 2),
+    home: {
+      hero: {
+        eyebrow: "Demo tenant for preview and QA",
+        title: "Demo Resort\nPreview Environment",
+        subtitle: "This tenant is intended for testing, stakeholder demos, and staging previews.",
+        ctaLabel: "Send Demo Lead",
+        heroImageUrl:
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1800&q=80"
+      },
+      stats: [
+        { label: "Demo rooms", value: "2" },
+        { label: "Mode", value: "Preview" },
+        { label: "Uptime target", value: "99.9%" },
+        { label: "Support", value: "On request" }
+      ],
+      highlights: [
+        "Safe demo dataset with no production tenant secrets",
+        "Supports QA of booking flow and metadata rendering",
+        "Can be marked noindex to avoid SEO crawl noise"
+      ],
+      featuredRooms: forestRooms.slice(0, 2),
+      featuredPackages: forestPackages.slice(0, 1),
+      gallery: [
+        {
+          id: "dm-g1",
+          alt: "Demo resort overview",
+          imageUrl:
+            "https://images.unsplash.com/photo-1464822759844-d150ad6d1d1f?auto=format&fit=crop&w=1200&q=80"
+        },
+        {
+          id: "dm-g2",
+          alt: "Demo villa",
+          imageUrl:
+            "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80"
+        }
+      ],
+      contact: {
+        phone: "+66 89 000 3333",
+        email: "demo@resort.example",
+        lineId: "@demoresort"
+      }
+    }
   }
 };
 
@@ -189,7 +235,7 @@ export function getStaticHomeByTenant(tenantSlug: string): SiteHomeDTO | null {
   const tenant = getTenantBySlug(tenantSlug);
   const content = TENANT_CONTENT[tenantSlug];
   if (!tenant || !content) return null;
-  return { tenant, ...content.home };
+  return { tenant: toTenantDTO(tenant), ...content.home };
 }
 
 export function getStaticRoomsByTenant(tenantSlug: string): RoomCardDTO[] {

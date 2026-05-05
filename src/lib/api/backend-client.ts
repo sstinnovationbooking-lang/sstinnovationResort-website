@@ -1,9 +1,14 @@
-import { getBackendApiBaseUrl, getBackendApiSecret } from "@/lib/env";
-import type { LeadRequestDTO, RoomCardDTO, SiteHomeDTO, TenantContext } from "@/types/site";
+import { getBackendApiBaseUrl, getBackendApiSecret, getContentMode } from "@/lib/env";
+import type { LeadRequestDTO, LeadResponseDTO, RoomCardDTO, SiteHomeDTO, TenantContext } from "@/lib/types/site";
 
 function mustBackendBaseUrl(): string {
   const value = getBackendApiBaseUrl();
-  if (!value) throw new Error("BACKEND_API_BASE_URL is required in CONTENT_MODE=api");
+  if (!value) {
+    if (getContentMode() === "api") {
+      console.error("[BFF] CONTENT_MODE=api but BACKEND_API_BASE_URL is missing.");
+    }
+    throw new Error("BACKEND_API_BASE_URL is required in CONTENT_MODE=api");
+  }
   return value.replace(/\/$/, "");
 }
 
@@ -11,10 +16,9 @@ function buildHeaders(tenant: TenantContext): HeadersInit {
   const secret = getBackendApiSecret();
   const headers: Record<string, string> = {
     "content-type": "application/json",
-    "x-tenant-id": tenant.tenantId,
     "x-tenant-slug": tenant.tenantSlug
   };
-  if (secret) headers["x-bff-secret"] = secret;
+  if (secret) headers["x-internal-secret"] = secret;
   return headers;
 }
 
@@ -49,7 +53,7 @@ export async function fetchBackendRooms(tenant: TenantContext): Promise<RoomCard
 export async function sendBackendLead(
   tenant: TenantContext,
   payload: LeadRequestDTO
-): Promise<{ ok: true; referenceId: string }> {
+): Promise<LeadResponseDTO> {
   const baseUrl = mustBackendBaseUrl();
   const response = await fetch(`${baseUrl}/site/leads`, {
     method: "POST",
@@ -57,5 +61,5 @@ export async function sendBackendLead(
     body: JSON.stringify(payload),
     cache: "no-store"
   });
-  return parseJsonResponse<{ ok: true; referenceId: string }>(response);
+  return parseJsonResponse<LeadResponseDTO>(response);
 }

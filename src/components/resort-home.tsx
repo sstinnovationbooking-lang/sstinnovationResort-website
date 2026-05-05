@@ -1,6 +1,7 @@
 import Image from "next/image";
+
 import { LeadForm } from "@/components/lead-form";
-import type { RoomCardDTO, SiteHomeDTO } from "@/types/site";
+import type { RoomCardDTO, SiteHomeDTO } from "@/lib/types/site";
 
 interface ResortHomeProps {
   home: SiteHomeDTO;
@@ -15,75 +16,120 @@ function formatTHB(price: number): string {
 
 export function ResortHome({ home, rooms }: ResortHomeProps) {
   return (
-    <main>
-      <section className="shell hero">
+    <main aria-labelledby="hero-title">
+      <section className="shell hero" id="hero">
         <div className="hero-copy">
           <span className="pill">{home.hero.eyebrow}</span>
-          <h1>{home.hero.title}</h1>
+          <h1 id="hero-title">{home.hero.title}</h1>
           <p>{home.hero.subtitle}</p>
-          <a className="btn btn-primary" href="#contact">
+          <a className="btn btn-primary" href="#lead-form">
             {home.hero.ctaLabel}
           </a>
-          <ul className="highlights">
+        </div>
+        <div
+          aria-label={`${home.tenant.brand} hero image`}
+          className="hero-media"
+          role="img"
+          style={{ backgroundImage: `url(${home.hero.heroImageUrl})` }}
+        />
+      </section>
+
+      <section className="shell section" id="highlights">
+        <div className="section-head">
+          <h2>Highlight</h2>
+          <p>What makes this tenant experience unique.</p>
+        </div>
+        {home.highlights.length > 0 ? (
+          <ul className="highlights-grid">
             {home.highlights.map((item) => (
-              <li key={item}>{item}</li>
+              <li className="highlight-card" key={item}>
+                {item}
+              </li>
             ))}
           </ul>
-        </div>
-        <div className="hero-media" style={{ backgroundImage: `url(${home.hero.heroImageUrl})` }} />
+        ) : (
+          <p className="empty-state">No highlights available right now.</p>
+        )}
       </section>
 
-      <section className="shell stats-grid">
-        {home.stats.map((stat) => (
-          <article className="stat-card" key={stat.label}>
-            <strong>{stat.value}</strong>
-            <span>{stat.label}</span>
-          </article>
-        ))}
-      </section>
-
-      <section className="shell section">
-        <div className="section-head">
-          <h2>ห้องพักและแพ็กเกจแนะนำ</h2>
-          <p>เทมเพลตเดียว ปรับข้อมูลตาม tenant ได้ทันที</p>
-        </div>
-        <div className="card-grid">
-          {rooms.map((room) => (
-            <article className="room-card" key={room.id}>
-              <div className="room-image" style={{ backgroundImage: `url(${room.imageUrl})` }} />
-              <div className="room-body">
-                {room.badge ? <span className="tag">{room.badge}</span> : null}
-                <h3>{room.name}</h3>
-                <p>{room.description}</p>
-                <strong>{formatTHB(room.nightlyPriceTHB)} / คืน</strong>
-              </div>
+      <section aria-label="Key stats" className="shell stats-grid" id="stats">
+        {home.stats.length > 0 ? (
+          home.stats.map((stat) => (
+            <article className="stat-card" key={stat.label}>
+              <strong>{stat.value}</strong>
+              <span>{stat.label}</span>
             </article>
-          ))}
-        </div>
+          ))
+        ) : (
+          <article className="stat-card stat-empty">
+            <strong>-</strong>
+            <span>Stats are currently unavailable.</span>
+          </article>
+        )}
       </section>
 
-      <section className="shell section">
+      <section className="shell section" id="rooms">
         <div className="section-head">
-          <h2>แกลเลอรีรีสอร์ต</h2>
+          <h2>Rooms</h2>
+          <p>Choose the best room style for your stay.</p>
         </div>
-        <div className="gallery-grid">
-          {home.gallery.map((item) => (
-            <figure className="gallery-item" key={item.id}>
-              <Image alt={item.alt} className="gallery-image" height={220} src={item.imageUrl} width={380} />
-            </figure>
-          ))}
+        {rooms.length > 0 ? (
+          <div className="card-grid">
+            {rooms.map((room) => (
+              <article className="room-card" key={room.id}>
+                <div aria-hidden className="room-image" style={{ backgroundImage: `url(${room.imageUrl})` }} />
+                <div className="room-body">
+                  {room.badge ? <span className="tag">{room.badge}</span> : null}
+                  <h3>{room.name}</h3>
+                  <p>{room.description}</p>
+                  <strong>{formatTHB(room.nightlyPriceTHB)} / night</strong>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="empty-state">No rooms are available yet for this tenant.</p>
+        )}
+      </section>
+
+      <section className="shell section" id="gallery">
+        <div className="section-head">
+          <h2>Gallery</h2>
         </div>
+        {home.gallery.length > 0 ? (
+          <div className="gallery-grid">
+            {home.gallery.map((item) => (
+              <figure className="gallery-item" key={item.id}>
+                <Image alt={item.alt} className="gallery-image" height={220} src={item.imageUrl} width={380} />
+              </figure>
+            ))}
+          </div>
+        ) : (
+          <p className="empty-state">Gallery is coming soon.</p>
+        )}
       </section>
 
       <section className="shell section contact" id="contact">
         <div className="contact-meta">
-          <h2>ติดต่อและส่งคำขอจอง</h2>
-          <p>โทร: {home.contact.phone}</p>
-          <p>อีเมล: {home.contact.email}</p>
+          <h2>Contact</h2>
+          <p>Phone: {home.contact.phone}</p>
+          <p>Email: {home.contact.email}</p>
           {home.contact.lineId ? <p>LINE: {home.contact.lineId}</p> : null}
         </div>
-        <LeadForm />
+        <div id="lead-form">
+          <h2 className="visually-hidden">Lead Form</h2>
+          <LeadForm tenantSlug={home.tenant.tenantSlug} />
+        </div>
       </section>
+
+      <footer className="site-footer" id="footer">
+        <div className="shell footer-inner">
+          <p>{home.tenant.brand}</p>
+          <a className="footer-link" href="#hero">
+            Back to top
+          </a>
+        </div>
+      </footer>
     </main>
   );
 }

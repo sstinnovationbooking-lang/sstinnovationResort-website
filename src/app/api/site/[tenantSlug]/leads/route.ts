@@ -1,15 +1,18 @@
 import { NextResponse } from "next/server";
 
 import { sendBackendLead } from "@/lib/api/backend-client";
-import { resolveTenantFromRequest, resolveTenantSlugFromRequest } from "@/lib/api/tenant-guard";
+import { resolveTenantFromRequest } from "@/lib/api/tenant-guard";
 import { getContentAdapter } from "@/lib/content/get-adapter";
 import { sanitizeLeadPayload, validateLeadPayload } from "@/lib/dto/lead";
 import { getContentMode } from "@/lib/env";
 
-export async function POST(request: Request) {
-  const tenantSlug = resolveTenantSlugFromRequest(request);
-  const tenant = resolveTenantFromRequest(request);
+interface RouteContext {
+  params: Promise<{ tenantSlug: string }>;
+}
 
+export async function POST(request: Request, context: RouteContext) {
+  const { tenantSlug } = await context.params;
+  const tenant = resolveTenantFromRequest(request, tenantSlug);
   if (!tenant) {
     return NextResponse.json({ error: "tenant not found" }, { status: 404 });
   }
@@ -25,7 +28,6 @@ export async function POST(request: Request) {
       getContentMode() === "api"
         ? await sendBackendLead(tenant, payload)
         : await getContentAdapter().submitLead(tenantSlug, payload);
-
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(

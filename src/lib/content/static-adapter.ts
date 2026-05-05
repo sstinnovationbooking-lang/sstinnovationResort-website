@@ -1,30 +1,47 @@
+import { validateLeadPayload } from "@/lib/dto/lead";
+import { sanitizeSiteHomeDTO } from "@/lib/dto/normalize";
+import { getDefaultTenantSlug } from "@/lib/env";
 import { getStaticHomeByTenant, getStaticRoomsByTenant } from "@/lib/tenants/static-content";
+import { getTenantBySlug } from "@/lib/tenants/registry";
 import type { ContentAdapter } from "@/lib/content/types";
-import type { LeadRequestDTO, TenantContext } from "@/types/site";
+import type { LeadRequestDTO } from "@/lib/types/site";
 
-function ensureLeadPayload(payload: LeadRequestDTO): void {
-  if (!payload.name?.trim()) throw new Error("name is required");
-  if (!payload.email?.trim() && !payload.phone?.trim()) {
-    throw new Error("email or phone is required");
-  }
+function normalizeTenantSlug(tenantSlug?: string | null): string {
+  const normalized = String(tenantSlug ?? "").trim().toLowerCase();
+  return normalized || getDefaultTenantSlug();
+}
+
+function resolveStaticTenantSlug(tenantSlug?: string | null): string {
+  const candidate = normalizeTenantSlug(tenantSlug);
+  if (getTenantBySlug(candidate)) return candidate;
+  return getDefaultTenantSlug();
 }
 
 export class StaticContentAdapter implements ContentAdapter {
-  async getHome(tenant: TenantContext) {
-    const data = getStaticHomeByTenant(tenant.tenantSlug);
-    if (!data) throw new Error("tenant content not found");
-    return data;
+  async getSiteHome(tenantSlug?: string | null) {
+    const resolvedTenantSlug = resolveStaticTenantSlug(tenantSlug);
+    const data = getStaticHomeByTenant(resolvedTenantSlug);
+    if (!data) {
+      throw new Error("Unable to load tenant content.");
+    }
+    return sanitizeSiteHomeDTO(data);
   }
 
-  async getRooms(tenant: TenantContext) {
-    return getStaticRoomsByTenant(tenant.tenantSlug);
+  async getRooms(tenantSlug?: string | null) {
+    const resolvedTenantSlug = resolveStaticTenantSlug(tenantSlug);
+    return getStaticRoomsByTenant(resolvedTenantSlug);
   }
 
-  async submitLead(tenant: TenantContext, payload: LeadRequestDTO) {
-    ensureLeadPayload(payload);
+  async submitLead(tenantSlug: string | null | undefined, payload: LeadRequestDTO) {
+    const errors = validateLeadPayload(payload);
+    if (errors.length > 0) {
+      throw new Error(errors.join(", "));
+    }
+
+    const resolvedTenantSlug = resolveStaticTenantSlug(tenantSlug);
     return {
       ok: true as const,
-      referenceId: `static-${tenant.tenantId}-${Date.now()}`
+      referenceId: `static-${resolvedTenantSlug}-${Date.now()}`
     };
   }
 }

@@ -1,4 +1,4 @@
-import type { ContentMode } from "@/types/site";
+import type { ContentMode } from "@/lib/types/site";
 
 const DEFAULT_MODE: ContentMode = "static";
 
