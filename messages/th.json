@@ -1,0 +1,304 @@
+{
+  "Layout": {
+    "brand": "SST Innovation Resort",
+    "contactNav": "ติดต่อ",
+    "languageLabel": "ภาษา",
+    "openMenu": "เปิดเมนู",
+    "closeMenu": "ปิดเมนู",
+    "goHome": "กลับหน้าแรก",
+    "callAria": "โทร {phone}",
+    "nav": {
+      "home": "หน้าแรก",
+      "rooms": "ห้องพัก",
+      "activities": "กิจกรรม",
+      "about": "เกี่ยวกับเรา",
+      "contact": "ติดต่อเรา"
+    }
+  },
+  "Metadata": {
+    "siteDefaultTitle": "แพลตฟอร์มรีสอร์ตแบบ Multi-tenant",
+    "siteTitleSuffix": "ระบบจองรีสอร์ต",
+    "defaultDescription": "เว็บไซต์รีสอร์ตแบบ Multi-tenant รองรับการจอง พร้อม BFF API และพร้อมใช้งานระดับ Production",
+    "tenantFallbackTitle": "ไม่พบเทนแนนต์",
+    "tenantFallbackDescription": "ไม่พบข้อมูลเทนแนนต์สำหรับเส้นทางนี้"
+  },
+  "NotFound": {
+    "title": "ไม่พบเทนแนนต์",
+    "description": "กรุณาตรวจสอบ URL ให้อยู่ในรูปแบบ /site/your-tenant-slug"
+  },
+  "TenantPage": {
+    "serviceUnavailable": "ระบบยังไม่พร้อมใช้งานชั่วคราว กรุณาลองใหม่อีกครั้ง",
+    "loadErrorTitle": "ไม่สามารถโหลดหน้าของรีสอร์ตนี้ได้",
+    "retry": "ลองใหม่",
+    "loadingAria": "กำลังโหลดข้อมูลรีสอร์ต"
+  },
+  "ResortHome": {
+    "heroImageAria": "ภาพหลักของ {brand}",
+    "highlightTitle": "จุดเด่น",
+    "highlightDescription": "สิ่งที่ทำให้ประสบการณ์ของเทนแนนต์นี้ไม่เหมือนใคร",
+    "highlightsEmpty": "ยังไม่มีข้อมูลจุดเด่นในขณะนี้",
+    "statsAria": "สถิติสำคัญ",
+    "statsEmpty": "ยังไม่สามารถแสดงสถิติได้",
+    "roomsTitle": "ห้องพัก",
+    "roomsDescription": "เลือกสไตล์ห้องที่เหมาะกับการเข้าพักของคุณ",
+    "roomsEmpty": "ยังไม่พบห้องว่างสำหรับช่วงเข้าพักที่เลือก ลองเปลี่ยนวันที่หรือติดต่อเราเพื่อช่วยแนะนำห้องพัก",
+    "perNight": "/ คืน",
+    "galleryTitle": "แกลเลอรี",
+    "galleryEmpty": "ยังไม่มีรูปภาพในขณะนี้",
+    "contactTitle": "ติดต่อเรา",
+    "phoneLabel": "โทรศัพท์",
+    "emailLabel": "อีเมล",
+    "lineLabel": "LINE",
+    "countryLabel": "ประเทศ",
+    "localTimeLabel": "เวลาท้องถิ่น",
+    "leadFormTitle": "แบบฟอร์มติดต่อ",
+    "backToTop": "กลับขึ้นด้านบน",
+    "roomsIntroEyebrow": "ห้องพักหรูหรา นอนหลับสบาย",
+    "roomsIntroDescription": "เลือกสไตล์ห้องที่เหมาะกับการเข้าพักของคุณ พร้อมบรรยากาศรีสอร์ทที่ผ่อนคลาย สะดวกสบาย และรองรับทุกการใช้งาน",
+    "readMore": "READ MORE",
+    "featuredGalleryAria": "Featured room gallery",
+    "featuredGalleryPrev": "Previous gallery items",
+    "featuredGalleryNext": "Next gallery items",
+    "amenitiesEyebrow": "Our services",
+    "amenitiesHeading": "Hotel amenities",
+    "hotelInfoHeading": "Hotel information",
+    "footerMenuTitle": "เมนูหลัก",
+    "footerContactTitle": "ข้อมูลติดต่อ",
+    "footerSystemTitle": "ข้อมูลระบบ",
+    "copyrightPrefix": "?",
+    "copyrightFallback": "All rights reserved.",
+    "nav": {
+      "home": "Home",
+      "rooms": "Rooms",
+      "activities": "Activities",
+      "about": "About",
+      "contact": "Contact"
+    },
+    "featuredGallery": {
+      "deluxe-king": {
+        "title": "Deluxe King Bed",
+        "sizeText": "32 sq.m"
+      },
+      "deluxe-twin": {
+        "title": "Deluxe Twin Bed",
+        "sizeText": "32 sq.m"
+      },
+      "deluxe-triple": {
+        "title": "Deluxe Triple Room",
+        "sizeText": "32 sq.m"
+      }
+    },
+    "roomHighlights": {
+      "deluxe-king-bed": {
+        "title": "DELUXE KING BED",
+        "subtitle": "30 SQUARE METERS OF SPACE",
+        "description": "Deluxe King Bed is a private room, designed for a single guest or a couple. Equipped with a king-sized bed, comfortable bedding, and great amenities."
+      },
+      "deluxe-twin-bed": {
+        "title": "DELUXE TWIN BED",
+        "subtitle": "30 SQUARE METERS OF SPACE",
+        "description": "Deluxe Twin Room is a spacious room with two separate beds. This room is ideal for couples or friends who wish to stay in the same room."
+      },
+      "deluxe-triple-room": {
+        "title": "DELUXE TRIPLE ROOM",
+        "subtitle": "32 SQUARE METERS OF SPACE",
+        "description": "A comfortable room designed for small groups or families, with practical space and relaxing resort-style atmosphere."
+      },
+      "private-villa": {
+        "title": "PRIVATE VILLA",
+        "subtitle": "RELAXING PRIVATE SPACE",
+        "description": "A private villa-style stay with a peaceful atmosphere, ideal for guests who want comfort, privacy, and a premium resort experience."
+      }
+    },
+    "amenitiesItems": {
+      "security": {
+        "title": "Security",
+        "description": "Security system and CCTV coverage for guest peace of mind."
+      },
+      "laundry": {
+        "title": "Laundry service",
+        "description": "Laundry and dry-cleaning service for guest convenience."
+      },
+      "shuttle": {
+        "title": "Shuttle service",
+        "description": "Guest transfer service based on resort conditions."
+      },
+      "wifi": {
+        "title": "Wi-Fi internet",
+        "description": "Wireless internet access in designated guest areas."
+      },
+      "breakfast": {
+        "title": "Breakfast",
+        "description": "Breakfast service based on selected package."
+      },
+      "support": {
+        "title": "Guest support",
+        "description": "Our team is ready to support your stay and provide information."
+      }
+    },
+    "hotelInfoItems": {
+      "check-in": {
+        "title": "Check-in",
+        "description": ""
+      },
+      "check-out": {
+        "title": "Check-out",
+        "description": ""
+      },
+      "minimum-age": {
+        "title": "Minimum check-in age 18",
+        "description": ""
+      },
+      "front-desk": {
+        "title": "Front desk",
+        "description": ""
+      },
+      "pet-policy": {
+        "title": "Pet policy",
+        "description": "Pets are not allowed."
+      },
+      "parking": {
+        "title": "Parking",
+        "description": "Free parking service."
+      }
+    },
+    "staticText": {
+      "forestHeroTitle": "เว็บไซต์รีสอร์ตพร้อมระบบจอง ดีไซน์สวย รองรับทุกอุปกรณ์",
+      "forestHeroSubtitle": "เทมเพลตสำหรับรีสอร์ตที่ต้องการหน้าเว็บมืออาชีพ ปรับแบรนด์ได้ และเชื่อม backend",
+      "forestHeroCta": "เริ่มส่งคำขอจอง",
+      "lakeHeroEyebrow": "รีสอร์ตริมทะเลสาบ สไตล์พักผ่อน",
+      "lakeHeroTitle": "Lake Serenity Resort\nพักสบาย ชมวิวทุกเช้า",
+      "lakeHeroSubtitle": "เทมเพลตเดียวกัน ปรับแบรนด์สำหรับแต่ละ tenant ได้ทันที",
+      "lakeHeroCta": "ส่งคำขอเข้าพัก",
+      "demoHeroEyebrow": "เดโมสำหรับพรีวิวและทดสอบ QA",
+      "demoHeroTitle": "Demo Resort\nสภาพแวดล้อมสำหรับพรีวิว",
+      "demoHeroSubtitle": "เทนเเนนต์นี้ใช้สำหรับทดสอบระบบ เดโมผู้มีส่วนเกี่ยวข้อง และพรีวิวก่อนใช้งานจริง",
+      "demoHeroCta": "ส่งคำขอเดโม",
+      "footerDescription": "เว็บไซต์รีสอร์ทพร้อมระบบจอง รองรับหลายเจ้าของรีสอร์ท และเชื่อมต่อระบบหลังบ้าน",
+      "systemBooking": "ระบบจองห้องพัก",
+      "systemWebsite": "เว็บไซต์รีสอร์ท",
+      "systemMultitenant": "รองรับ Multi-tenant",
+      "systemBackend": "เชื่อมต่อระบบหลังบ้าน",
+      "supportHours": "ทุกวัน 08:00 - 20:00 น.",
+      "roomGardenVillaName": "การ์เดนวิลล่า",
+      "roomGardenVillaDescription": "วิลล่ากลางสวนส่วนตัว เงียบสงบ เหมาะกับคู่รักและครอบครัวขนาดเล็ก",
+      "roomGardenVillaBadge": "สวนส่วนตัว",
+      "roomMountainCabinName": "เมาน์เทนเคบิน",
+      "roomMountainCabinDescription": "เคบินวิวภูเขา โทนอบอุ่น พร้อมระเบียงชมธรรมชาติ",
+      "roomMountainCabinBadge": "วิวภูเขา",
+      "roomRiverPoolVillaName": "ริเวอร์พูลวิลล่า",
+      "roomRiverPoolVillaDescription": "พูลวิลล่าริมน้ำพร้อมสระส่วนตัว เหมาะกับทริปกลุ่มเพื่อน",
+      "roomRiverPoolVillaBadge": "พูลวิลล่า",
+      "roomLakesideSuiteName": "เลคไซด์สวีท",
+      "roomLakesideSuiteDescription": "ห้องพักวิวทะเลสาบ ตื่นมาพร้อมหมอกเช้าและอาหารเช้าริมน้ำ",
+      "roomLakesideSuiteBadge": "วิวทะเลสาบ",
+      "roomWoodenVillaName": "วูดเดนวิลล่า",
+      "roomWoodenVillaDescription": "บ้านไม้ร่วมสมัย เน้นความอบอุ่นและความเป็นส่วนตัว",
+      "roomWoodenVillaBadge": "บ้านไม้"
+    }
+  },
+  "LeadForm": {
+    "customerName": "ชื่อลูกค้า",
+    "phone": "โทรศัพท์",
+    "email": "อีเมล",
+    "roomId": "รหัสห้อง",
+    "checkIn": "วันเช็กอิน",
+    "checkOut": "วันเช็กเอาต์",
+    "message": "ข้อความ",
+    "placeholderName": "ชื่อ-นามสกุล",
+    "placeholderPhone": "+66 8x-xxx-xxxx",
+    "placeholderEmail": "you@example.com",
+    "placeholderRoomId": "ระบุรหัสห้อง (ถ้ามี)",
+    "placeholderMessage": "แจ้งห้องที่ต้องการและความต้องการเพิ่มเติม...",
+    "submitIdle": "ส่งคำขอจอง",
+    "submitLoading": "กำลังส่ง...",
+    "statusReady": "พร้อมส่งแบบฟอร์ม",
+    "validationSummary": "กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนส่ง",
+    "submitSuccess": "ส่งสำเร็จ เลขอ้างอิง: {referenceId}",
+    "submitFailed": "ไม่สามารถส่งคำขอจองได้",
+    "unexpectedError": "เกิดข้อผิดพลาดที่ไม่คาดคิด",
+    "errorCustomerNameRequired": "กรุณากรอกชื่อลูกค้า",
+    "errorPhoneRequired": "กรุณากรอกเบอร์โทรศัพท์",
+    "errorEmailInvalid": "รูปแบบอีเมลไม่ถูกต้อง",
+    "errorPhoneInvalid": "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง",
+    "errorCheckInInvalid": "รูปแบบวันเช็กอินต้องเป็น YYYY-MM-DD",
+    "errorCheckOutInvalid": "รูปแบบวันเช็กเอาต์ต้องเป็น YYYY-MM-DD",
+    "errorDateOrder": "วันเช็กเอาต์ต้องหลังวันเช็กอิน",
+    "errorInvalidPayload": "ข้อมูลที่ส่งไม่ถูกต้อง"
+  },
+  "RoomSearchModal": {
+    "loadingTitle": "กำลังค้นหาห้องพักที่ว่าง",
+    "loadingSubtitle": "โปรดรอสักครู่",
+    "availableTitle": "พบห้องพักที่ว่าง",
+    "availableCount": "พบห้องพักที่ว่าง {count} รายการ",
+    "emptyTitle": "ไม่พบห้องพักที่ว่างในวันที่เลือก",
+    "emptyMessage": "กรุณาเลือกวันเข้าพักใหม่ หรือติดต่อรีสอร์ทเพื่อสอบถามเพิ่มเติม",
+    "unavailableBadge": "ไม่ว่าง",
+    "fullBadge": "เต็มแล้ว",
+    "errorTitle": "ไม่สามารถค้นหาห้องพักได้ในขณะนี้",
+    "errorMessage": "กรุณาลองใหม่อีกครั้ง หรือติดต่อรีสอร์ทโดยตรง",
+    "retryButton": "ลองใหม่อีกครั้ง",
+    "closeButton": "ปิด",
+    "selectButton": "เลือก",
+    "selectDisabled": "ไม่สามารถเลือกได้",
+    "roomDetails": "รายละเอียดห้องพัก",
+    "pricePerNight": "ต่อคืน",
+    "taxesIncluded": "รวมภาษีและค่าธรรมเนียมแล้ว",
+    "summaryCheckIn": "วันที่เช็คอิน",
+    "summaryNights": "จำนวนคืน",
+    "summaryCurrency": "สกุลเงิน",
+    "validationCheckInRequired": "กรุณาระบุวันที่เช็คอิน",
+    "validationCheckInFormat": "รูปแบบวันที่ไม่ถูกต้อง กรุณาใช้ YYYY-MM-DD",
+    "validationNightsRange": "จำนวนคืนต้องอยู่ระหว่าง {min} ถึง {max} คืน",
+    "technicalGenericSafe": "ไม่สามารถใช้บริการค้นหาห้องพักได้ชั่วคราว",
+    "rateFallback": "เรทราคาที่ดีที่สุด",
+    "unavailableRateFallback": "ไม่พร้อมให้บริการในช่วงวันที่เลือก"
+  },
+  "StatusNotice": {
+    "detailTitle": "รายละเอียดเชิงเทคนิค (เฉพาะโหมดพัฒนา)",
+    "actions": {
+      "retry": "ลองใหม่",
+      "home": "กลับหน้าแรก",
+      "contact": "ติดต่อรีสอร์ท",
+      "close": "ปิด"
+    },
+    "states": {
+      "network_issue": {
+        "title": "ไม่สามารถเชื่อมต่อเครือข่ายได้",
+        "message": "กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ แล้วลองใหม่อีกครั้ง",
+        "help": "หากอินเทอร์เน็ตใช้งานได้ปกติ แต่หน้ายังไม่โหลด กรุณาลองใหม่อีกครั้งในอีกสักครู่"
+      },
+      "temporary_unavailable": {
+        "title": "ไม่สามารถโหลดหน้าของรีสอร์ทนี้ได้ในขณะนี้",
+        "message": "ระบบอาจมีปัญหาชั่วคราว กรุณาลองใหม่อีกครั้งในภายหลัง",
+        "help": "คุณสามารถลองใหม่ได้ทันที หรือกลับไปที่หน้าแรก"
+      },
+      "maintenance": {
+        "title": "ระบบอยู่ระหว่างการปรับปรุง",
+        "message": "ขออภัยในความไม่สะดวก กรุณากลับมาใหม่อีกครั้งในภายหลัง",
+        "help": "เรากำลังอัปเดตระบบเพื่อให้ใช้งานได้ดีขึ้น"
+      },
+      "backend_unavailable": {
+        "title": "ไม่สามารถดึงข้อมูลรีสอร์ทได้ในขณะนี้",
+        "message": "ข้อมูลของรีสอร์ทยังไม่พร้อมใช้งานชั่วคราว กรุณาลองใหม่อีกครั้ง หรือติดต่อรีสอร์ทโดยตรง",
+        "help": "ทีมงานของรีสอร์ทยังสามารถช่วยยืนยันการจองและข้อมูลห้องพักได้"
+      },
+      "not_found": {
+        "title": "ไม่พบหน้าที่คุณต้องการ",
+        "message": "หน้าที่ร้องขออาจถูกย้าย ลบ หรือไม่มีอยู่ในระบบ",
+        "help": "กรุณากลับไปหน้าแรกเพื่อเรียกดูข้อมูลเพิ่มเติม"
+      },
+      "generic_error": {
+        "title": "เกิดข้อผิดพลาดบางอย่าง",
+        "message": "กรุณาลองใหม่อีกครั้ง หากปัญหายังคงอยู่ โปรดติดต่อรีสอร์ท",
+        "help": "หน้านี้ถูกออกแบบให้ปลอดภัยต่อข้อมูลลูกค้าระหว่างที่ระบบกำลังกู้คืน"
+      }
+    }
+  },
+  "HeroBooking": {
+    "checkInLabel": "วันที่เช็คอิน",
+    "nightsLabel": "จำนวนคืนที่เข้าพัก",
+    "searchIdle": "ค้นหาห้องพัก",
+    "searchLoading": "กำลังค้นหาห้องพัก..."
+  }
+}

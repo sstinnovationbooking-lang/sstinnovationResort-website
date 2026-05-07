@@ -1,0 +1,304 @@
+{
+  "Layout": {
+    "brand": "SST Innovation Resort",
+    "contactNav": "Contact",
+    "languageLabel": "Bahasa",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "goHome": "Go to homepage",
+    "callAria": "Call {phone}",
+    "nav": {
+      "home": "Home",
+      "rooms": "Rooms",
+      "activities": "Activities",
+      "about": "About",
+      "contact": "Contact"
+    }
+  },
+  "Metadata": {
+    "siteDefaultTitle": "Resort Multi-tenant Platform",
+    "siteTitleSuffix": "Resort Booking Platform",
+    "defaultDescription": "Multi-tenant resort website with booking flow, BFF APIs, and production-ready architecture.",
+    "tenantFallbackTitle": "Tenant not found",
+    "tenantFallbackDescription": "Tenant data is not available for this route."
+  },
+  "NotFound": {
+    "title": "Tenant Not Found",
+    "description": "Please verify the URL path in the format /site/your-tenant-slug"
+  },
+  "TenantPage": {
+    "serviceUnavailable": "Service is temporarily unavailable. Please try again soon.",
+    "loadErrorTitle": "We could not load this resort page.",
+    "retry": "Retry",
+    "loadingAria": "Loading resort information"
+  },
+  "ResortHome": {
+    "heroImageAria": "{brand} hero image",
+    "highlightTitle": "Highlights",
+    "highlightDescription": "What makes this tenant experience unique.",
+    "highlightsEmpty": "No highlights available right now.",
+    "statsAria": "Key stats",
+    "statsEmpty": "Stats are currently unavailable.",
+    "roomsTitle": "Rooms",
+    "roomsDescription": "Choose the best room style for your stay.",
+    "roomsEmpty": "No rooms are available for your selected stay right now. Please try different dates or contact us.",
+    "perNight": "/ night",
+    "galleryTitle": "Gallery",
+    "galleryEmpty": "Gallery is coming soon.",
+    "contactTitle": "Contact",
+    "phoneLabel": "Phone",
+    "emailLabel": "Email",
+    "lineLabel": "LINE",
+    "countryLabel": "Country",
+    "localTimeLabel": "Local time",
+    "leadFormTitle": "Lead Form",
+    "backToTop": "Back to top",
+    "roomsIntroEyebrow": "Premium comfort for restful nights",
+    "roomsIntroDescription": "Choose the room style that fits your stay, with a relaxing resort atmosphere and practical comfort.",
+    "readMore": "READ MORE",
+    "featuredGalleryAria": "Featured room gallery",
+    "featuredGalleryPrev": "Previous gallery items",
+    "featuredGalleryNext": "Next gallery items",
+    "amenitiesEyebrow": "Our services",
+    "amenitiesHeading": "Hotel amenities",
+    "hotelInfoHeading": "Hotel information",
+    "footerMenuTitle": "Main menu",
+    "footerContactTitle": "Contact information",
+    "footerSystemTitle": "System services",
+    "copyrightPrefix": "?",
+    "copyrightFallback": "All rights reserved.",
+    "nav": {
+      "home": "Home",
+      "rooms": "Rooms",
+      "activities": "Activities",
+      "about": "About",
+      "contact": "Contact"
+    },
+    "featuredGallery": {
+      "deluxe-king": {
+        "title": "Deluxe King Bed",
+        "sizeText": "32 sq.m"
+      },
+      "deluxe-twin": {
+        "title": "Deluxe Twin Bed",
+        "sizeText": "32 sq.m"
+      },
+      "deluxe-triple": {
+        "title": "Deluxe Triple Room",
+        "sizeText": "32 sq.m"
+      }
+    },
+    "roomHighlights": {
+      "deluxe-king-bed": {
+        "title": "DELUXE KING BED",
+        "subtitle": "30 SQUARE METERS OF SPACE",
+        "description": "Deluxe King Bed is a private room, designed for a single guest or a couple. Equipped with a king-sized bed, comfortable bedding, and great amenities."
+      },
+      "deluxe-twin-bed": {
+        "title": "DELUXE TWIN BED",
+        "subtitle": "30 SQUARE METERS OF SPACE",
+        "description": "Deluxe Twin Room is a spacious room with two separate beds. This room is ideal for couples or friends who wish to stay in the same room."
+      },
+      "deluxe-triple-room": {
+        "title": "DELUXE TRIPLE ROOM",
+        "subtitle": "32 SQUARE METERS OF SPACE",
+        "description": "A comfortable room designed for small groups or families, with practical space and relaxing resort-style atmosphere."
+      },
+      "private-villa": {
+        "title": "PRIVATE VILLA",
+        "subtitle": "RELAXING PRIVATE SPACE",
+        "description": "A private villa-style stay with a peaceful atmosphere, ideal for guests who want comfort, privacy, and a premium resort experience."
+      }
+    },
+    "amenitiesItems": {
+      "security": {
+        "title": "Security",
+        "description": "Security system and CCTV coverage for guest peace of mind."
+      },
+      "laundry": {
+        "title": "Laundry service",
+        "description": "Laundry and dry-cleaning service for guest convenience."
+      },
+      "shuttle": {
+        "title": "Shuttle service",
+        "description": "Guest transfer service based on resort conditions."
+      },
+      "wifi": {
+        "title": "Wi-Fi internet",
+        "description": "Wireless internet access in designated guest areas."
+      },
+      "breakfast": {
+        "title": "Breakfast",
+        "description": "Breakfast service based on selected package."
+      },
+      "support": {
+        "title": "Guest support",
+        "description": "Our team is ready to support your stay and provide information."
+      }
+    },
+    "hotelInfoItems": {
+      "check-in": {
+        "title": "Check-in",
+        "description": ""
+      },
+      "check-out": {
+        "title": "Check-out",
+        "description": ""
+      },
+      "minimum-age": {
+        "title": "Minimum check-in age 18",
+        "description": ""
+      },
+      "front-desk": {
+        "title": "Front desk",
+        "description": ""
+      },
+      "pet-policy": {
+        "title": "Pet policy",
+        "description": "Pets are not allowed."
+      },
+      "parking": {
+        "title": "Parking",
+        "description": "Free parking service."
+      }
+    },
+    "staticText": {
+      "forestHeroTitle": "Beautiful resort website with booking flow",
+      "forestHeroSubtitle": "Template for resorts that need a professional website, brand flexibility, and backend integration.",
+      "forestHeroCta": "Start booking request",
+      "lakeHeroEyebrow": "Lakeside resort lifestyle",
+      "lakeHeroTitle": "Lake Serenity Resort\nStay relaxed, enjoy the morning view",
+      "lakeHeroSubtitle": "One template, ready for per-tenant branding.",
+      "lakeHeroCta": "Send stay request",
+      "demoHeroEyebrow": "Demo tenant for preview and QA",
+      "demoHeroTitle": "Demo Resort\nPreview Environment",
+      "demoHeroSubtitle": "This tenant is intended for testing, stakeholder demos, and staging previews.",
+      "demoHeroCta": "Send Demo Lead",
+      "footerDescription": "Resort website with booking flow, multi-owner support, and backend integration.",
+      "systemBooking": "Room booking system",
+      "systemWebsite": "Resort website",
+      "systemMultitenant": "Multi-tenant support",
+      "systemBackend": "Backend integration",
+      "supportHours": "Daily 08:00 - 20:00",
+      "roomGardenVillaName": "Garden Villa",
+      "roomGardenVillaDescription": "A private garden villa, quiet and ideal for couples or small families.",
+      "roomGardenVillaBadge": "Private garden",
+      "roomMountainCabinName": "Mountain Cabin",
+      "roomMountainCabinDescription": "Warm mountain-view cabin with a relaxing private balcony.",
+      "roomMountainCabinBadge": "Mountain view",
+      "roomRiverPoolVillaName": "River Pool Villa",
+      "roomRiverPoolVillaDescription": "Riverside pool villa with private pool, ideal for group trips.",
+      "roomRiverPoolVillaBadge": "Pool villa",
+      "roomLakesideSuiteName": "Lakeside Suite",
+      "roomLakesideSuiteDescription": "Lakeside room with morning mist views and waterside breakfast ambience.",
+      "roomLakesideSuiteBadge": "Lake view",
+      "roomWoodenVillaName": "Wooden Villa",
+      "roomWoodenVillaDescription": "Contemporary wooden villa focused on warmth and privacy.",
+      "roomWoodenVillaBadge": "Wooden villa"
+    }
+  },
+  "LeadForm": {
+    "customerName": "Customer name",
+    "phone": "Phone",
+    "email": "Email",
+    "roomId": "Room ID",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "message": "Message",
+    "placeholderName": "Your full name",
+    "placeholderPhone": "+66 8x-xxx-xxxx",
+    "placeholderEmail": "you@example.com",
+    "placeholderRoomId": "Optional room ID",
+    "placeholderMessage": "Tell us your preferred room and requests...",
+    "submitIdle": "Send booking request",
+    "submitLoading": "Submitting...",
+    "statusReady": "Form status ready.",
+    "validationSummary": "Please fix the validation errors before submitting.",
+    "submitSuccess": "Submitted successfully. Reference ID: {referenceId}",
+    "submitFailed": "Unable to submit booking request",
+    "unexpectedError": "Unexpected error",
+    "errorCustomerNameRequired": "Customer name is required",
+    "errorPhoneRequired": "Phone is required",
+    "errorEmailInvalid": "Email format is invalid",
+    "errorPhoneInvalid": "Phone format is invalid",
+    "errorCheckInInvalid": "Check-in date must be YYYY-MM-DD",
+    "errorCheckOutInvalid": "Check-out date must be YYYY-MM-DD",
+    "errorDateOrder": "Check-out date must be after check-in date",
+    "errorInvalidPayload": "Payload is invalid"
+  },
+  "RoomSearchModal": {
+    "loadingTitle": "Searching available rooms",
+    "loadingSubtitle": "Please wait a moment",
+    "availableTitle": "Available rooms found",
+    "availableCount": "Found {count} available rooms",
+    "emptyTitle": "No rooms available for selected dates",
+    "emptyMessage": "Please choose different check-in dates or contact the resort for assistance.",
+    "unavailableBadge": "Unavailable",
+    "fullBadge": "Sold out",
+    "errorTitle": "We cannot search rooms right now",
+    "errorMessage": "Please try again or contact the resort directly.",
+    "retryButton": "Try again",
+    "closeButton": "Close",
+    "selectButton": "Select",
+    "selectDisabled": "Not selectable",
+    "roomDetails": "Room details",
+    "pricePerNight": "/ night",
+    "taxesIncluded": "Taxes and fees included",
+    "summaryCheckIn": "Check-in date",
+    "summaryNights": "Nights",
+    "summaryCurrency": "Currency",
+    "validationCheckInRequired": "Please select a check-in date.",
+    "validationCheckInFormat": "Invalid date format. Please use YYYY-MM-DD.",
+    "validationNightsRange": "Nights must be between {min} and {max}.",
+    "technicalGenericSafe": "Room search is temporarily unavailable.",
+    "rateFallback": "Best available rate",
+    "unavailableRateFallback": "Not available for selected dates"
+  },
+  "StatusNotice": {
+    "detailTitle": "Technical detail (development only)",
+    "actions": {
+      "retry": "Retry",
+      "home": "Go to homepage",
+      "contact": "Contact resort",
+      "close": "Close"
+    },
+    "states": {
+      "network_issue": {
+        "title": "Network connection is unavailable",
+        "message": "Please check your internet connection and try again.",
+        "help": "If your connection is stable but this page still cannot load, please retry in a moment."
+      },
+      "temporary_unavailable": {
+        "title": "This resort page is temporarily unavailable",
+        "message": "The service may be experiencing a short-term issue. Please try again shortly.",
+        "help": "You can retry now or return to the homepage."
+      },
+      "maintenance": {
+        "title": "This service is under maintenance",
+        "message": "We are currently updating the system. Thank you for your patience.",
+        "help": "Please come back again later."
+      },
+      "backend_unavailable": {
+        "title": "Resort data is temporarily unavailable",
+        "message": "We could not retrieve resort information right now. Please retry or contact the resort directly.",
+        "help": "Support can help confirm booking and room details while the service recovers."
+      },
+      "not_found": {
+        "title": "We can't find this page",
+        "message": "The page may have been moved, removed, or is not available.",
+        "help": "Please return to the homepage and continue browsing from there."
+      },
+      "generic_error": {
+        "title": "Something went wrong",
+        "message": "Please try again. If this continues, contact the resort for help.",
+        "help": "This notice keeps your information safe while we recover the page."
+      }
+    }
+  },
+  "HeroBooking": {
+    "checkInLabel": "Check-in date",
+    "nightsLabel": "Length of stay (nights)",
+    "searchIdle": "Search rooms",
+    "searchLoading": "Searching rooms..."
+  }
+}

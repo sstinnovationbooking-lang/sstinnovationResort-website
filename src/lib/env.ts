@@ -27,3 +27,11 @@ export function getBackendApiBaseUrl(): string {
 export function getBackendApiSecret(): string {
   return String(process.env.BACKEND_API_SECRET ?? "").trim();
 }
+
+export function getCentralApiBaseUrl(): string {
+  return String(process.env.CENTRAL_API_BASE_URL ?? "").trim();
+}
+
+export function getCentralApiSecret(): string {
+  return String(process.env.CENTRAL_API_SECRET ?? "").trim();
+}

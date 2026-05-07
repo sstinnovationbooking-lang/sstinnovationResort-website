@@ -1,7 +1,8 @@
 import type { ContentAdapter } from "@/lib/content/types";
 import { sanitizeSiteHomeDTO } from "@/lib/dto/normalize";
 import { getDefaultTenantSlug } from "@/lib/env";
-import type { ApiErrorDTO, LeadRequestDTO, LeadResponseDTO, RoomCardDTO, SiteHomeDTO } from "@/lib/types/site";
+import { toRoomSearchQueryString } from "@/lib/search/room-search";
+import type { ApiErrorDTO, LeadRequestDTO, LeadResponseDTO, RoomCardDTO, RoomSearchCriteria, SiteHomeDTO } from "@/lib/types/site";
 
 interface ApiContentAdapterOptions {
   basePath?: string;
@@ -12,8 +13,16 @@ function normalizeTenantSlug(tenantSlug?: string | null): string {
   return normalized || getDefaultTenantSlug();
 }
 
-function buildApiPath(basePath: string, tenantSlug: string, resource: "home" | "rooms" | "leads"): string {
-  return `${basePath}/api/site/${encodeURIComponent(tenantSlug)}/${resource}`;
+function buildApiPath(
+  basePath: string,
+  tenantSlug: string,
+  resource: "home" | "rooms" | "leads",
+  criteria?: RoomSearchCriteria
+): string {
+  const base = `${basePath}/api/site/${encodeURIComponent(tenantSlug)}/${resource}`;
+  if (resource !== "rooms") return base;
+  const query = toRoomSearchQueryString(criteria);
+  return query ? `${base}?${query}` : base;
 }
 
 async function parseJsonOrThrow<T>(response: Response): Promise<T> {
@@ -58,10 +67,10 @@ export class ApiContentAdapter implements ContentAdapter {
     }
   }
 
-  async getRooms(tenantSlug?: string | null): Promise<RoomCardDTO[]> {
+  async getRooms(tenantSlug?: string | null, criteria?: RoomSearchCriteria): Promise<RoomCardDTO[]> {
     try {
       const slug = normalizeTenantSlug(tenantSlug);
-      const response = await fetch(buildApiPath(this.basePath, slug, "rooms"), {
+      const response = await fetch(buildApiPath(this.basePath, slug, "rooms", criteria), {
         method: "GET",
         cache: "no-store"
       });

@@ -1,28 +1,36 @@
 import type { Metadata } from "next";
+import { createTranslator, NextIntlClientProvider } from "next-intl";
+import { cookies } from "next/headers";
 import type { ReactNode } from "react";
+
+import { LOCALE_COOKIE_NAME, LOCALE_TO_BCP47 } from "@/i18n/config";
+import { loadMessages } from "@/i18n/messages";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: {
-    default: "Resort Multi-tenant Platform",
-    template: "%s | Resort Platform"
-  },
-  description: "Production-ready Next.js 16 multi-tenant resort website with BFF architecture."
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const cookieStore = await cookies();
+  const localeFromCookie = cookieStore.get(LOCALE_COOKIE_NAME)?.value;
+  const { locale, messages } = await loadMessages(localeFromCookie);
+  const t = createTranslator({ locale, messages, namespace: "Metadata" });
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  return {
+    title: {
+      default: t("siteDefaultTitle"),
+      template: `%s | ${t("siteTitleSuffix")}`
+    },
+    description: t("defaultDescription")
+  };
+}
+
+export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const cookieStore = await cookies();
+  const localeFromCookie = cookieStore.get(LOCALE_COOKIE_NAME)?.value;
+  const { locale, messages } = await loadMessages(localeFromCookie);
+
   return (
-    <html lang="en">
+    <html lang={LOCALE_TO_BCP47[locale]} suppressHydrationWarning>
       <body>
-        <header className="site-header">
-          <div className="shell header-row">
-            <div className="brand">SST Innovation Resort</div>
-            <nav>
-              <a href="#contact">Contact</a>
-            </nav>
-          </div>
-        </header>
-        {children}
+        <NextIntlClientProvider locale={locale} messages={messages}>{children}</NextIntlClientProvider>
       </body>
     </html>
   );

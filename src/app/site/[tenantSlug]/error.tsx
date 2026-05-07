@@ -1,18 +1,28 @@
 "use client";
 
+import { useParams } from "next/navigation";
+
+import { StatusNoticePage } from "@/components/status-notice-page";
+import { classifyStatusFromError, safeDevErrorDetail } from "@/lib/status-notice";
+
 interface TenantErrorPageProps {
   error: Error;
   reset: () => void;
 }
 
 export default function TenantErrorPage({ error, reset }: TenantErrorPageProps) {
+  const params = useParams<{ tenantSlug?: string }>();
+  const tenantSlug = String(params?.tenantSlug ?? "").trim().toLowerCase() || undefined;
+  const status = classifyStatusFromError(error);
+  const detail = safeDevErrorDetail(error);
+
   return (
-    <main className="shell section page-error" role="alert">
-      <h1>We could not load this resort page.</h1>
-      <p>{error.message || "Please try again in a moment."}</p>
-      <button className="btn btn-primary" onClick={reset} type="button">
-        Retry
-      </button>
-    </main>
+    <StatusNoticePage
+      detail={detail}
+      primaryAction={{ action: "retry", onClick: reset }}
+      secondaryAction={{ action: "home" }}
+      status={status}
+      tenantSlug={tenantSlug}
+    />
   );
 }

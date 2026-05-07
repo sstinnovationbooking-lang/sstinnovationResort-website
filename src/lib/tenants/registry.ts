@@ -9,18 +9,24 @@ const TENANTS: TenantRegistryItem[] = [
     tenantSlug: "forest-escape",
     brand: "Forest Escape Resort",
     locale: "th",
+    ownerId: "owner-sst-group",
+    resortId: "resort-forest-escape",
     hosts: ["forest-escape.resort.local", "forestescape.example.com"]
   },
   {
     tenantSlug: "lake-serenity",
     brand: "Lake Serenity Resort",
     locale: "th",
+    ownerId: "owner-lake-hospitality",
+    resortId: "resort-lake-serenity",
     hosts: ["lake-serenity.resort.local", "lakeserenity.example.com"]
   },
   {
     tenantSlug: "demo-resort",
     brand: "Demo Resort",
     locale: "en",
+    ownerId: "owner-demo",
+    resortId: "resort-demo",
     hosts: ["demo-resort.resort.local"]
   }
 ];

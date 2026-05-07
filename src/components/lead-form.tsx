@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { sanitizeLeadPayload, validateLeadPayload } from "@/lib/dto/lead";
 import type { ApiErrorDTO } from "@/lib/types/site";
@@ -17,14 +18,30 @@ function hasFieldError(errors: string[], fieldName: FieldName): boolean {
 }
 
 export function LeadForm({ tenantSlug }: LeadFormProps) {
+  const t = useTranslations("LeadForm");
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState<string>("");
   const [errors, setErrors] = useState<string[]>([]);
 
   const submitLabel = useMemo(() => {
-    if (state === "submitting") return "Submitting...";
-    return "Send booking request";
-  }, [state]);
+    if (state === "submitting") return t("submitLoading");
+    return t("submitIdle");
+  }, [state, t]);
+
+  function toLocalizedError(error: string): string {
+    const normalized = error.toLowerCase();
+
+    if (normalized.includes("customername is required")) return t("errorCustomerNameRequired");
+    if (normalized.includes("phone is required")) return t("errorPhoneRequired");
+    if (normalized.includes("email format is invalid")) return t("errorEmailInvalid");
+    if (normalized.includes("phone format is invalid")) return t("errorPhoneInvalid");
+    if (normalized.includes("checkin format must be yyyy-mm-dd")) return t("errorCheckInInvalid");
+    if (normalized.includes("checkout format must be yyyy-mm-dd")) return t("errorCheckOutInvalid");
+    if (normalized.includes("checkout must be after checkin")) return t("errorDateOrder");
+    if (normalized.includes("invalid payload")) return t("errorInvalidPayload");
+
+    return t("unexpectedError");
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -49,7 +66,7 @@ export function LeadForm({ tenantSlug }: LeadFormProps) {
     if (localErrors.length > 0) {
       setState("error");
       setErrors(localErrors);
-      setMessage("Please fix the validation errors before submitting.");
+      setMessage(t("validationSummary"));
       return;
     }
 
@@ -68,90 +85,107 @@ export function LeadForm({ tenantSlug }: LeadFormProps) {
         const responseErrors =
           "details" in data && Array.isArray(data.details) ? data.details.filter((item) => !!item) : [];
         setErrors(responseErrors);
-        const errorMessage = "error" in data ? data.error : "Unable to submit booking request";
+        const errorMessage = "error" in data ? toLocalizedError(data.error) : t("submitFailed");
         throw new Error(errorMessage);
       }
 
       setState("success");
-      setMessage(`Submitted successfully. Reference ID: ${data.referenceId}`);
+      setMessage(t("submitSuccess", { referenceId: String(data.referenceId ?? "-") }));
       form.reset();
     } catch (error) {
       setState("error");
-      setMessage(error instanceof Error ? error.message : "Unexpected error");
+      setMessage(error instanceof Error ? toLocalizedError(error.message) : t("unexpectedError"));
     }
   }
 
   return (
-    <form aria-describedby="lead-form-status" className="lead-form" noValidate onSubmit={onSubmit}>
+    <form
+      aria-describedby="lead-form-status"
+      className="lead-form"
+      data-submit-state={state}
+      noValidate
+      onSubmit={onSubmit}
+    >
       <div className="lead-grid">
         <label htmlFor="lead-customer-name">
-          Customer name
+          {t("customerName")}
           <input
             aria-invalid={hasFieldError(errors, "customerName")}
             autoComplete="name"
             id="lead-customer-name"
             name="customerName"
-            placeholder="Your full name"
+            placeholder={t("placeholderName")}
             required
             type="text"
           />
         </label>
         <label htmlFor="lead-phone">
-          Phone
+          {t("phone")}
           <input
             aria-invalid={hasFieldError(errors, "phone")}
             autoComplete="tel"
             id="lead-phone"
             name="phone"
-            placeholder="+66 8x-xxx-xxxx"
+            placeholder={t("placeholderPhone")}
             required
             type="tel"
           />
         </label>
         <label htmlFor="lead-email">
-          Email
+          {t("email")}
           <input
             aria-invalid={hasFieldError(errors, "email")}
             autoComplete="email"
             id="lead-email"
             name="email"
-            placeholder="you@example.com"
+            placeholder={t("placeholderEmail")}
             type="email"
           />
         </label>
         <label htmlFor="lead-room-id">
-          Room ID
-          <input aria-invalid={hasFieldError(errors, "roomId")} id="lead-room-id" name="roomId" placeholder="Optional room ID" type="text" />
+          {t("roomId")}
+          <input
+            aria-invalid={hasFieldError(errors, "roomId")}
+            id="lead-room-id"
+            name="roomId"
+            placeholder={t("placeholderRoomId")}
+            type="text"
+          />
         </label>
         <label htmlFor="lead-checkin">
-          Check-in
+          {t("checkIn")}
           <input aria-invalid={hasFieldError(errors, "checkIn")} id="lead-checkin" name="checkIn" type="date" />
         </label>
         <label htmlFor="lead-checkout">
-          Check-out
+          {t("checkOut")}
           <input aria-invalid={hasFieldError(errors, "checkOut")} id="lead-checkout" name="checkOut" type="date" />
         </label>
       </div>
       <label htmlFor="lead-message">
-        Message
-        <textarea id="lead-message" name="message" placeholder="Tell us your preferred room and requests..." rows={4} />
+        {t("message")}
+        <textarea id="lead-message" name="message" placeholder={t("placeholderMessage")} rows={4} />
       </label>
       <button className="btn btn-primary" disabled={state === "submitting"} type="submit">
         {submitLabel}
       </button>
       {message ? (
-        <p className={state === "success" ? "lead-success" : "lead-error"} id="lead-form-status" role="status">
+        <p
+          aria-live={state === "error" ? "assertive" : "polite"}
+          className={state === "success" ? "lead-notice lead-notice-success" : "lead-notice lead-notice-error"}
+          id="lead-form-status"
+          role={state === "error" ? "alert" : "status"}
+        >
           {message}
         </p>
       ) : (
         <p className="visually-hidden" id="lead-form-status">
-          Form status ready.
+          {t("statusReady")}
         </p>
       )}
       {errors.length > 0 ? (
         <ul aria-live="polite" className="lead-errors">
           {errors.map((error) => (
-            <li key={error}>{error}</li>
+            <li key={error}>{toLocalizedError(error)}</li>
           ))}
         </ul>
       ) : null}

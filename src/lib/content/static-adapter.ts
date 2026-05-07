@@ -4,7 +4,7 @@ import { getDefaultTenantSlug } from "@/lib/env";
 import { getStaticHomeByTenant, getStaticRoomsByTenant } from "@/lib/tenants/static-content";
 import { getTenantBySlug } from "@/lib/tenants/registry";
 import type { ContentAdapter } from "@/lib/content/types";
-import type { LeadRequestDTO } from "@/lib/types/site";
+import type { LeadRequestDTO, RoomSearchCriteria } from "@/lib/types/site";
 
 function normalizeTenantSlug(tenantSlug?: string | null): string {
   const normalized = String(tenantSlug ?? "").trim().toLowerCase();
@@ -27,9 +27,13 @@ export class StaticContentAdapter implements ContentAdapter {
     return sanitizeSiteHomeDTO(data);
   }
 
-  async getRooms(tenantSlug?: string | null) {
+  async getRooms(tenantSlug?: string | null, criteria?: RoomSearchCriteria) {
     const resolvedTenantSlug = resolveStaticTenantSlug(tenantSlug);
-    return getStaticRoomsByTenant(resolvedTenantSlug);
+    const rooms = getStaticRoomsByTenant(resolvedTenantSlug);
+
+    // Static mode keeps mock data simple while preserving backend-compatible query shape.
+    if (!criteria?.nights || criteria.nights <= 3) return rooms;
+    return [...rooms].sort((a, b) => a.nightlyPriceTHB - b.nightlyPriceTHB);
   }
 
   async submitLead(tenantSlug: string | null | undefined, payload: LeadRequestDTO) {

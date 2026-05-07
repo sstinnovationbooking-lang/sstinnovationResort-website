@@ -1,12 +1,21 @@
 import type { Metadata } from "next";
+import { createTranslator } from "next-intl";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { ResortHome } from "@/components/resort-home";
+import { StatusNoticePage } from "@/components/status-notice-page";
+import {
+  LOCALE_QUERY_PARAM,
+  LOCALE_TO_BCP47,
+  SUPPORTED_LOCALES,
+  resolveLocaleFromCookieHeader
+} from "@/i18n/config";
+import { loadMessages } from "@/i18n/messages";
 import { getContentAdapter } from "@/lib/content/get-adapter";
+import { classifyStatusFromError, safeDevErrorDetail } from "@/lib/status-notice";
 import { resolveTenant } from "@/lib/tenant-resolver";
-import { listTenantSlugs } from "@/lib/tenants/registry";
-import type { RoomCardDTO, SiteHomeDTO } from "@/lib/types/site";
+import type { SiteHomeDTO } from "@/lib/types/site";
 
 interface PageProps {
   params: Promise<{ tenantSlug: string }>;
@@ -38,13 +47,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { tenantSlug } = await params;
   const isDemoTenant = isDemoTenantSlug(tenantSlug);
   const headerStore = await headers();
+  const localeFromCookie = resolveLocaleFromCookieHeader(headerStore.get("cookie"));
+  const { locale, messages } = await loadMessages(localeFromCookie);
+  const mt = createTranslator({ locale, messages, namespace: "Metadata" });
   const rawHost = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
   const tenant = resolveTenant({ rawHost, tenantSlug, enforceHostTenant: true });
 
   if (!tenant) {
     return {
-      title: "Tenant not found",
-      description: "Tenant does not exist for this route.",
+      title: mt("tenantFallbackTitle"),
+      description: mt("tenantFallbackDescription"),
       robots: { index: false, follow: false }
     };
   }
@@ -52,21 +64,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   try {
     const adapter = getContentAdapter({ basePath: getBasePathFromHeaders(headerStore) });
     const home = await adapter.getSiteHome(tenantSlug);
-    const title = `${home.tenant.brand} | Resort Booking`;
-    const description = home.hero.subtitle;
+    const title = `${home.tenant.brand} | ${mt("siteTitleSuffix")}`;
+    const description = home.hero.subtitle || mt("defaultDescription");
     const canonicalPath = `/site/${home.tenant.tenantSlug}`;
     const metadataBase = inferMetadataBase(rawHost);
+    const languageAlternates = Object.fromEntries(
+      SUPPORTED_LOCALES.map((item) => [item, `${canonicalPath}?${LOCALE_QUERY_PARAM}=${item}`])
+    );
 
     return {
       title,
       description,
       metadataBase,
-      alternates: { canonical: canonicalPath },
+      alternates: { canonical: canonicalPath, languages: languageAlternates },
       openGraph: {
         title,
         description,
         url: canonicalPath,
         type: "website",
+        locale: LOCALE_TO_BCP47[locale],
         images: [{ url: home.hero.heroImageUrl }]
       },
       twitter: {
@@ -79,20 +95,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   } catch {
     return {
-      title: `${tenant.brand} | Resort Booking`,
-      description: `Explore ${tenant.brand} resort information and booking.`,
+      title: `${tenant.brand} | ${mt("siteTitleSuffix")}`,
+      description: mt("defaultDescription"),
       robots: { index: !isDemoTenant, follow: !isDemoTenant }
     };
   }
 }
 
-export function generateStaticParams() {
-  return listTenantSlugs().map((tenantSlug) => ({ tenantSlug }));
-}
-
 export default async function TenantPage({ params }: PageProps) {
   const { tenantSlug } = await params;
   const headerStore = await headers();
+  const localeFromCookie = resolveLocaleFromCookieHeader(headerStore.get("cookie"));
+  const { locale, messages } = await loadMessages(localeFromCookie);
+  const t = createTranslator({ locale, messages, namespace: "TenantPage" });
   const tenant = resolveTenant({
     rawHost: headerStore.get("x-forwarded-host") ?? headerStore.get("host"),
     tenantSlug,
@@ -102,27 +117,32 @@ export default async function TenantPage({ params }: PageProps) {
   if (!tenant) notFound();
 
   let homeData: SiteHomeDTO | null = null;
-  let roomsData: RoomCardDTO[] = [];
-  let fallbackMessage: string | null = null;
+  let fallbackError: unknown = null;
 
   try {
     const adapter = getContentAdapter({ basePath: getBasePathFromHeaders(headerStore) });
-    const [home, rooms] = await Promise.all([adapter.getSiteHome(tenantSlug), adapter.getRooms(tenantSlug)]);
-    homeData = home;
-    roomsData = rooms;
+    homeData = await adapter.getSiteHome(tenantSlug);
   } catch (error) {
-    fallbackMessage =
-      error instanceof Error ? error.message : "Service is temporarily unavailable. Please try again soon.";
+    fallbackError = error;
   }
 
   if (!homeData) {
+    const status = classifyStatusFromError(fallbackError ?? t("serviceUnavailable"));
+    const detail = safeDevErrorDetail(fallbackError);
     return (
-      <main className="shell section page-error" role="alert">
-        <h1>{tenant.brand}</h1>
-        <p>{fallbackMessage ?? "Service is temporarily unavailable. Please try again soon."}</p>
-      </main>
+      <StatusNoticePage
+        detail={detail}
+        status={status}
+        tenantBrand={tenant.brand}
+        tenantSlug={tenant.tenantSlug}
+      />
     );
   }
 
-  return <ResortHome home={homeData} rooms={roomsData} />;
+  return (
+    <ResortHome
+      home={homeData}
+      navbar={homeData.ui?.navbar}
+    />
+  );
 }
