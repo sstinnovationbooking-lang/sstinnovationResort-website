@@ -95,6 +95,26 @@ jobs:
           node --version
           npm --version
 
+      - name: Verify Vercel token and project access
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx vercel --version
+          npx vercel whoami --token="$VERCEL_TOKEN"
+
+          HTTP_STATUS="$(curl -sS -o /tmp/vercel_project_check.json -w "%{http_code}" \
+            -H "Authorization: Bearer $VERCEL_TOKEN" \
+            "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID?teamId=$VERCEL_ORG_ID")"
+
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::Vercel project access check failed (HTTP $HTTP_STATUS)."
+            echo "::error::Ensure token has access to team '$VERCEL_ORG_ID' and project '$VERCEL_PROJECT_ID'."
+            cat /tmp/vercel_project_check.json || true
+            exit 1
+          fi
+
+          echo "::notice::Vercel token can access org/project successfully."
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
