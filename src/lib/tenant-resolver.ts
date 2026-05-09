@@ -76,7 +76,12 @@ export function resolveTenant(input: ResolveTenantInput): TenantContext | null {
   if (requestedSlug) {
     if (!isKnownTenantSlug(requestedSlug)) return null;
 
-    if (input.enforceHostTenant && hostTenantSlug && requestedSlug !== hostTenantSlug) {
+    if (
+      input.enforceHostTenant &&
+      hostTenantSlug &&
+      isKnownTenantSlug(hostTenantSlug) &&
+      requestedSlug !== hostTenantSlug
+    ) {
       return null;
     }
 
