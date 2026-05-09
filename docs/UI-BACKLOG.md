@@ -1,6 +1,6 @@
 # UI Backlog (Website First)
 
-Last updated: 2026-05-07
+Last updated: 2026-05-08
 
 ## In Progress
 - Keep visual direction consistent across tenants while allowing tenant branding.
@@ -15,6 +15,11 @@ Last updated: 2026-05-07
 - Round update (2026-05-07): added homepage alternating Room Highlights section (up to 4 blocks) between Rooms intro and Featured Room Gallery.
 - Round update (2026-05-07): added Navbar phone contact item after language selector with responsive compact/icon-only behavior.
 - Round update (2026-05-07): completed full i18n language switching across all supported locales with key parity and safe locale fallback behavior.
+- Round update (2026-05-08): homepage oversized Gallery section replaced with compact Activities cards grid (max 6) using structured `homepage.activities` content fallback flow.
+- Round update (2026-05-08): Activities i18n missing-key issue addressed by adding required nested `ResortHome.activities.*` keys with legacy-key compatibility fallback in the Activities component.
+- Round update (2026-05-08): homepage language stabilization pass added localized tenant text resolution support and safe locale fallback behavior (`selected -> th -> en`) for homepage content rendering.
+- Round update (2026-05-08): active website language selector options temporarily reduced to Thai and English only, with unsupported persisted locales auto-reset to Thai default.
+- Round update (2026-05-08): completed Thai homepage UI localization parity for `ResortHome` nav/section labels and media modal controls to ensure full two-language switching consistency.
 
 ## TODO (Short Term)
 - [ ] Navbar

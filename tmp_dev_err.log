@@ -1,0 +1,7 @@
+Error: ENOTEMPTY: directory not empty, rmdir 'E:\sstinnovationResort-website\.next\dev\logs'
+    at ignore-listed frames {
+  errno: -4051,
+  code: 'ENOTEMPTY',
+  syscall: 'rmdir',
+  path: 'E:\\sstinnovationResort-website\\.next\\dev\\logs'
+}

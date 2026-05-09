@@ -5,15 +5,64 @@ import {
   getCentralApiSecret,
   getContentMode
 } from "@/lib/env";
-import { isValidSiteFooter } from "@/lib/content/footer";
+import {
+  hasConfiguredFooterCopyright,
+  hasConfiguredFooterSocialLinks,
+  isValidSiteFooter
+} from "@/lib/content/footer";
+import { isValidSiteContact } from "@/lib/content/site-contact";
+import { isValidHomepageActivities } from "@/lib/content/homepage-activities";
 import { isValidHomepageAmenities } from "@/lib/content/homepage-amenities";
 import { isValidHomepageHotelInfo } from "@/lib/content/homepage-hotel-info";
 import { isValidHomepageRoomHighlights } from "@/lib/content/homepage-room-highlights";
 import { isValidRoomsFeaturedGallery } from "@/lib/content/rooms-featured-gallery";
 import { isValidRoomsIntro } from "@/lib/content/rooms-intro";
+import { sanitizeRoomsPayload } from "@/lib/content/rooms";
 import { toRoomSearchQueryString } from "@/lib/search/room-search";
-import { getStaticHomeByTenant } from "@/lib/tenants/static-content";
-import type { LeadRequestDTO, LeadResponseDTO, RoomCardDTO, RoomSearchCriteria, SiteHomeDTO, TenantContext } from "@/lib/types/site";
+import { getStaticHomeByTenant, getStaticRoomsByTenant } from "@/lib/tenants/static-content";
+import type {
+  LeadRequestDTO,
+  LeadResponseDTO,
+  RoomCardDTO,
+  RoomSearchCriteria,
+  SiteFooterDTO,
+  SiteHomeDTO,
+  TenantContext
+} from "@/lib/types/site";
+
+function resolveFooterSocialLinks(
+  primaryFooter: SiteFooterDTO | undefined,
+  centralFooter: SiteFooterDTO | undefined,
+  staticFooter: SiteFooterDTO | undefined
+): SiteFooterDTO | undefined {
+  if (!primaryFooter) return primaryFooter;
+  if (hasConfiguredFooterSocialLinks(primaryFooter.socialLinks)) return primaryFooter;
+
+  if (centralFooter && hasConfiguredFooterSocialLinks(centralFooter.socialLinks)) {
+    return { ...primaryFooter, socialLinks: centralFooter.socialLinks };
+  }
+  if (staticFooter && hasConfiguredFooterSocialLinks(staticFooter.socialLinks)) {
+    return { ...primaryFooter, socialLinks: staticFooter.socialLinks };
+  }
+  return primaryFooter;
+}
+
+function resolveFooterCopyright(
+  primaryFooter: SiteFooterDTO | undefined,
+  centralFooter: SiteFooterDTO | undefined,
+  staticFooter: SiteFooterDTO | undefined
+): SiteFooterDTO | undefined {
+  if (!primaryFooter) return primaryFooter;
+  if (hasConfiguredFooterCopyright(primaryFooter.copyright)) return primaryFooter;
+
+  if (centralFooter && hasConfiguredFooterCopyright(centralFooter.copyright)) {
+    return { ...primaryFooter, copyright: centralFooter.copyright };
+  }
+  if (staticFooter && hasConfiguredFooterCopyright(staticFooter.copyright)) {
+    return { ...primaryFooter, copyright: staticFooter.copyright };
+  }
+  return primaryFooter;
+}
 
 function mustBackendBaseUrl(): string {
   const value = getBackendApiBaseUrl();
@@ -60,6 +109,28 @@ async function fetchHomeFromBaseUrl(baseUrl: string, tenant: TenantContext, secr
   return parseJsonResponse<SiteHomeDTO>(response);
 }
 
+async function fetchRoomsFromBaseUrl(
+  baseUrl: string,
+  tenant: TenantContext,
+  secret: string,
+  criteria?: RoomSearchCriteria
+): Promise<RoomCardDTO[]> {
+  const query = toRoomSearchQueryString(criteria);
+  const response = await fetch(`${baseUrl}/site/rooms${query ? `?${query}` : ""}`, {
+    method: "GET",
+    headers: buildHeaders(tenant, secret),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(`Backend API error ${response.status}: ${message || "unknown error"}`);
+  }
+
+  const payload: unknown = await response.json().catch(() => []);
+  return sanitizeRoomsPayload(payload, tenant);
+}
+
 export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeDTO> {
   const backendBaseUrl = mustBackendBaseUrl();
   const backendSecret = getBackendApiSecret();
@@ -69,26 +140,34 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
 
   try {
     const backendHome = await fetchHomeFromBaseUrl(backendBaseUrl, tenant, backendSecret);
+    const needsActivitiesFallback = !isValidHomepageActivities(backendHome.homepageActivities);
     const needsAmenitiesFallback = !isValidHomepageAmenities(backendHome.homepageAmenities);
     const needsHotelInfoFallback = !isValidHomepageHotelInfo(backendHome.homepageHotelInfo);
     const needsRoomHighlightsFallback = !isValidHomepageRoomHighlights(backendHome.homepageRoomHighlights);
     const needsRoomsIntroFallback = !isValidRoomsIntro(backendHome.roomsIntro);
     const needsRoomsFeaturedGalleryFallback = !isValidRoomsFeaturedGallery(backendHome.roomsFeaturedGallery);
     const needsFooterFallback = !isValidSiteFooter(backendHome.footer);
+    const needsContactFallback = !isValidSiteContact(backendHome.contact);
 
     if (
       !centralBaseUrl ||
       (
+        !needsActivitiesFallback &&
         !needsAmenitiesFallback &&
         !needsHotelInfoFallback &&
         !needsRoomHighlightsFallback &&
         !needsRoomsIntroFallback &&
         !needsRoomsFeaturedGalleryFallback &&
-        !needsFooterFallback
+        !needsFooterFallback &&
+        !needsContactFallback
       )
     ) {
       return {
         ...backendHome,
+        homepageActivities:
+          needsActivitiesFallback && isValidHomepageActivities(staticHome?.homepageActivities)
+            ? staticHome?.homepageActivities
+            : backendHome.homepageActivities,
         homepageAmenities:
           needsAmenitiesFallback && isValidHomepageAmenities(staticHome?.homepageAmenities)
             ? staticHome?.homepageAmenities
@@ -104,7 +183,22 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
         roomsFeaturedGallery:
           needsRoomsFeaturedGalleryFallback && isValidRoomsFeaturedGallery(staticHome?.roomsFeaturedGallery)
             ? staticHome?.roomsFeaturedGallery
-            : backendHome.roomsFeaturedGallery
+            : backendHome.roomsFeaturedGallery,
+        footer: needsFooterFallback && isValidSiteFooter(staticHome?.footer)
+          ? staticHome?.footer
+          : resolveFooterCopyright(
+            resolveFooterSocialLinks(
+              backendHome.footer,
+              undefined,
+              staticHome?.footer
+            ),
+            undefined,
+            staticHome?.footer
+          ),
+        contact:
+          needsContactFallback && staticHome && isValidSiteContact(staticHome.contact)
+            ? staticHome.contact
+            : backendHome.contact
       };
     }
 
@@ -112,6 +206,12 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
       const centralHome = await fetchHomeFromBaseUrl(centralBaseUrl, tenant, centralSecret);
       return {
         ...backendHome,
+        homepageActivities:
+          needsActivitiesFallback && isValidHomepageActivities(centralHome.homepageActivities)
+            ? centralHome.homepageActivities
+            : needsActivitiesFallback && isValidHomepageActivities(staticHome?.homepageActivities)
+              ? staticHome?.homepageActivities
+              : backendHome.homepageActivities,
         homepageAmenities:
           needsAmenitiesFallback && isValidHomepageAmenities(centralHome.homepageAmenities)
             ? centralHome.homepageAmenities
@@ -139,9 +239,23 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
             : needsRoomsFeaturedGalleryFallback && isValidRoomsFeaturedGallery(staticHome?.roomsFeaturedGallery)
               ? staticHome?.roomsFeaturedGallery
             : backendHome.roomsFeaturedGallery,
-        footer: needsFooterFallback && isValidSiteFooter(centralHome.footer)
-          ? centralHome.footer
-          : backendHome.footer
+        footer: resolveFooterCopyright(
+          resolveFooterSocialLinks(
+            needsFooterFallback && isValidSiteFooter(centralHome.footer)
+              ? centralHome.footer
+              : backendHome.footer,
+            centralHome.footer,
+            staticHome?.footer
+          ),
+          centralHome.footer,
+          staticHome?.footer
+        ),
+        contact:
+          needsContactFallback && isValidSiteContact(centralHome.contact)
+            ? centralHome.contact
+            : needsContactFallback && staticHome && isValidSiteContact(staticHome.contact)
+              ? staticHome.contact
+              : backendHome.contact
       };
     } catch {
       // Keep backend home payload; fallback defaults will be sanitized in DTO normalization.
@@ -149,6 +263,10 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
 
     return {
       ...backendHome,
+      homepageActivities:
+        needsActivitiesFallback && isValidHomepageActivities(staticHome?.homepageActivities)
+          ? staticHome?.homepageActivities
+          : backendHome.homepageActivities,
       homepageAmenities:
         needsAmenitiesFallback && isValidHomepageAmenities(staticHome?.homepageAmenities)
           ? staticHome?.homepageAmenities
@@ -164,7 +282,22 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
       roomsFeaturedGallery:
         needsRoomsFeaturedGalleryFallback && isValidRoomsFeaturedGallery(staticHome?.roomsFeaturedGallery)
           ? staticHome?.roomsFeaturedGallery
-          : backendHome.roomsFeaturedGallery
+          : backendHome.roomsFeaturedGallery,
+      footer: needsFooterFallback && isValidSiteFooter(staticHome?.footer)
+        ? staticHome?.footer
+        : resolveFooterCopyright(
+          resolveFooterSocialLinks(
+            backendHome.footer,
+            undefined,
+            staticHome?.footer
+          ),
+          undefined,
+          staticHome?.footer
+        ),
+      contact:
+        needsContactFallback && staticHome && isValidSiteContact(staticHome.contact)
+          ? staticHome.contact
+          : backendHome.contact
     };
   } catch (backendError) {
     if (!centralBaseUrl) {
@@ -175,6 +308,12 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
       const centralHome = await fetchHomeFromBaseUrl(centralBaseUrl, tenant, centralSecret);
       return {
         ...centralHome,
+        homepageActivities:
+          isValidHomepageActivities(centralHome.homepageActivities)
+            ? centralHome.homepageActivities
+            : isValidHomepageActivities(staticHome?.homepageActivities)
+              ? staticHome?.homepageActivities
+              : centralHome.homepageActivities,
         homepageAmenities:
           isValidHomepageAmenities(centralHome.homepageAmenities)
             ? centralHome.homepageAmenities
@@ -198,7 +337,26 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
             ? centralHome.roomsFeaturedGallery
             : isValidRoomsFeaturedGallery(staticHome?.roomsFeaturedGallery)
               ? staticHome?.roomsFeaturedGallery
-              : centralHome.roomsFeaturedGallery
+              : centralHome.roomsFeaturedGallery,
+        footer: isValidSiteFooter(centralHome.footer)
+          ? resolveFooterCopyright(
+            resolveFooterSocialLinks(
+              centralHome.footer,
+              undefined,
+              staticHome?.footer
+            ),
+            undefined,
+            staticHome?.footer
+          )
+          : isValidSiteFooter(staticHome?.footer)
+            ? staticHome?.footer
+            : centralHome.footer,
+        contact:
+          isValidSiteContact(centralHome.contact)
+            ? centralHome.contact
+            : staticHome && isValidSiteContact(staticHome.contact)
+              ? staticHome.contact
+              : centralHome.contact
       };
     } catch (centralError) {
       const backendMessage = backendError instanceof Error ? backendError.message : "primary backend unavailable";
@@ -209,15 +367,28 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
 }
 
 export async function fetchBackendRooms(tenant: TenantContext, criteria?: RoomSearchCriteria): Promise<RoomCardDTO[]> {
-  const baseUrl = mustBackendBaseUrl();
-  const secret = getBackendApiSecret();
-  const query = toRoomSearchQueryString(criteria);
-  const response = await fetch(`${baseUrl}/site/rooms${query ? `?${query}` : ""}`, {
-    method: "GET",
-    headers: buildHeaders(tenant, secret),
-    cache: "no-store"
-  });
-  return parseJsonResponse<RoomCardDTO[]>(response);
+  const backendBaseUrl = mustBackendBaseUrl();
+  const backendSecret = getBackendApiSecret();
+  const centralBaseUrl = normalizeOptionalBaseUrl(getCentralApiBaseUrl());
+  const centralSecret = getCentralApiSecret() || backendSecret;
+
+  try {
+    return await fetchRoomsFromBaseUrl(backendBaseUrl, tenant, backendSecret, criteria);
+  } catch (backendError) {
+    if (centralBaseUrl) {
+      try {
+        return await fetchRoomsFromBaseUrl(centralBaseUrl, tenant, centralSecret, criteria);
+      } catch {
+        // Fallback to static tenant content below.
+      }
+    }
+
+    const staticRooms = sanitizeRoomsPayload(getStaticRoomsByTenant(tenant.tenantSlug), tenant);
+    if (staticRooms.length > 0) {
+      return staticRooms;
+    }
+    throw backendError;
+  }
 }
 
 export async function sendBackendLead(

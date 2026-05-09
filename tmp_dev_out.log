@@ -1,0 +1,14 @@
+
+> sstinnovationresort-website@0.1.0 dev
+> %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/dev-reset.ps1
+
+Port 3000 is in use by PID(s): 13056
+Removed stale lock file: .next/dev/lock
+Preferred port 3000 is busy. Using fallback port 3001.
+Starting Next.js dev server on port 3001 ...
+▲ Next.js 16.2.4 (webpack)
+- Local:         http://localhost:3001
+- Network:       http://10.255.164.241:3001
+- Environments: .env.local
+✓ Ready in 8.8s
+[?25h

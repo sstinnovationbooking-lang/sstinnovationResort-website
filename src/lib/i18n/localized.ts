@@ -20,9 +20,33 @@ function normalizeText(value: unknown): string | null {
   return normalized.length > 0 ? normalized : null;
 }
 
+function isUnsafeResolvedText(value: string): boolean {
+  const normalized = value.trim();
+  if (!normalized) return true;
+  if (/^\?+$/.test(normalized)) return true;
+  if (/\?{3,}/.test(normalized)) return true;
+  return false;
+}
+
+export function isLocalizedRecord(value: unknown): value is LocalizedString {
+  return isRecord(value);
+}
+
+export function hasLocalizedValue(value: unknown): boolean {
+  if (typeof value === "string") return Boolean(normalizeText(value));
+  if (!isRecord(value)) return false;
+  for (const candidate of Object.values(value)) {
+    const text = normalizeText(candidate);
+    if (text && !isUnsafeResolvedText(text)) return true;
+  }
+  return false;
+}
+
 export function getLocalizedValue(value: unknown, localeLike: string | null | undefined, fallback = ""): string {
   const directText = normalizeText(value);
-  if (directText !== null) return directText;
+  if (directText !== null) {
+    return isUnsafeResolvedText(directText) ? fallback : directText;
+  }
   if (!isRecord(value)) return fallback;
 
   const record = value as LocalizedString;
@@ -30,6 +54,7 @@ export function getLocalizedValue(value: unknown, localeLike: string | null | un
   for (const [key, raw] of Object.entries(record)) {
     const text = normalizeText(raw);
     if (!text) continue;
+    if (isUnsafeResolvedText(text)) continue;
     lowerCaseMap.set(key.toLowerCase(), text);
   }
 

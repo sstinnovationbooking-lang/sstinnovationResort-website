@@ -1,9 +1,11 @@
-"use client";
+﻿"use client";
 
 import type { JSX } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
+import { DEFAULT_LOCALE, normalizeLocale } from "@/i18n/config";
 import { DEFAULT_HOMEPAGE_AMENITIES, sanitizeHomepageAmenities } from "@/lib/content/homepage-amenities";
+import { getLocalizedValue } from "@/lib/i18n/localized";
 import type { HomepageAmenityItemDTO, SiteHomeDTO } from "@/lib/types/site";
 
 interface HomepageAmenitiesProps {
@@ -104,15 +106,21 @@ function AmenityCard({ item }: { item: HomepageAmenityItemDTO }) {
       <div aria-hidden className="amenity-icon-wrap">
         <AmenityIcon iconKey={item.iconKey} />
       </div>
-      <h3 className="amenity-title">{item.title}</h3>
-      <p className="amenity-description">{item.description}</p>
+      <h3 className="amenity-title">{String(item.title ?? "")}</h3>
     </article>
   );
 }
 
 export function HomepageAmenities({ home }: HomepageAmenitiesProps) {
   const t = useTranslations("ResortHome");
+  const locale = useLocale();
+  const resolvedLocale = normalizeLocale(locale) ?? DEFAULT_LOCALE;
   const { section, visibleItems, useStaticTranslationFallback } = resolveAmenities(home);
+
+  function localized(value: unknown, fallback = ""): string {
+    return getLocalizedValue(value, resolvedLocale, fallback);
+  }
+
   function tryTranslate(key: string, fallback: string): string {
     try {
       return t(key as never);
@@ -120,6 +128,7 @@ export function HomepageAmenities({ home }: HomepageAmenitiesProps) {
       return fallback;
     }
   }
+
   if (section.isVisible === false || visibleItems.length === 0) {
     return null;
   }
@@ -127,23 +136,33 @@ export function HomepageAmenities({ home }: HomepageAmenitiesProps) {
   return (
     <section aria-labelledby="amenities-title" className="shell section amenities-section reveal" id="amenities">
       <div className="amenities-head">
-        <span className="amenities-eyebrow">{tryTranslate("amenitiesEyebrow", section.eyebrow)}</span>
-        <h2 id="amenities-title">{tryTranslate("amenitiesHeading", section.heading)}</h2>
+        <span className="amenities-eyebrow">
+          {useStaticTranslationFallback
+            ? tryTranslate("amenitiesEyebrow", localized(section.eyebrow))
+            : localized(section.eyebrow, tryTranslate("amenitiesEyebrow", ""))}
+        </span>
+        <h2 id="amenities-title">
+          {useStaticTranslationFallback
+            ? tryTranslate("amenitiesHeading", localized(section.heading))
+            : localized(section.heading, tryTranslate("amenitiesHeading", ""))}
+        </h2>
       </div>
 
       <div className="amenities-grid">
-        {visibleItems.map((item) => (
-          <AmenityCard
-            item={{
-              ...item,
-              title: useStaticTranslationFallback ? tryTranslate(`amenitiesItems.${item.id}.title`, item.title) : item.title,
-              description: useStaticTranslationFallback
-                ? tryTranslate(`amenitiesItems.${item.id}.description`, item.description)
-                : item.description
-            }}
-            key={item.id}
-          />
-        ))}
+        {visibleItems.map((item) => {
+          const localizedTitle = localized(item.title);
+          return (
+            <AmenityCard
+              item={{
+                ...item,
+                title: useStaticTranslationFallback
+                  ? tryTranslate(`amenitiesItems.${item.id}.title`, localizedTitle)
+                  : localizedTitle
+              }}
+              key={item.id}
+            />
+          );
+        })}
       </div>
     </section>
   );

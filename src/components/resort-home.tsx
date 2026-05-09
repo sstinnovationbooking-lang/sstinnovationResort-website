@@ -1,10 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
+import { HomepageActivities } from "@/components/homepage-activities";
 import { FeaturedRoomGallery } from "@/components/featured-room-gallery";
+import { BackToTopButton } from "@/components/back-to-top-button";
+import { FooterCopyrightLegal } from "@/components/footer-copyright-legal";
+import { FooterSocialLinks } from "@/components/footer-social-links";
 import { HeroBookingWidget } from "@/components/hero-booking-widget";
 import { HomepageAmenities } from "@/components/homepage-amenities";
 import { HomepageHotelInfo } from "@/components/homepage-hotel-info";
@@ -12,6 +15,7 @@ import { HomepageRoomHighlights } from "@/components/homepage-room-highlights";
 import { ResortTopNavbar } from "@/components/top-navbar";
 import { DEFAULT_SITE_FOOTER, sanitizeSiteFooter } from "@/lib/content/footer";
 import { DEFAULT_ROOMS_INTRO } from "@/lib/content/rooms-intro";
+import { resolveSiteContact } from "@/lib/content/site-contact";
 import { DEFAULT_LOCALE, normalizeLocale } from "@/i18n/config";
 import { getLocalizedValue } from "@/lib/i18n/localized";
 import { translateStaticFallbackText } from "@/lib/i18n/static-fallback-text";
@@ -34,7 +38,8 @@ export function ResortHome({ home, navbar }: ResortHomeProps) {
       ? navbar.leftLinks
       : DEFAULT_SITE_FOOTER.menuItems ?? [];
   const footerSystemItems = footer.systemLinks ?? DEFAULT_SITE_FOOTER.systemLinks ?? [];
-  const navbarPhoneDisplay = String(home.contact.phone || footer.contact.phone || "").trim();
+  const siteContact = resolveSiteContact(home, resolvedLocale);
+  const navbarPhoneDisplay = siteContact.phone;
   const roomsIntro = home.roomsIntro;
   const roomsIntroLooksLikeStaticDefault =
     String(roomsIntro?.eyebrow ?? "").trim() === String(DEFAULT_ROOMS_INTRO.eyebrow).trim() &&
@@ -43,19 +48,20 @@ export function ResortHome({ home, navbar }: ResortHomeProps) {
   const roomsIntroEyebrow =
     !roomsIntro || roomsIntroLooksLikeStaticDefault
       ? t("roomsIntroEyebrow")
-      : getLocalizedValue(roomsIntro.eyebrow, resolvedLocale, roomsIntro.eyebrow);
+      : getLocalizedValue(roomsIntro.eyebrow, resolvedLocale, "");
   const roomsIntroHeading =
     !roomsIntro || roomsIntroLooksLikeStaticDefault
       ? t("roomsTitle")
-      : getLocalizedValue(roomsIntro.heading, resolvedLocale, roomsIntro.heading);
+      : getLocalizedValue(roomsIntro.heading, resolvedLocale, "");
   const roomsIntroDescription =
     !roomsIntro || roomsIntroLooksLikeStaticDefault
       ? t("roomsIntroDescription")
-      : getLocalizedValue(roomsIntro.description, resolvedLocale, roomsIntro.description);
-  const heroEyebrow = getLocalizedValue(home.hero.eyebrow, resolvedLocale, home.hero.eyebrow);
-  const heroTitle = getLocalizedValue(home.hero.title, resolvedLocale, home.hero.title);
-  const heroSubtitle = getLocalizedValue(home.hero.subtitle, resolvedLocale, home.hero.subtitle);
-  const heroCtaLabel = getLocalizedValue(home.hero.ctaLabel, resolvedLocale, home.hero.ctaLabel);
+      : getLocalizedValue(roomsIntro.description, resolvedLocale, "");
+  const heroEyebrow = getLocalizedValue(home.hero.eyebrow, resolvedLocale, "");
+  const heroTitle = getLocalizedValue(home.hero.title, resolvedLocale, "");
+  const heroSubtitle = getLocalizedValue(home.hero.subtitle, resolvedLocale, "");
+  const footerBrandName = getLocalizedValue(footer.brandName, resolvedLocale, "SST INNOVATION RESORT");
+  const footerDescription = getLocalizedValue(footer.description, resolvedLocale, "");
 
   function resolveMenuLabel(label: string, href?: string): string {
     const normalized = String(href ?? "").trim().toLowerCase();
@@ -123,11 +129,10 @@ export function ResortHome({ home, navbar }: ResortHomeProps) {
           <h1 id="hero-title">{translateStaticFallbackText(heroTitle, t)}</h1>
           <p>{translateStaticFallbackText(heroSubtitle, t)}</p>
           <div className="hero-banner-actions">
-            <a className="hero-cta-btn" href="#lead-form">
-              {translateStaticFallbackText(heroCtaLabel, t)}
+            <a className="hero-cta-btn" href={`/site/${home.tenant.tenantSlug}/rooms`}>
+              {t("heroBookNow")}
             </a>
           </div>
-          {home.stats.length > 0 ? <div className="hero-banner-caption">{home.tenant.brand}</div> : null}
         </div>
       </section>
 
@@ -143,91 +148,69 @@ export function ResortHome({ home, navbar }: ResortHomeProps) {
 
       <FeaturedRoomGallery home={home} />
 
-      <section className="shell section reveal" id="gallery">
-        <div className="section-head">
-          <h2>{t("galleryTitle")}</h2>
-        </div>
-        {home.gallery.length > 0 ? (
-          <div className="gallery-grid">
-            {home.gallery.map((item) => (
-              <figure className="gallery-item" key={item.id}>
-                <Image
-                  alt={item.alt}
-                  className="gallery-image"
-                  height={220}
-                  loading="lazy"
-                  sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
-                  src={item.imageUrl}
-                  unoptimized
-                  width={380}
-                />
-              </figure>
-            ))}
-          </div>
-        ) : (
-          <p className="empty-state">{t("galleryEmpty")}</p>
-        )}
-      </section>
-
       <HomepageAmenities home={home} />
       <HomepageHotelInfo home={home} />
+      <HomepageActivities home={home} />
 
       {footer.isVisible !== false ? (
-        <footer className="site-footer" id="footer">
-          <div className="shell footer-shell">
-            <div className="footer-grid">
-              <section className="footer-col footer-brand" aria-label="Resort brand">
-                <h3 className="footer-brand-name">{footer.brandName || "SST INNOVATION RESORT"}</h3>
-                <p>{translateStaticFallbackText(footer.description, t)}</p>
-              </section>
+        <>
+          <footer className="site-footer" id="footer">
+            <div className="shell footer-shell">
+              <div className="footer-grid">
+                <section className="footer-col footer-brand" aria-label="Resort brand">
+                  <h3 className="footer-brand-name">{footerBrandName || "SST INNOVATION RESORT"}</h3>
+                  <p>{translateStaticFallbackText(footerDescription, t)}</p>
+                  <FooterSocialLinks locale={resolvedLocale} socialLinks={footer.socialLinks} />
+                </section>
 
-              <section className="footer-col footer-menu" aria-label="Footer menu">
-                <h4>{t("footerMenuTitle")}</h4>
-                <ul>
-                  {footerMenuItems.map((item) => (
-                    <li key={`footer-menu-${item.label}-${item.href ?? "nohref"}`}>
-                      {item.href ? <a href={item.href}>{resolveMenuLabel(item.label, item.href)}</a> : <span>{item.label}</span>}
-                    </li>
-                  ))}
-                </ul>
-              </section>
+                <section className="footer-col footer-menu" aria-label="Footer menu">
+                  <h4>{t("footerMenuTitle")}</h4>
+                  <ul>
+                    {footerMenuItems.map((item) => (
+                      <li key={`footer-menu-${item.label}-${item.href ?? "nohref"}`}>
+                        {item.href ? (
+                          <a href={item.href}>{resolveMenuLabel(getLocalizedValue(item.label, resolvedLocale, ""), item.href)}</a>
+                        ) : (
+                          <span>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
 
-              <section className="footer-col footer-contact" aria-label="Contact information">
-                <h4>{t("footerContactTitle")}</h4>
-                <ul>
-                  <li>{footer.contact.address}</li>
-                  <li>{footer.contact.phone}</li>
-                  <li>{footer.contact.email}</li>
-                  {footer.contact.supportHours ? <li>{translateStaticFallbackText(footer.contact.supportHours, t)}</li> : null}
-                </ul>
-              </section>
+                <section className="footer-col footer-contact" aria-label="Contact information">
+                  <h4>{siteContact.footerTitle || t("footerContactTitle")}</h4>
+                  <ul>
+                    <li>{siteContact.address}</li>
+                    <li>{siteContact.phone}</li>
+                    <li>{siteContact.email}</li>
+                    {siteContact.openingHours ? <li>{translateStaticFallbackText(siteContact.openingHours, t)}</li> : null}
+                  </ul>
+                </section>
 
-              <section className="footer-col footer-system" aria-label="System information">
-                <h4>{t("footerSystemTitle")}</h4>
-                <ul>
-                  {footerSystemItems.map((item) => (
-                    <li key={`footer-system-${item.label}-${item.href ?? "nohref"}`}>
-                      {item.href ? (
-                        <a href={item.href}>{translateStaticFallbackText(item.label, t)}</a>
-                      ) : (
-                        <span>{translateStaticFallbackText(item.label, t)}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
+                <section className="footer-col footer-system" aria-label="System information">
+                  <h4>{t("footerSystemTitle")}</h4>
+                  <ul>
+                    {footerSystemItems.map((item) => (
+                      <li key={`footer-system-${item.label}-${item.href ?? "nohref"}`}>
+                        {item.href ? (
+                          <a href={item.href}>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</a>
+                        ) : (
+                          <span>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              </div>
+
+              <div className="footer-bottom">
+                <FooterCopyrightLegal footer={footer} locale={resolvedLocale} tenantBrand={home.tenant.brand} />
+              </div>
             </div>
-
-            <div className="footer-bottom">
-              <p className="footer-meta">
-                {t("copyrightPrefix")} {new Date().getFullYear()} {home.tenant.brand}. {footer.copyrightText ?? t("copyrightFallback")}
-              </p>
-              <a className="footer-backtop" href="#hero">
-                {t("backToTop")}
-              </a>
-            </div>
-          </div>
-        </footer>
+          </footer>
+          <BackToTopButton />
+        </>
       ) : null}
     </main>
   );

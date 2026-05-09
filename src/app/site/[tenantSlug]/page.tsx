@@ -13,6 +13,7 @@ import {
 } from "@/i18n/config";
 import { loadMessages } from "@/i18n/messages";
 import { getContentAdapter } from "@/lib/content/get-adapter";
+import { getLocalizedValue } from "@/lib/i18n/localized";
 import { classifyStatusFromError, safeDevErrorDetail } from "@/lib/status-notice";
 import { resolveTenant } from "@/lib/tenant-resolver";
 import type { SiteHomeDTO } from "@/lib/types/site";
@@ -65,7 +66,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const adapter = getContentAdapter({ basePath: getBasePathFromHeaders(headerStore) });
     const home = await adapter.getSiteHome(tenantSlug);
     const title = `${home.tenant.brand} | ${mt("siteTitleSuffix")}`;
-    const description = home.hero.subtitle || mt("defaultDescription");
+    const description = getLocalizedValue(home.hero.subtitle, locale, mt("defaultDescription")) || mt("defaultDescription");
     const canonicalPath = `/site/${home.tenant.tenantSlug}`;
     const metadataBase = inferMetadataBase(rawHost);
     const languageAlternates = Object.fromEntries(

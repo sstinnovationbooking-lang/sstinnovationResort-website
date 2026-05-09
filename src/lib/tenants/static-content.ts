@@ -1,6 +1,7 @@
 ﻿import { getTenantBySlug } from "@/lib/tenants/registry";
 import { toTenantDTO } from "@/lib/tenants/registry";
 import type {
+  HomepageActivitiesDTO,
   HomepageAmenitiesDTO,
   HomepageHotelInfoDTO,
   HomepageRoomHighlightsDTO,
@@ -18,7 +19,27 @@ const forestRooms: RoomCardDTO[] = [
   {
     id: "fr-garden-villa",
     name: "Garden Villa",
+    title: "Garden Villa Private Retreat",
     description: "วิลล่ากลางสวนส่วนตัว เงียบสงบ เหมาะกับคู่รักและครอบครัวขนาดเล็ก",
+    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80"
+    ],
+    sizeSqm: 42,
+    maxGuests: 2,
+    pricePerNight: 2990,
+    currency: "THB",
+    availableRooms: 3,
+    totalRooms: 8,
+    isAvailable: true,
+    cancellationPolicy: "Free cancellation up to 72 hours before check-in.",
+    taxFeeNote: "Taxes and fees not included",
+    lowAvailabilityThreshold: 2,
+    roomType: "Villa",
+    category: "Private",
+    sortOrder: 1,
+    detailsUrl: "#",
     nightlyPriceTHB: 2990,
     badge: "สวนส่วนตัว",
     imageUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80"
@@ -26,7 +47,27 @@ const forestRooms: RoomCardDTO[] = [
   {
     id: "fr-mountain-cabin",
     name: "Mountain Cabin",
+    title: "Mountain Cabin Panorama",
     description: "เคบินวิวภูเขา โทนอบอุ่น พร้อมระเบียงชมธรรมชาติ",
+    image: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80"
+    ],
+    sizeSqm: 36,
+    maxGuests: 3,
+    pricePerNight: 3490,
+    currency: "THB",
+    availableRooms: 1,
+    totalRooms: 6,
+    isAvailable: true,
+    cancellationPolicy: "Free cancellation up to 48 hours before check-in.",
+    taxFeeNote: "Taxes and fees not included",
+    lowAvailabilityThreshold: 2,
+    roomType: "Cabin",
+    category: "Mountain view",
+    sortOrder: 2,
+    detailsUrl: "#",
     nightlyPriceTHB: 3490,
     badge: "วิวภูเขา",
     imageUrl: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80"
@@ -34,7 +75,27 @@ const forestRooms: RoomCardDTO[] = [
   {
     id: "fr-river-pool-villa",
     name: "River Pool Villa",
+    title: "River Pool Villa Premium",
     description: "พูลวิลล่าริมน้ำพร้อมสระส่วนตัว เหมาะกับทริปกลุ่มเพื่อน",
+    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1505692952047-1a78307da8f2?auto=format&fit=crop&w=1200&q=80"
+    ],
+    sizeSqm: 58,
+    maxGuests: 4,
+    pricePerNight: 5890,
+    currency: "THB",
+    availableRooms: 0,
+    totalRooms: 4,
+    isAvailable: false,
+    cancellationPolicy: "Non-refundable rate for selected stay dates.",
+    taxFeeNote: "Taxes and fees not included",
+    lowAvailabilityThreshold: 1,
+    roomType: "Pool Villa",
+    category: "Private",
+    sortOrder: 3,
+    detailsUrl: "#",
     nightlyPriceTHB: 5890,
     badge: "พูลวิลล่า",
     imageUrl: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80"
@@ -62,7 +123,27 @@ const lakeRooms: RoomCardDTO[] = [
   {
     id: "ls-lake-suite",
     name: "Lakeside Suite",
+    title: "Lakeside Suite Serenity",
     description: "ห้องพักวิวทะเลสาบ ตื่นมาพร้อมหมอกเช้าและอาหารเช้าริมน้ำ",
+    image: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80"
+    ],
+    sizeSqm: 40,
+    maxGuests: 2,
+    pricePerNight: 3890,
+    currency: "THB",
+    availableRooms: 2,
+    totalRooms: 5,
+    isAvailable: true,
+    cancellationPolicy: "Free cancellation up to 72 hours before check-in.",
+    taxFeeNote: "Taxes and fees not included",
+    lowAvailabilityThreshold: 2,
+    roomType: "Suite",
+    category: "Lake view",
+    sortOrder: 1,
+    detailsUrl: "#",
     nightlyPriceTHB: 3890,
     badge: "วิวทะเลสาบ",
     imageUrl: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80"
@@ -70,7 +151,27 @@ const lakeRooms: RoomCardDTO[] = [
   {
     id: "ls-wood-villa",
     name: "Wooden Villa",
+    title: "Wooden Villa Family Stay",
     description: "บ้านไม้ร่วมสมัย เน้นความอบอุ่นและความเป็นส่วนตัว",
+    image: "https://images.unsplash.com/photo-1499696010180-025ef6e1a8f9?auto=format&fit=crop&w=1200&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1499696010180-025ef6e1a8f9?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80"
+    ],
+    sizeSqm: 48,
+    maxGuests: 4,
+    pricePerNight: 4290,
+    currency: "THB",
+    availableRooms: 1,
+    totalRooms: 4,
+    isAvailable: true,
+    cancellationPolicy: "Free cancellation up to 48 hours before check-in.",
+    taxFeeNote: "Taxes and fees not included",
+    lowAvailabilityThreshold: 1,
+    roomType: "Villa",
+    category: "Private",
+    sortOrder: 2,
+    detailsUrl: "#",
     nightlyPriceTHB: 4290,
     badge: "บ้านไม้",
     imageUrl: "https://images.unsplash.com/photo-1499696010180-025ef6e1a8f9?auto=format&fit=crop&w=1200&q=80"
@@ -214,6 +315,8 @@ function cloneDefaultHomepageHotelInfo(): HomepageHotelInfoDTO {
 
 const defaultHomepageRoomHighlights: HomepageRoomHighlightsDTO = {
   isVisible: true,
+  maxItems: 4,
+  displayLimit: 1,
   items: [
     {
       id: "deluxe-king-bed",
@@ -241,7 +344,7 @@ const defaultHomepageRoomHighlights: HomepageRoomHighlightsDTO = {
       imageAlt: "Deluxe Twin Bed",
       imagePosition: "right",
       order: 2,
-      isVisible: true
+      isVisible: false
     },
     {
       id: "deluxe-triple-room",
@@ -255,7 +358,7 @@ const defaultHomepageRoomHighlights: HomepageRoomHighlightsDTO = {
       imageAlt: "Deluxe Triple Room",
       imagePosition: "left",
       order: 3,
-      isVisible: true
+      isVisible: false
     },
     {
       id: "private-villa",
@@ -269,7 +372,7 @@ const defaultHomepageRoomHighlights: HomepageRoomHighlightsDTO = {
       imageAlt: "Private Villa",
       imagePosition: "right",
       order: 4,
-      isVisible: true
+      isVisible: false
     }
   ]
 };
@@ -281,6 +384,74 @@ function cloneDefaultHomepageRoomHighlights(): HomepageRoomHighlightsDTO {
   };
 }
 
+const defaultHomepageActivities: HomepageActivitiesDTO = {
+  heading: "กิจกรรมของเรา",
+  isVisible: true,
+  items: [
+    {
+      id: "tour",
+      title: "ทัวร์และสถานที่ท่องเที่ยว",
+      imageUrl: "",
+      altText: "ทัวร์และสถานที่ท่องเที่ยว",
+      order: 1,
+      isVisible: true
+    },
+    {
+      id: "kayak",
+      title: "กิจกรรมสนุก ๆ",
+      imageUrl: "",
+      altText: "กิจกรรมสนุก ๆ",
+      order: 2,
+      isVisible: true
+    },
+    {
+      id: "travel",
+      title: "ประกันการเดินทาง",
+      imageUrl: "",
+      altText: "ประกันการเดินทาง",
+      order: 3,
+      isVisible: true
+    },
+    {
+      id: "nature",
+      title: "กิจกรรมกลางแจ้ง",
+      imageUrl: "",
+      altText: "กิจกรรมกลางแจ้ง",
+      order: 4,
+      isVisible: true
+    },
+    {
+      id: "dining",
+      title: "อาหารและเครื่องดื่ม",
+      imageUrl: "",
+      altText: "อาหารและเครื่องดื่ม",
+      order: 5,
+      isVisible: true
+    },
+    {
+      id: "relax",
+      title: "พักผ่อนและสปา",
+      imageUrl: "",
+      altText: "พักผ่อนและสปา",
+      order: 6,
+      isVisible: true
+    }
+  ]
+};
+
+function cloneDefaultHomepageActivities(images: string[]): HomepageActivitiesDTO {
+  const safeImages = images.filter((value) => String(value).trim().length > 0);
+  const firstImage = safeImages[0] ?? "";
+
+  return {
+    ...defaultHomepageActivities,
+    items: defaultHomepageActivities.items.map((item, index) => ({
+      ...item,
+      imageUrl: safeImages[index] ?? firstImage
+    }))
+  };
+}
+
 const TENANT_CONTENT: Record<string, TenantStaticContent> = {
   "forest-escape": {
     rooms: forestRooms,
@@ -289,7 +460,7 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
         eyebrow: "",
         title: "เว็บไซต์รีสอร์ตพร้อมระบบจอง ดีไซน์สวย รองรับทุกอุปกรณ์",
         subtitle: "เทมเพลตสำหรับรีสอร์ตที่ต้องการหน้าเว็บมืออาชีพ ปรับแบรนด์ได้ และเชื่อม backend",
-        ctaLabel: "เริ่มส่งคำขอจอง",
+        ctaLabel: "จองเลย",
         heroImageUrl:
           "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1800&q=80"
       },
@@ -330,6 +501,14 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
           isVisible: true
         }
       ],
+      homepageActivities: cloneDefaultHomepageActivities([
+        forestRooms[0]?.imageUrl ?? "",
+        forestRooms[1]?.imageUrl ?? "",
+        forestRooms[2]?.imageUrl ?? "",
+        "https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80"
+      ]),
       homepageAmenities: cloneDefaultHomepageAmenities(),
       homepageHotelInfo: cloneDefaultHomepageHotelInfo(),
       footer: {
@@ -354,6 +533,65 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
           { label: "รองรับ Multi-tenant" },
           { label: "เชื่อมต่อระบบหลังบ้าน" }
         ],
+        socialLinks: [
+          {
+            id: "facebook",
+            platform: "facebook",
+            label: "Facebook",
+            url: "https://facebook.com/forestescape",
+            enabled: true,
+            order: 1
+          },
+          {
+            id: "line",
+            platform: "line",
+            label: "LINE",
+            url: "https://line.me/ti/p/@forestescape",
+            enabled: true,
+            order: 2
+          },
+          {
+            id: "messenger",
+            platform: "messenger",
+            label: "Messenger",
+            url: "https://m.me/forestescape",
+            enabled: true,
+            order: 3
+          },
+          {
+            id: "youtube",
+            platform: "youtube",
+            label: "YouTube",
+            url: "https://youtube.com/@forestescape",
+            enabled: true,
+            order: 4
+          }
+        ],
+        copyright: {
+          year: 2026,
+          developerName: {
+            "th-TH": "SST INNOVATION CO., LTD.",
+            "en-US": "SST INNOVATION CO., LTD."
+          },
+          resortName: {
+            "th-TH": "Forest Escape Resort",
+            "en-US": "Forest Escape Resort"
+          },
+          rightsText: {
+            "th-TH": "สงวนลิขสิทธิ์ทั้งหมด",
+            "en-US": "All rights reserved."
+          },
+          legalTitle: {
+            "th-TH": "ข้อมูลลิขสิทธิ์และความเป็นเจ้าของ",
+            "en-US": "Copyright and Ownership Information"
+          },
+          legalBody: {
+            "th-TH":
+              "ระบบเว็บไซต์นี้พัฒนาโดย {developerName} ส่วนเนื้อหาของรีสอร์ท เช่น ข้อความ รูปภาพ ข้อมูลห้องพัก โปรโมชั่น ข้อมูลติดต่อ และข้อมูลเฉพาะของรีสอร์ท เป็นลิขสิทธิ์ของ {resortName} ห้ามคัดลอก ดัดแปลง เผยแพร่ หรือนำไปใช้โดยไม่ได้รับอนุญาต",
+            "en-US":
+              "This website system is developed by {developerName}. The resort content, including text, images, room information, promotions, contact information, and other resort-specific materials, belongs to {resortName}. Copying, modifying, distributing, or reusing any content without permission is not allowed."
+          }
+        },
         copyrightText: "All rights reserved.",
         isVisible: true
       },
@@ -393,7 +631,28 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
       contact: {
         phone: "+66 89 000 1111",
         email: "booking@forestescape.example",
-        lineId: "@forestescape"
+        lineId: "@forestescape",
+        line: "@forestescape",
+        country: {
+          "th-TH": "ไทย",
+          "en-US": "Thailand"
+        },
+        openingHours: {
+          "th-TH": "ทุกวัน 08:00 - 20:00 น.",
+          "en-US": "Daily 08:00 - 20:00"
+        },
+        address: {
+          "th-TH": "99/9 หมู่ 1 ตำบลตัวอย่าง อำเภอเมือง จังหวัดเชียงใหม่ 50000",
+          "en-US": "99/9 Moo 1, Example Subdistrict, Mueang District, Chiang Mai 50000"
+        },
+        contactTitle: {
+          "th-TH": "ติดต่อเรา",
+          "en-US": "Contact"
+        },
+        footerTitle: {
+          "th-TH": "ข้อมูลการติดต่อ",
+          "en-US": "Contact information"
+        }
       },
       ui: {
         navbar: {
@@ -417,6 +676,14 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
           ],
           cta: { label: "Sign In or Join", href: "#lead-form" },
           showSearchStrip: true
+        },
+        booking: {
+          mode: "booking_enabled",
+          allowBookingForm: true,
+          contactRoute: "/contact",
+          paymentOptions: ["deposit_50", "full"],
+          defaultPaymentOption: "deposit_50",
+          depositPercent: 50
         }
       }
     }
@@ -469,6 +736,14 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
           isVisible: true
         }
       ],
+      homepageActivities: cloneDefaultHomepageActivities([
+        lakeRooms[0]?.imageUrl ?? "",
+        lakeRooms[1]?.imageUrl ?? "",
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1482192505345-5655af888cc4?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80"
+      ]),
       homepageAmenities: cloneDefaultHomepageAmenities(),
       homepageHotelInfo: cloneDefaultHomepageHotelInfo(),
       footer: {
@@ -493,6 +768,65 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
           { label: "รองรับ Multi-tenant" },
           { label: "เชื่อมต่อระบบหลังบ้าน" }
         ],
+        socialLinks: [
+          {
+            id: "facebook",
+            platform: "facebook",
+            label: "Facebook",
+            url: "https://facebook.com/lakeserenity",
+            enabled: true,
+            order: 1
+          },
+          {
+            id: "line",
+            platform: "line",
+            label: "LINE",
+            url: "https://line.me/ti/p/@lakeserenity",
+            enabled: true,
+            order: 2
+          },
+          {
+            id: "messenger",
+            platform: "messenger",
+            label: "Messenger",
+            url: "https://m.me/lakeserenity",
+            enabled: true,
+            order: 3
+          },
+          {
+            id: "youtube",
+            platform: "youtube",
+            label: "YouTube",
+            url: "https://youtube.com/@lakeserenity",
+            enabled: true,
+            order: 4
+          }
+        ],
+        copyright: {
+          year: 2026,
+          developerName: {
+            "th-TH": "SST INNOVATION CO., LTD.",
+            "en-US": "SST INNOVATION CO., LTD."
+          },
+          resortName: {
+            "th-TH": "Lake Serenity Resort",
+            "en-US": "Lake Serenity Resort"
+          },
+          rightsText: {
+            "th-TH": "สงวนลิขสิทธิ์ทั้งหมด",
+            "en-US": "All rights reserved."
+          },
+          legalTitle: {
+            "th-TH": "ข้อมูลลิขสิทธิ์และความเป็นเจ้าของ",
+            "en-US": "Copyright and Ownership Information"
+          },
+          legalBody: {
+            "th-TH":
+              "ระบบเว็บไซต์นี้พัฒนาโดย {developerName} ส่วนเนื้อหาของรีสอร์ท เช่น ข้อความ รูปภาพ ข้อมูลห้องพัก โปรโมชั่น ข้อมูลติดต่อ และข้อมูลเฉพาะของรีสอร์ท เป็นลิขสิทธิ์ของ {resortName} ห้ามคัดลอก ดัดแปลง เผยแพร่ หรือนำไปใช้โดยไม่ได้รับอนุญาต",
+            "en-US":
+              "This website system is developed by {developerName}. The resort content, including text, images, room information, promotions, contact information, and other resort-specific materials, belongs to {resortName}. Copying, modifying, distributing, or reusing any content without permission is not allowed."
+          }
+        },
         copyrightText: "All rights reserved.",
         isVisible: true
       },
@@ -532,7 +866,28 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
       contact: {
         phone: "+66 89 000 2222",
         email: "booking@lakeserenity.example",
-        lineId: "@lakeserenity"
+        lineId: "@lakeserenity",
+        line: "@lakeserenity",
+        country: {
+          "th-TH": "ไทย",
+          "en-US": "Thailand"
+        },
+        openingHours: {
+          "th-TH": "ทุกวัน 08:00 - 20:00 น.",
+          "en-US": "Daily 08:00 - 20:00"
+        },
+        address: {
+          "th-TH": "99/9 หมู่ 1 ตำบลตัวอย่าง อำเภอเมือง จังหวัดเชียงใหม่ 50000",
+          "en-US": "99/9 Moo 1, Example Subdistrict, Mueang District, Chiang Mai 50000"
+        },
+        contactTitle: {
+          "th-TH": "ติดต่อเรา",
+          "en-US": "Contact"
+        },
+        footerTitle: {
+          "th-TH": "ข้อมูลการติดต่อ",
+          "en-US": "Contact information"
+        }
       },
       ui: {
         navbar: {
@@ -556,6 +911,13 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
           ],
           cta: { label: "Sign In or Join", href: "#lead-form" },
           showSearchStrip: true
+        },
+        booking: {
+          mode: "contact_only",
+          allowBookingForm: false,
+          contactRoute: "/contact",
+          paymentOptions: ["full"],
+          defaultPaymentOption: "full"
         }
       }
     }
@@ -608,6 +970,14 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
           isVisible: true
         }
       ],
+      homepageActivities: cloneDefaultHomepageActivities([
+        forestRooms[0]?.imageUrl ?? "",
+        forestRooms[1]?.imageUrl ?? "",
+        forestRooms[2]?.imageUrl ?? "",
+        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=80"
+      ]),
       homepageAmenities: cloneDefaultHomepageAmenities(),
       homepageHotelInfo: cloneDefaultHomepageHotelInfo(),
       footer: {
@@ -632,6 +1002,65 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
           { label: "รองรับ Multi-tenant" },
           { label: "เชื่อมต่อระบบหลังบ้าน" }
         ],
+        socialLinks: [
+          {
+            id: "facebook",
+            platform: "facebook",
+            label: "Facebook",
+            url: "https://facebook.com/demoresort",
+            enabled: true,
+            order: 1
+          },
+          {
+            id: "line",
+            platform: "line",
+            label: "LINE",
+            url: "https://line.me/ti/p/@demoresort",
+            enabled: true,
+            order: 2
+          },
+          {
+            id: "messenger",
+            platform: "messenger",
+            label: "Messenger",
+            url: "https://m.me/demoresort",
+            enabled: true,
+            order: 3
+          },
+          {
+            id: "youtube",
+            platform: "youtube",
+            label: "YouTube",
+            url: "https://youtube.com/@demoresort",
+            enabled: true,
+            order: 4
+          }
+        ],
+        copyright: {
+          year: 2026,
+          developerName: {
+            "th-TH": "SST INNOVATION CO., LTD.",
+            "en-US": "SST INNOVATION CO., LTD."
+          },
+          resortName: {
+            "th-TH": "Demo Resort",
+            "en-US": "Demo Resort"
+          },
+          rightsText: {
+            "th-TH": "สงวนลิขสิทธิ์ทั้งหมด",
+            "en-US": "All rights reserved."
+          },
+          legalTitle: {
+            "th-TH": "ข้อมูลลิขสิทธิ์และความเป็นเจ้าของ",
+            "en-US": "Copyright and Ownership Information"
+          },
+          legalBody: {
+            "th-TH":
+              "ระบบเว็บไซต์นี้พัฒนาโดย {developerName} ส่วนเนื้อหาของรีสอร์ท เช่น ข้อความ รูปภาพ ข้อมูลห้องพัก โปรโมชั่น ข้อมูลติดต่อ และข้อมูลเฉพาะของรีสอร์ท เป็นลิขสิทธิ์ของ {resortName} ห้ามคัดลอก ดัดแปลง เผยแพร่ หรือนำไปใช้โดยไม่ได้รับอนุญาต",
+            "en-US":
+              "This website system is developed by {developerName}. The resort content, including text, images, room information, promotions, contact information, and other resort-specific materials, belongs to {resortName}. Copying, modifying, distributing, or reusing any content without permission is not allowed."
+          }
+        },
         copyrightText: "All rights reserved.",
         isVisible: true
       },
@@ -665,7 +1094,28 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
       contact: {
         phone: "+66 89 000 3333",
         email: "demo@resort.example",
-        lineId: "@demoresort"
+        lineId: "@demoresort",
+        line: "@demoresort",
+        country: {
+          "th-TH": "ไทย",
+          "en-US": "Thailand"
+        },
+        openingHours: {
+          "th-TH": "ทุกวัน 08:00 - 20:00 น.",
+          "en-US": "Daily 08:00 - 20:00"
+        },
+        address: {
+          "th-TH": "99/9 หมู่ 1 ตำบลตัวอย่าง อำเภอเมือง จังหวัดเชียงใหม่ 50000",
+          "en-US": "99/9 Moo 1, Example Subdistrict, Mueang District, Chiang Mai 50000"
+        },
+        contactTitle: {
+          "th-TH": "ติดต่อเรา",
+          "en-US": "Contact"
+        },
+        footerTitle: {
+          "th-TH": "ข้อมูลการติดต่อ",
+          "en-US": "Contact information"
+        }
       },
       ui: {
         navbar: {
@@ -686,6 +1136,13 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
           rightLinks: [{ label: "Help", href: "#contact" }],
           cta: { label: "Sign In or Join", href: "#lead-form" },
           showSearchStrip: false
+        },
+        booking: {
+          mode: "booking_enabled",
+          allowBookingForm: true,
+          contactRoute: "/contact",
+          paymentOptions: ["full"],
+          defaultPaymentOption: "full"
         }
       }
     }

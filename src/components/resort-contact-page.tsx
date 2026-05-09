@@ -2,11 +2,16 @@
 
 import { useLocale, useTranslations } from "next-intl";
 
+import { FooterSocialLinks } from "@/components/footer-social-links";
+import { BackToTopButton } from "@/components/back-to-top-button";
+import { FooterCopyrightLegal } from "@/components/footer-copyright-legal";
 import { LeadForm } from "@/components/lead-form";
 import { ResortTopNavbar } from "@/components/top-navbar";
 import { DEFAULT_SITE_FOOTER, sanitizeSiteFooter } from "@/lib/content/footer";
+import { resolveSiteContact } from "@/lib/content/site-contact";
 import { DEFAULT_LOCALE, normalizeLocale } from "@/i18n/config";
-import { formatCountryByLocale, formatPhoneByLocale } from "@/lib/i18n/format";
+import { formatPhoneByLocale } from "@/lib/i18n/format";
+import { getLocalizedValue } from "@/lib/i18n/localized";
 import { translateStaticFallbackText } from "@/lib/i18n/static-fallback-text";
 import type { NavbarSettingsDTO, SiteHomeDTO } from "@/lib/types/site";
 
@@ -26,7 +31,10 @@ export function ResortContactPage({ home, navbar }: ResortContactPageProps) {
       ? navbar.leftLinks
       : DEFAULT_SITE_FOOTER.menuItems ?? [];
   const footerSystemItems = footer.systemLinks ?? DEFAULT_SITE_FOOTER.systemLinks ?? [];
-  const navbarPhoneDisplay = String(home.contact.phone || footer.contact.phone || "").trim();
+  const siteContact = resolveSiteContact(home, resolvedLocale);
+  const navbarPhoneDisplay = siteContact.phone;
+  const footerBrandName = getLocalizedValue(footer.brandName, resolvedLocale, "SST INNOVATION RESORT");
+  const footerDescription = getLocalizedValue(footer.description, resolvedLocale, "");
 
   function resolveMenuLabel(label: string, href?: string): string {
     const normalized = String(href ?? "").trim().toLowerCase();
@@ -53,23 +61,23 @@ export function ResortContactPage({ home, navbar }: ResortContactPageProps) {
       <section className="contact-page-content">
         <section className="shell section contact reveal" id="contact">
           <div className="contact-meta">
-            <h2>{t("contactTitle")}</h2>
+            <h2>{siteContact.contactTitle || t("contactTitle")}</h2>
             <p>
-              {t("phoneLabel")}: {formatPhoneByLocale(resolvedLocale, home.contact.phone)}
+              {t("phoneLabel")}: {formatPhoneByLocale(resolvedLocale, siteContact.phone)}
             </p>
             <p>
-              {t("emailLabel")}: {home.contact.email}
+              {t("emailLabel")}: {siteContact.email}
             </p>
-            {home.contact.lineId ? (
+            {siteContact.line ? (
               <p>
-                {t("lineLabel")}: {home.contact.lineId}
+                {t("lineLabel")}: {siteContact.line}
               </p>
             ) : null}
             <p>
-              {t("countryLabel")}: {formatCountryByLocale(resolvedLocale)}
+              {t("countryLabel")}: {siteContact.country}
             </p>
-            {footer.contact.supportHours ? <p>{translateStaticFallbackText(footer.contact.supportHours, t)}</p> : null}
-            <p>{footer.contact.address}</p>
+            {siteContact.openingHours ? <p>{translateStaticFallbackText(siteContact.openingHours, t)}</p> : null}
+            <p>{siteContact.address}</p>
           </div>
           <div id="lead-form">
             <h2 className="visually-hidden">{t("leadFormTitle")}</h2>
@@ -79,61 +87,64 @@ export function ResortContactPage({ home, navbar }: ResortContactPageProps) {
       </section>
 
       {footer.isVisible !== false ? (
-        <footer className="site-footer" id="footer">
-          <div className="shell footer-shell">
-            <div className="footer-grid">
-              <section aria-label="Resort brand" className="footer-col footer-brand">
-                <h3 className="footer-brand-name">{footer.brandName || "SST INNOVATION RESORT"}</h3>
-                <p>{translateStaticFallbackText(footer.description, t)}</p>
-              </section>
+        <>
+          <footer className="site-footer" id="footer">
+            <div className="shell footer-shell">
+              <div className="footer-grid">
+                <section aria-label="Resort brand" className="footer-col footer-brand">
+                  <h3 className="footer-brand-name">{footerBrandName || "SST INNOVATION RESORT"}</h3>
+                  <p>{translateStaticFallbackText(footerDescription, t)}</p>
+                  <FooterSocialLinks locale={resolvedLocale} socialLinks={footer.socialLinks} />
+                </section>
 
-              <section aria-label="Footer menu" className="footer-col footer-menu">
-                <h4>{t("footerMenuTitle")}</h4>
-                <ul>
-                  {footerMenuItems.map((item) => (
-                    <li key={`footer-menu-${item.label}-${item.href ?? "nohref"}`}>
-                      {item.href ? <a href={item.href}>{resolveMenuLabel(item.label, item.href)}</a> : <span>{item.label}</span>}
-                    </li>
-                  ))}
-                </ul>
-              </section>
+                <section aria-label="Footer menu" className="footer-col footer-menu">
+                  <h4>{t("footerMenuTitle")}</h4>
+                  <ul>
+                    {footerMenuItems.map((item) => (
+                      <li key={`footer-menu-${item.label}-${item.href ?? "nohref"}`}>
+                        {item.href ? (
+                          <a href={item.href}>{resolveMenuLabel(getLocalizedValue(item.label, resolvedLocale, ""), item.href)}</a>
+                        ) : (
+                          <span>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
 
-              <section aria-label="Contact information" className="footer-col footer-contact">
-                <h4>{t("footerContactTitle")}</h4>
-                <ul>
-                  <li>{footer.contact.address}</li>
-                  <li>{footer.contact.phone}</li>
-                  <li>{footer.contact.email}</li>
-                  {footer.contact.supportHours ? <li>{translateStaticFallbackText(footer.contact.supportHours, t)}</li> : null}
-                </ul>
-              </section>
+                <section aria-label="Contact information" className="footer-col footer-contact">
+                  <h4>{siteContact.footerTitle || t("footerContactTitle")}</h4>
+                  <ul>
+                    <li>{siteContact.address}</li>
+                    <li>{siteContact.phone}</li>
+                    <li>{siteContact.email}</li>
+                    {siteContact.openingHours ? <li>{translateStaticFallbackText(siteContact.openingHours, t)}</li> : null}
+                  </ul>
+                </section>
 
-              <section aria-label="System information" className="footer-col footer-system">
-                <h4>{t("footerSystemTitle")}</h4>
-                <ul>
-                  {footerSystemItems.map((item) => (
-                    <li key={`footer-system-${item.label}-${item.href ?? "nohref"}`}>
-                      {item.href ? (
-                        <a href={item.href}>{translateStaticFallbackText(item.label, t)}</a>
-                      ) : (
-                        <span>{translateStaticFallbackText(item.label, t)}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
+                <section aria-label="System information" className="footer-col footer-system">
+                  <h4>{t("footerSystemTitle")}</h4>
+                  <ul>
+                    {footerSystemItems.map((item) => (
+                      <li key={`footer-system-${item.label}-${item.href ?? "nohref"}`}>
+                        {item.href ? (
+                          <a href={item.href}>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</a>
+                        ) : (
+                          <span>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              </div>
+
+              <div className="footer-bottom">
+                <FooterCopyrightLegal footer={footer} locale={resolvedLocale} tenantBrand={home.tenant.brand} />
+              </div>
             </div>
-
-            <div className="footer-bottom">
-              <p className="footer-meta">
-                {t("copyrightPrefix")} {new Date().getFullYear()} {home.tenant.brand}. {footer.copyrightText ?? t("copyrightFallback")}
-              </p>
-              <a className="footer-backtop" href="#hero">
-                {t("backToTop")}
-              </a>
-            </div>
-          </div>
-        </footer>
+          </footer>
+          <BackToTopButton />
+        </>
       ) : null}
     </main>
   );

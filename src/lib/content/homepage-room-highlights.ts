@@ -1,10 +1,13 @@
-import type { HomepageRoomHighlightItemDTO, HomepageRoomHighlightsDTO } from "@/lib/types/site";
+import type { HomepageRoomHighlightItemDTO, HomepageRoomHighlightsDTO, LocalizedText } from "@/lib/types/site";
 
 export const HOMEPAGE_ROOM_HIGHLIGHTS_CONTENT_KEY = "homepage.roomHighlights";
 export const HOMEPAGE_ROOM_HIGHLIGHTS_MAX_ITEMS = 4;
+export const HOMEPAGE_ROOM_HIGHLIGHTS_DEFAULT_DISPLAY_LIMIT = 1;
 
 export const DEFAULT_HOMEPAGE_ROOM_HIGHLIGHTS: HomepageRoomHighlightsDTO = {
   isVisible: true,
+  maxItems: HOMEPAGE_ROOM_HIGHLIGHTS_MAX_ITEMS,
+  displayLimit: HOMEPAGE_ROOM_HIGHLIGHTS_DEFAULT_DISPLAY_LIMIT,
   items: [
     {
       id: "deluxe-king-bed",
@@ -32,7 +35,7 @@ export const DEFAULT_HOMEPAGE_ROOM_HIGHLIGHTS: HomepageRoomHighlightsDTO = {
       imageAlt: "Deluxe Twin Bed",
       imagePosition: "right",
       order: 2,
-      isVisible: true
+      isVisible: false
     },
     {
       id: "deluxe-triple-room",
@@ -46,7 +49,7 @@ export const DEFAULT_HOMEPAGE_ROOM_HIGHLIGHTS: HomepageRoomHighlightsDTO = {
       imageAlt: "Deluxe Triple Room",
       imagePosition: "left",
       order: 3,
-      isVisible: true
+      isVisible: false
     },
     {
       id: "private-villa",
@@ -60,13 +63,29 @@ export const DEFAULT_HOMEPAGE_ROOM_HIGHLIGHTS: HomepageRoomHighlightsDTO = {
       imageAlt: "Private Villa",
       imagePosition: "right",
       order: 4,
-      isVisible: true
+      isVisible: false
     }
   ]
 };
 
 function cleanText(value: unknown): string {
   return String(value ?? "").trim();
+}
+
+function normalizeLocalizedText(value: unknown): LocalizedText | null {
+  if (typeof value === "string") {
+    const normalized = cleanText(value);
+    return normalized || null;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+
+  const record: Record<string, string> = {};
+  for (const [key, raw] of Object.entries(value)) {
+    const text = cleanText(raw);
+    if (!text) continue;
+    record[key] = text;
+  }
+  return Object.keys(record).length > 0 ? record : null;
 }
 
 function normalizeImagePosition(value: unknown): "left" | "right" | undefined {
@@ -76,23 +95,38 @@ function normalizeImagePosition(value: unknown): "left" | "right" | undefined {
   return undefined;
 }
 
+function normalizePositiveInt(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return Math.floor(value);
+  }
+  const raw = cleanText(value);
+  if (!raw) return null;
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function clampToSupportedLimit(value: number, fallback: number): number {
+  if (!Number.isFinite(value)) return fallback;
+  return Math.min(HOMEPAGE_ROOM_HIGHLIGHTS_MAX_ITEMS, Math.max(1, Math.floor(value)));
+}
+
 function normalizeItem(value: unknown, index: number): HomepageRoomHighlightItemDTO | null {
   if (!value || typeof value !== "object") return null;
   const raw = value as Partial<HomepageRoomHighlightItemDTO>;
 
-  const title = cleanText(raw.title);
-  const description = cleanText(raw.description);
+  const title = normalizeLocalizedText(raw.title);
+  const description = normalizeLocalizedText(raw.description);
   if (!title || !description) return null;
 
   return {
     id: cleanText(raw.id) || `room-highlight-${index + 1}`,
     title,
-    subtitle: cleanText(raw.subtitle),
+    subtitle: normalizeLocalizedText(raw.subtitle) ?? "",
     description,
-    buttonText: cleanText(raw.buttonText),
+    buttonText: normalizeLocalizedText(raw.buttonText) ?? "",
     buttonHref: cleanText(raw.buttonHref),
     imageUrl: cleanText(raw.imageUrl),
-    imageAlt: cleanText(raw.imageAlt) || title,
+    imageAlt: normalizeLocalizedText(raw.imageAlt) ?? title,
     imagePosition: normalizeImagePosition(raw.imagePosition),
     order: typeof raw.order === "number" ? raw.order : index + 1,
     isVisible: raw.isVisible === false ? false : true
@@ -120,12 +154,28 @@ export function sanitizeHomepageRoomHighlights(value: unknown): HomepageRoomHigh
   }
 
   const candidate = value as Partial<HomepageRoomHighlightsDTO>;
+  const legacyMaxVisibleItems = (candidate as Record<string, unknown>).maxVisibleItems;
+  const effectiveMaxItems = clampToSupportedLimit(
+    normalizePositiveInt(candidate.maxItems) ?? HOMEPAGE_ROOM_HIGHLIGHTS_MAX_ITEMS,
+    HOMEPAGE_ROOM_HIGHLIGHTS_MAX_ITEMS
+  );
+  const normalizedDisplayLimit =
+    normalizePositiveInt(candidate.displayLimit) ??
+    normalizePositiveInt(legacyMaxVisibleItems) ??
+    HOMEPAGE_ROOM_HIGHLIGHTS_DEFAULT_DISPLAY_LIMIT;
+  const effectiveDisplayLimit = Math.min(
+    effectiveMaxItems,
+    clampToSupportedLimit(
+      normalizedDisplayLimit,
+      HOMEPAGE_ROOM_HIGHLIGHTS_DEFAULT_DISPLAY_LIMIT
+    )
+  );
   const items = Array.isArray(candidate.items)
     ? candidate.items
       .map((item, index) => normalizeItem(item, index))
       .filter((item): item is HomepageRoomHighlightItemDTO => item !== null)
       .sort((a, b) => a.order - b.order)
-      .slice(0, HOMEPAGE_ROOM_HIGHLIGHTS_MAX_ITEMS)
+      .slice(0, effectiveMaxItems)
     : [];
 
   if (items.length === 0) {
@@ -137,7 +187,8 @@ export function sanitizeHomepageRoomHighlights(value: unknown): HomepageRoomHigh
 
   return {
     isVisible: candidate.isVisible === false ? false : true,
+    maxItems: effectiveMaxItems,
+    displayLimit: effectiveDisplayLimit,
     items
   };
 }
-

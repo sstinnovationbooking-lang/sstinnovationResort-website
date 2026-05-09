@@ -53,16 +53,18 @@ export default async function TenantRoomsPage({ params, searchParams }: PageProp
 
   let homeData: SiteHomeDTO | null = null;
   let roomsData: RoomCardDTO[] = [];
+  let roomsLoadError = false;
   let fallbackError: unknown = null;
 
   try {
     const adapter = getContentAdapter({ basePath: getBasePathFromHeaders(headerStore) });
-    const [home, rooms] = await Promise.all([
-      adapter.getSiteHome(tenantSlug),
-      adapter.getRooms(tenantSlug, roomSearchCriteria)
-    ]);
-    homeData = home;
-    roomsData = rooms;
+    homeData = await adapter.getSiteHome(tenantSlug);
+    try {
+      roomsData = await adapter.getRooms(tenantSlug, roomSearchCriteria);
+    } catch (roomsError) {
+      roomsLoadError = true;
+      fallbackError = roomsError;
+    }
   } catch (error) {
     fallbackError = error;
   }
@@ -80,5 +82,13 @@ export default async function TenantRoomsPage({ params, searchParams }: PageProp
     );
   }
 
-  return <ResortRoomsPage home={homeData} navbar={homeData.ui?.navbar} rooms={roomsData} />;
+  return (
+    <ResortRoomsPage
+      home={homeData}
+      navbar={homeData.ui?.navbar}
+      rooms={roomsData}
+      roomsLoadError={roomsLoadError}
+      searchCriteria={roomSearchCriteria}
+    />
+  );
 }

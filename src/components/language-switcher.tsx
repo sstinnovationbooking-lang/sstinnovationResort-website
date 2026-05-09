@@ -65,6 +65,7 @@ export function LanguageSwitcher() {
         disabled={isPending}
         id="locale-switcher"
         onChange={(event) => onChange(event.target.value)}
+        size={1}
         value={selectedLocaleTag}
       >
         {NAVBAR_LANGUAGE_OPTIONS.map((item) => (

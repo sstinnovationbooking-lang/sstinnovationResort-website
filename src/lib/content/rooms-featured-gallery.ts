@@ -1,4 +1,4 @@
-import type { FeaturedGalleryItemDTO } from "@/lib/types/site";
+import type { FeaturedGalleryItemDTO, LocalizedText } from "@/lib/types/site";
 
 export const ROOMS_FEATURED_GALLERY_CONTENT_KEY = "rooms.featuredGallery";
 export const ROOMS_FEATURED_GALLERY_MAX_ITEMS = 6;
@@ -6,28 +6,28 @@ export const ROOMS_FEATURED_GALLERY_MAX_ITEMS = 6;
 export const DEFAULT_ROOMS_FEATURED_GALLERY: FeaturedGalleryItemDTO[] = [
   {
     id: "deluxe-king",
-    title: "ห้องดีลักซ์เตียงคิงไซส์",
-    sizeText: "พื้นที่ 32 ตร.ม",
+    title: "Deluxe King Bed",
+    sizeText: "32 sq.m",
     imageUrl: "",
-    altText: "ห้องดีลักซ์เตียงคิงไซส์",
+    altText: "Deluxe King Bed",
     order: 1,
     isVisible: true
   },
   {
     id: "deluxe-twin",
-    title: "ห้องดีลักซ์เตียงแฝด",
-    sizeText: "พื้นที่ 32 ตร.ม",
+    title: "Deluxe Twin Bed",
+    sizeText: "32 sq.m",
     imageUrl: "",
-    altText: "ห้องดีลักซ์เตียงแฝด",
+    altText: "Deluxe Twin Bed",
     order: 2,
     isVisible: true
   },
   {
     id: "deluxe-triple",
-    title: "ห้องดีลักซ์สำหรับสามท่าน",
-    sizeText: "พื้นที่ 32 ตร.ม",
+    title: "Deluxe Triple Room",
+    sizeText: "32 sq.m",
     imageUrl: "",
-    altText: "ห้องดีลักซ์สำหรับสามท่าน",
+    altText: "Deluxe Triple Room",
     order: 3,
     isVisible: true
   }
@@ -37,13 +37,29 @@ function cleanText(value: unknown): string {
   return String(value ?? "").trim();
 }
 
+function normalizeLocalizedText(value: unknown): LocalizedText | null {
+  if (typeof value === "string") {
+    const normalized = cleanText(value);
+    return normalized || null;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+
+  const record: Record<string, string> = {};
+  for (const [key, raw] of Object.entries(value)) {
+    const text = cleanText(raw);
+    if (!text) continue;
+    record[key] = text;
+  }
+  return Object.keys(record).length > 0 ? record : null;
+}
+
 function normalizeItem(value: unknown, index: number): FeaturedGalleryItemDTO | null {
   if (!value || typeof value !== "object") return null;
   const raw = value as Partial<FeaturedGalleryItemDTO>;
 
   const id = cleanText(raw.id) || `featured-room-${index + 1}`;
-  const title = cleanText(raw.title);
-  const sizeText = cleanText(raw.sizeText);
+  const title = normalizeLocalizedText(raw.title);
+  const sizeText = normalizeLocalizedText(raw.sizeText);
   const imageUrl = cleanText(raw.imageUrl);
 
   if (!title || !sizeText) return null;
@@ -53,7 +69,7 @@ function normalizeItem(value: unknown, index: number): FeaturedGalleryItemDTO | 
     title,
     sizeText,
     imageUrl,
-    altText: cleanText(raw.altText) || title,
+    altText: normalizeLocalizedText(raw.altText) ?? title,
     order: typeof raw.order === "number" ? raw.order : index,
     isVisible: raw.isVisible === false ? false : true
   };
@@ -84,3 +100,4 @@ export function sanitizeRoomsFeaturedGallery(value: unknown): FeaturedGalleryIte
 
   return normalized.slice(0, ROOMS_FEATURED_GALLERY_MAX_ITEMS);
 }
+

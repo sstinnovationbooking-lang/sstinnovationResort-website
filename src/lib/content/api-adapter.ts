@@ -1,7 +1,9 @@
 import type { ContentAdapter } from "@/lib/content/types";
+import { sanitizeRoomsPayload } from "@/lib/content/rooms";
 import { sanitizeSiteHomeDTO } from "@/lib/dto/normalize";
 import { getDefaultTenantSlug } from "@/lib/env";
 import { toRoomSearchQueryString } from "@/lib/search/room-search";
+import { getTenantBySlug } from "@/lib/tenants/registry";
 import type { ApiErrorDTO, LeadRequestDTO, LeadResponseDTO, RoomCardDTO, RoomSearchCriteria, SiteHomeDTO } from "@/lib/types/site";
 
 interface ApiContentAdapterOptions {
@@ -74,7 +76,8 @@ export class ApiContentAdapter implements ContentAdapter {
         method: "GET",
         cache: "no-store"
       });
-      return parseJsonOrThrow<RoomCardDTO[]>(response);
+      const payload = await parseJsonOrThrow<unknown>(response);
+      return sanitizeRoomsPayload(payload, getTenantBySlug(slug) ?? undefined);
     } catch (error) {
       throw withFallbackError(error);
     }

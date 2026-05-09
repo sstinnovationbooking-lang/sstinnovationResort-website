@@ -1,43 +1,13 @@
 export const SUPPORTED_LOCALES = [
   "th",
-  "en",
-  "lo",
-  "zh",
-  "ja",
-  "ko",
-  "ru",
-  "fr",
-  "de",
-  "es",
-  "it",
-  "pt",
-  "id",
-  "vi",
-  "ms",
-  "hi",
-  "ar"
+  "en"
 ] as const;
 
 export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
 
 export type LocaleTag =
   | "th-TH"
-  | "en-US"
-  | "lo-LA"
-  | "zh-CN"
-  | "ja-JP"
-  | "ko-KR"
-  | "ru-RU"
-  | "fr-FR"
-  | "de-DE"
-  | "es-ES"
-  | "it-IT"
-  | "pt-PT"
-  | "id-ID"
-  | "vi-VN"
-  | "ms-MY"
-  | "hi-IN"
-  | "ar-SA";
+  | "en-US";
 
 export type LanguageOption = {
   locale: LocaleTag;
@@ -55,43 +25,13 @@ export const LOCALE_STORAGE_KEY = "NEXT_LOCALE";
 export const LOCALE_QUERY_PARAM = "lang";
 
 export const NAVBAR_LANGUAGE_OPTIONS: LanguageOption[] = [
-  { locale: "th-TH", defaultLabel: "Thai (TH)", nativeName: "ไทย", countryCode: "TH", appLocale: "th", isAvailable: true },
-  { locale: "en-US", defaultLabel: "English (US)", nativeName: "English", countryCode: "US", appLocale: "en", isAvailable: true },
-  { locale: "lo-LA", defaultLabel: "Lao (LA)", nativeName: "ລາວ", countryCode: "LA", appLocale: "lo", isAvailable: true },
-  { locale: "zh-CN", defaultLabel: "Chinese (CN)", nativeName: "中文", countryCode: "CN", appLocale: "zh", isAvailable: true },
-  { locale: "ja-JP", defaultLabel: "Japanese (JP)", nativeName: "日本語", countryCode: "JP", appLocale: "ja", isAvailable: true },
-  { locale: "ko-KR", defaultLabel: "Korean (KR)", nativeName: "한국어", countryCode: "KR", appLocale: "ko", isAvailable: true },
-  { locale: "ru-RU", defaultLabel: "Russian (RU)", nativeName: "Русский", countryCode: "RU", appLocale: "ru", isAvailable: true },
-  { locale: "fr-FR", defaultLabel: "French (FR)", nativeName: "Français", countryCode: "FR", appLocale: "fr", isAvailable: true },
-  { locale: "de-DE", defaultLabel: "German (DE)", nativeName: "Deutsch", countryCode: "DE", appLocale: "de", isAvailable: true },
-  { locale: "es-ES", defaultLabel: "Spanish (ES)", nativeName: "Español", countryCode: "ES", appLocale: "es", isAvailable: true },
-  { locale: "it-IT", defaultLabel: "Italian (IT)", nativeName: "Italiano", countryCode: "IT", appLocale: "it", isAvailable: true },
-  { locale: "pt-PT", defaultLabel: "Portuguese (PT)", nativeName: "Português", countryCode: "PT", appLocale: "pt", isAvailable: true },
-  { locale: "id-ID", defaultLabel: "Indonesian (ID)", nativeName: "Bahasa Indonesia", countryCode: "ID", appLocale: "id", isAvailable: true },
-  { locale: "vi-VN", defaultLabel: "Vietnamese (VN)", nativeName: "Tiếng Việt", countryCode: "VN", appLocale: "vi", isAvailable: true },
-  { locale: "ms-MY", defaultLabel: "Malay (MY)", nativeName: "Bahasa Melayu", countryCode: "MY", appLocale: "ms", isAvailable: true },
-  { locale: "hi-IN", defaultLabel: "Hindi (IN)", nativeName: "हिन्दी", countryCode: "IN", appLocale: "hi", isAvailable: true },
-  { locale: "ar-SA", defaultLabel: "Arabic (SA)", nativeName: "العربية", countryCode: "SA", appLocale: "ar", isAvailable: true }
+  { locale: "th-TH", defaultLabel: "Thai", nativeName: "ไทย", countryCode: "TH", appLocale: "th", isAvailable: true },
+  { locale: "en-US", defaultLabel: "English", nativeName: "English", countryCode: "US", appLocale: "en", isAvailable: true }
 ];
 
 const APP_LOCALE_TO_TAG: Record<AppLocale, LocaleTag> = {
   th: "th-TH",
-  en: "en-US",
-  lo: "lo-LA",
-  zh: "zh-CN",
-  ja: "ja-JP",
-  ko: "ko-KR",
-  ru: "ru-RU",
-  fr: "fr-FR",
-  de: "de-DE",
-  es: "es-ES",
-  it: "it-IT",
-  pt: "pt-PT",
-  id: "id-ID",
-  vi: "vi-VN",
-  ms: "ms-MY",
-  hi: "hi-IN",
-  ar: "ar-SA"
+  en: "en-US"
 };
 
 const LOCALE_TAG_TO_APP: Record<LocaleTag, AppLocale> = Object.fromEntries(
@@ -104,42 +44,12 @@ export const LOCALE_TO_BCP47: Record<AppLocale, string> = APP_LOCALE_TO_TAG;
 
 export const LOCALE_TO_COUNTRY: Record<AppLocale, string> = {
   th: "TH",
-  en: "US",
-  lo: "LA",
-  zh: "CN",
-  ja: "JP",
-  ko: "KR",
-  ru: "RU",
-  fr: "FR",
-  de: "DE",
-  es: "ES",
-  it: "IT",
-  pt: "PT",
-  id: "ID",
-  vi: "VN",
-  ms: "MY",
-  hi: "IN",
-  ar: "SA"
+  en: "US"
 };
 
 export const LOCALE_TO_CURRENCY: Record<AppLocale, string> = {
   th: "THB",
-  en: "USD",
-  lo: "LAK",
-  zh: "CNY",
-  ja: "JPY",
-  ko: "KRW",
-  ru: "RUB",
-  fr: "EUR",
-  de: "EUR",
-  es: "EUR",
-  it: "EUR",
-  pt: "EUR",
-  id: "IDR",
-  vi: "VND",
-  ms: "MYR",
-  hi: "INR",
-  ar: "SAR"
+  en: "USD"
 };
 
 export const LOCALE_LABELS: Record<AppLocale, string> = Object.fromEntries(
@@ -184,9 +94,18 @@ export function getLanguageDisplayName(
   currentLocaleTag: string | null | undefined,
   optionLocaleTag: LocaleTag
 ): string {
+  const currentTag = normalizeLocaleTag(currentLocaleTag) ?? DEFAULT_LOCALE_TAG;
+  if (currentTag === "th-TH") {
+    if (optionLocaleTag === "th-TH") return "ไทย";
+    if (optionLocaleTag === "en-US") return "อังกฤษ";
+  }
+  if (currentTag === "en-US") {
+    if (optionLocaleTag === "th-TH") return "Thai";
+    if (optionLocaleTag === "en-US") return "English";
+  }
+
   const fallback = LANGUAGE_OPTION_MAP.get(optionLocaleTag.toLowerCase())?.nativeName ?? optionLocaleTag;
   try {
-    const currentTag = normalizeLocaleTag(currentLocaleTag) ?? DEFAULT_LOCALE_TAG;
     const languageCode = optionLocaleTag.split("-")[0] || "en";
     const displayNames = new Intl.DisplayNames([currentTag], { type: "language" });
     return displayNames.of(languageCode) ?? fallback;
@@ -208,4 +127,5 @@ export function resolveLocaleFromCookieHeader(cookieHeader: string | null | unde
 
   return DEFAULT_LOCALE;
 }
+
 

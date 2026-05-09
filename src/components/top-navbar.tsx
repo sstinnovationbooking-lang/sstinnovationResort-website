@@ -83,6 +83,27 @@ function normalizeNavHref(href?: string | null): string {
   return normalized.replace(/\/+$/, "") || "/";
 }
 
+function resolveTenantSlugFromPathname(pathname: string): string | null {
+  const match = String(pathname ?? "").match(/^\/site\/([^/?#]+)/i);
+  const tenantSlug = String(match?.[1] ?? "").trim().toLowerCase();
+  return tenantSlug || null;
+}
+
+function resolveTenantAwareNavHref(href: string, tenantSlug: string | null): string {
+  const normalized = normalizeNavHref(href);
+  if (!tenantSlug) return normalized;
+
+  if (normalized === "/") {
+    return `/site/${tenantSlug}`;
+  }
+
+  if (normalized.toLowerCase() === "/rooms") {
+    return `/site/${tenantSlug}/rooms`;
+  }
+
+  return normalized;
+}
+
 function toActiveRouteKey(pathname: string): string {
   const cleaned = String(pathname || "/").trim().replace(/\/+$/, "") || "/";
   if (cleaned === "/") return "/";
@@ -123,6 +144,8 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
   const resolvedLocale = normalizeLocale(locale) ?? DEFAULT_LOCALE;
   const settings = withFallback(navbar);
   const pathname = usePathname();
+  const currentTenantSlug = resolveTenantSlugFromPathname(pathname);
+  const tenantHomeHref = currentTenantSlug ? `/site/${currentTenantSlug}` : "/";
   const activeRouteKey = toActiveRouteKey(pathname);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -198,12 +221,12 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
   }
 
   function resolveNavLabel(label: string, href: string): string {
-    const normalized = normalizeNavHref(href).toLowerCase();
-    if (normalized === "/") return t("nav.home");
-    if (normalized === "/rooms") return t("nav.rooms");
-    if (normalized === "/activities") return t("nav.activities");
-    if (normalized === "/about") return t("nav.about");
-    if (normalized === "/contact") return t("nav.contact");
+    const routeKey = toActiveRouteKey(href).toLowerCase();
+    if (routeKey === "/") return t("nav.home");
+    if (routeKey === "/rooms") return t("nav.rooms");
+    if (routeKey === "/activities") return t("nav.activities");
+    if (routeKey === "/about") return t("nav.about");
+    if (routeKey === "/contact") return t("nav.contact");
     return getLocalizedValue(label, resolvedLocale, label);
   }
 
@@ -226,14 +249,14 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
           <span />
         </button>
 
-        <Link aria-label={t("goHome")} className="top-logo-link" href="/" onClick={() => closeMobileMenu()}>
+        <Link aria-label={t("goHome")} className="top-logo-link" href={tenantHomeHref} onClick={() => closeMobileMenu()}>
           {renderLogo(brand, settings)}
         </Link>
 
         <nav className="top-main-menu" aria-label="Primary">
           {settings.leftLinks.map((item) => {
-            const href = normalizeNavHref(item.href);
-            const isActive = href.toLowerCase() === activeRouteKey;
+            const href = resolveTenantAwareNavHref(item.href, currentTenantSlug);
+            const isActive = toActiveRouteKey(href).toLowerCase() === activeRouteKey;
             const label = resolveNavLabel(item.label, href);
             return (
               <Link
@@ -269,7 +292,7 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
             X
           </button>
           <div className="mobile-logo-wrap">
-            <Link aria-label={t("goHome")} className="top-logo-link" href="/" onClick={() => closeMobileMenu()}>
+            <Link aria-label={t("goHome")} className="top-logo-link" href={tenantHomeHref} onClick={() => closeMobileMenu()}>
               {renderLogo(brand, settings)}
             </Link>
           </div>
@@ -277,8 +300,8 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
 
         <nav aria-label="Mobile Primary" className="mobile-nav-links">
           {settings.leftLinks.map((item, index) => {
-            const href = normalizeNavHref(item.href);
-            const isActive = href.toLowerCase() === activeRouteKey;
+            const href = resolveTenantAwareNavHref(item.href, currentTenantSlug);
+            const isActive = toActiveRouteKey(href).toLowerCase() === activeRouteKey;
             const label = resolveNavLabel(item.label, href);
             return (
               <Link

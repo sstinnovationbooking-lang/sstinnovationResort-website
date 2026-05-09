@@ -1,4 +1,4 @@
-import type { HomepageAmenitiesDTO, HomepageAmenityItemDTO } from "@/lib/types/site";
+﻿import type { HomepageAmenitiesDTO, HomepageAmenityItemDTO, LocalizedText } from "@/lib/types/site";
 
 export const HOMEPAGE_AMENITIES_CONTENT_KEY = "homepage.amenities";
 
@@ -69,11 +69,28 @@ function cleanText(value: unknown): string {
   return String(value ?? "").trim();
 }
 
+function normalizeLocalizedText(value: unknown): LocalizedText | null {
+  if (typeof value === "string") {
+    const normalized = cleanText(value);
+    return normalized || null;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+
+  const record: Record<string, string> = {};
+  for (const [key, raw] of Object.entries(value)) {
+    const text = cleanText(raw);
+    if (!text) continue;
+    record[key] = text;
+  }
+
+  return Object.keys(record).length > 0 ? record : null;
+}
+
 function normalizeAmenityItem(value: unknown, index: number): HomepageAmenityItemDTO | null {
   if (!value || typeof value !== "object") return null;
   const raw = value as Partial<HomepageAmenityItemDTO>;
-  const title = cleanText(raw.title);
-  const description = cleanText(raw.description);
+  const title = normalizeLocalizedText(raw.title);
+  const description = normalizeLocalizedText(raw.description);
   if (!title || !description) return null;
 
   return {
@@ -90,7 +107,7 @@ export function isValidHomepageAmenities(value: unknown): value is HomepageAmeni
   if (!value || typeof value !== "object") return false;
   const candidate = value as Partial<HomepageAmenitiesDTO>;
 
-  if (!cleanText(candidate.eyebrow) || !cleanText(candidate.heading)) {
+  if (!normalizeLocalizedText(candidate.eyebrow) || !normalizeLocalizedText(candidate.heading)) {
     return false;
   }
 
@@ -107,8 +124,8 @@ export function sanitizeHomepageAmenities(value: unknown): HomepageAmenitiesDTO 
   }
 
   const candidate = value as Partial<HomepageAmenitiesDTO>;
-  const eyebrow = cleanText(candidate.eyebrow) || DEFAULT_HOMEPAGE_AMENITIES.eyebrow;
-  const heading = cleanText(candidate.heading) || DEFAULT_HOMEPAGE_AMENITIES.heading;
+  const eyebrow = normalizeLocalizedText(candidate.eyebrow) ?? DEFAULT_HOMEPAGE_AMENITIES.eyebrow;
+  const heading = normalizeLocalizedText(candidate.heading) ?? DEFAULT_HOMEPAGE_AMENITIES.heading;
   const items = Array.isArray(candidate.items)
     ? candidate.items
       .map((item, index) => normalizeAmenityItem(item, index))

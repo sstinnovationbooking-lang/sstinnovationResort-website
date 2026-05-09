@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sstinnovationresort.local/schemas/ui.booking.schema.json",
+  "title": "Site UI Booking Settings",
+  "description": "Per-tenant booking package controls from backend/central for room-detail booking behavior.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["contact_only", "booking_enabled"],
+      "description": "contact_only routes Book now to contact flow; booking_enabled opens booking form."
+    },
+    "allowBookingForm": {
+      "type": "boolean",
+      "description": "Hard switch for in-modal booking form."
+    },
+    "contactRoute": {
+      "type": "string",
+      "pattern": "^/",
+      "description": "Tenant-relative or site path used when mode is contact_only."
+    },
+    "paymentOptions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["deposit_50", "full"]
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Supported payment choices in booking form."
+    },
+    "defaultPaymentOption": {
+      "type": "string",
+      "enum": ["deposit_50", "full"],
+      "description": "Default selected payment option."
+    },
+    "depositPercent": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 99,
+      "description": "Deposit percentage used when payment option is deposit_50."
+    }
+  },
+  "required": ["mode"],
+  "allOf": [
+    {
+      "if": {
+        "properties": { "mode": { "const": "contact_only" } },
+        "required": ["mode"]
+      },
+      "then": {
+        "properties": {
+          "allowBookingForm": { "const": false }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "mode": { "const": "booking_enabled" } },
+        "required": ["mode"]
+      },
+      "then": {
+        "properties": {
+          "allowBookingForm": { "const": true }
+        }
+      }
+    }
+  ]
+}

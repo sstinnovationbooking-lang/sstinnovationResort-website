@@ -35,6 +35,7 @@
   "HeroBooking": {
     "checkInLabel": "Check-in date",
     "nightsLabel": "Length of stay (nights)",
+    "guestsLabel": "Guests",
     "searchIdle": "Search rooms",
     "searchLoading": "Searching rooms..."
   },
@@ -46,6 +47,7 @@
     "statsAria": "Key stats",
     "statsEmpty": "Stats are currently unavailable.",
     "roomsTitle": "Rooms",
+    "heroBookNow": "Book now",
     "roomsDescription": "Choose the best room style for your stay.",
     "roomsIntroEyebrow": "Premium comfort for restful nights",
     "roomsIntroDescription": "Choose the room style that fits your stay, with a relaxing resort atmosphere and practical comfort.",
@@ -54,6 +56,33 @@
     "readMore": "READ MORE",
     "galleryTitle": "Gallery",
     "galleryEmpty": "Gallery is coming soon.",
+    "activitiesHeading": "Our Activities",
+    "activitiesItems": {
+      "tour": {
+        "title": "Tours and Attractions",
+        "altText": "Tours and Attractions"
+      },
+      "kayak": {
+        "title": "Fun Activities",
+        "altText": "Fun Activities"
+      },
+      "travel": {
+        "title": "Travel Services",
+        "altText": "Travel Services"
+      },
+      "nature": {
+        "title": "Outdoor Activities",
+        "altText": "Outdoor Activities"
+      },
+      "dining": {
+        "title": "Food and Drinks",
+        "altText": "Food and Drinks"
+      },
+      "relax": {
+        "title": "Relaxation and Spa",
+        "altText": "Relaxation and Spa"
+      }
+    },
     "featuredGalleryAria": "Featured room gallery",
     "featuredGalleryPrev": "Previous gallery items",
     "featuredGalleryNext": "Next gallery items",
@@ -70,8 +99,21 @@
     "footerMenuTitle": "Main menu",
     "footerContactTitle": "Contact information",
     "footerSystemTitle": "System services",
-    "copyrightPrefix": "?",
+    "footerFollowUs": "Follow us",
+    "footerSocialFacebook": "Facebook",
+    "footerSocialLine": "LINE",
+    "footerSocialMessenger": "Messenger",
+    "footerSocialYoutube": "YouTube",
+    "footerLegalInfo": "Legal info",
+    "footerLegalTitle": "Copyright and Ownership Information",
+    "footerCloseLegalInfo": "Close",
+    "footerRightsReserved": "All rights reserved.",
+    "footerDeveloperLabel": "Website system developer",
+    "footerContentOwnerLabel": "Resort content owner",
+    "footerCopyrightNotice": "This website system is developed by {developerName}. The resort content, including text, images, room information, promotions, contact information, and other resort-specific materials, belongs to {resortName}. Copying, modifying, distributing, or reusing any content without permission is not allowed.",
+    "copyrightPrefix": "©",
     "copyrightFallback": "All rights reserved.",
+    "footerDeveloperCredit": "Developed by SST INNOVATION CO., LTD.",
     "backToTop": "Back to top",
     "nav": {
       "home": "Home",
@@ -201,7 +243,136 @@
       "roomWoodenVillaName": "Wooden Villa",
       "roomWoodenVillaDescription": "Contemporary wooden villa focused on warmth and privacy.",
       "roomWoodenVillaBadge": "Wooden villa"
-    }
+    },
+    "activities": {
+      "heading": "Our Activities",
+      "items": {
+        "tour": {
+          "title": "Tours and Attractions",
+          "altText": "Tours and Attractions"
+        },
+        "kayak": {
+          "title": "Fun Activities",
+          "altText": "Fun Activities"
+        },
+        "travel": {
+          "title": "Travel Services",
+          "altText": "Travel Services"
+        },
+        "nature": {
+          "title": "Outdoor Activities",
+          "altText": "Outdoor Activities"
+        },
+        "dining": {
+          "title": "Food and Drinks",
+          "altText": "Food and Drinks"
+        },
+        "relax": {
+          "title": "Relaxation and Spa",
+          "altText": "Relaxation and Spa"
+        }
+      }
+    },
+    "mediaModal": {
+      "close": "Close",
+      "previousImage": "Previous image",
+      "nextImage": "Next image",
+      "previousActivity": "Previous activity",
+      "nextActivity": "Next activity",
+      "imageUnavailable": "Image unavailable",
+      "openImagePreview": "Open image preview: {title}",
+      "openActivityPreview": "Open activity details: {title}",
+      "activityFallbackDetail": "More details will be available soon."
+    },
+    "roomsAvailabilityTitle": "Room availability",
+    "roomsAvailabilitySubtitle": "Select your preferred room option for the selected stay dates.",
+    "roomsAvailabilitySearchSummary": "Room search summary",
+    "roomsAvailabilityCheckIn": "Check-in",
+    "roomsAvailabilityNights": "Nights",
+    "roomsAvailabilityGuests": "Guests",
+    "roomsSearchCardTitle": "Room search",
+    "roomsSearchCheckInLabel": "Check-in date",
+    "roomsSearchNightsLabel": "Number of nights",
+    "roomsSearchGuestsLabel": "Number of guests",
+    "roomsSearchSubmit": "Search rooms",
+    "roomsSearchLoading": "Loading rooms",
+    "roomsSearchLoadingTitle": "Searching rooms",
+    "roomsSearchLoadingDescription": "Please wait while we check availability for your selected dates",
+    "roomsSearchErrorTitle": "Search failed",
+    "roomsSearchErrorDescription": "We could not connect to the room search system right now",
+    "roomsSearchInvalidResponse": "The room search response format is invalid",
+    "roomsSearchNoResultsTitle": "No available rooms found",
+    "roomsSearchNoResultsDescription": "No rooms are available for the selected date and guest count",
+    "roomsSearchNoResultsHint": "Please adjust your date or number of nights and try again",
+    "roomsSearchValidationTitle": "Search failed",
+    "roomsSearchValidationCheckInRequired": "Please select a check-in date",
+    "roomsSearchValidationNightsRange": "Nights must be between 1 and 30",
+    "roomsSearchValidationGuestsMin": "Number of guests must be greater than 0",
+    "roomsSearchTryAgain": "Try again",
+    "roomsSearchClose": "Close",
+    "roomsSearchClear": "Clear search",
+    "roomsSearchResultsTitle": "Search results",
+    "roomsSearchResultsSubtitle": "Showing available rooms for the selected date",
+    "roomsFailedToLoad": "Failed to load rooms",
+    "roomsTryAgain": "Try again",
+    "roomOnlyLeft": "Only {count} room(s) left!",
+    "roomTaxesAndFees": "Taxes and fees not included",
+    "roomTaxesAndFeesLabel": "Taxes and fees",
+    "roomDetails": "Room details",
+    "roomOptions": "Room options",
+    "roomStatusSoldOut": "Sold out",
+    "roomStatusUnavailable": "Unavailable",
+    "roomStatusAvailable": "Available",
+    "roomPricePerRoomPerNight": "Price / room / night",
+    "roomPricePerNight": "Price per night",
+    "roomsAdjustDates": "Please adjust your search dates",
+    "roomsNoRoomAvailable": "No rooms available",
+    "roomCancellationPolicy": "Cancellation policy",
+    "roomGuests": "Guests",
+    "roomSelect": "Select",
+    "roomUnit": "room",
+    "roomsUnit": "rooms",
+    "roomBookNow": "Select",
+    "roomSendBookingRequest": "Send booking request",
+    "roomBookNowAction": "Book now",
+    "roomBookingContactAction": "Contact resort",
+    "roomBookingFormTitle": "Booking request form",
+    "roomBookingPaymentOption": "Payment option",
+    "roomBookingDepositOptionLabel": "Deposit 50%",
+    "roomBookingFullOptionLabel": "Pay full amount",
+    "roomBookingSummaryTitle": "Payment summary",
+    "roomBookingTotalAmount": "Total amount",
+    "roomBookingPayableAmount": "Amount to pay now",
+    "roomBookingSubmitting": "Submitting request...",
+    "roomBookingSubmitFailed": "Unable to submit booking request right now",
+    "roomBookingBackToDetails": "Back to room details",
+    "roomBookingSendingTitle": "Sending booking information",
+    "roomBookingSendingDescription": "Please wait while we send your booking to the resort system",
+    "roomBookingSuccessTitle": "Booking request sent successfully",
+    "roomBookingSuccessDescription": "Booking successful. Please contact the resort admin for confirmation.",
+    "roomBookingReferenceLabel": "Booking reference",
+    "roomBookingErrorTitle": "Booking request failed",
+    "roomBookingErrorDescription": "We could not connect to the booking system right now. Please try again.",
+    "roomBookingRetry": "Try again",
+    "roomBookingClosePopup": "Close",
+    "roomBookingGuestsLockedNote": "Guests are fixed by this room package",
+    "roomBookingAvailabilityChecking": "Checking latest availability...",
+    "roomBookingAvailabilitySoldOut": "This room is sold out for the selected dates",
+    "roomBookingAvailabilityCheckFailed": "Unable to verify latest availability right now",
+    "roomBookingDatePastError": "Check-in and check-out cannot be in the past",
+    "roomClose": "Close",
+    "roomTypeLabel": "Room type",
+    "roomMaxGuestsLabel": "Maximum guests",
+    "roomStatusLabel": "Room status",
+    "roomAvailableRoomsLabel": "Available rooms",
+    "roomAmenitiesLabel": "Amenities",
+    "roomImagesLabel": "Room images",
+    "roomSelectedStayDetails": "Selected stay details",
+    "roomStayCheckIn": "Check-in date",
+    "roomStayNights": "Number of nights",
+    "roomStayGuests": "Number of guests",
+    "roomNotSpecified": "Not specified",
+    "roomCancellationFallback": "Cancellation policy provided after selection"
   },
   "LeadForm": {
     "customerName": "Customer name",
@@ -212,7 +383,7 @@
     "checkOut": "Check-out",
     "message": "Message",
     "placeholderName": "Your full name",
-    "placeholderPhone": "+66 8x-xxx-xxxx",
+    "placeholderPhone": "08x-xxx-xxx",
     "placeholderEmail": "you@example.com",
     "placeholderRoomId": "Optional room ID",
     "placeholderMessage": "Tell us your preferred room and requests...",
@@ -226,7 +397,7 @@
     "errorCustomerNameRequired": "Customer name is required",
     "errorPhoneRequired": "Phone is required",
     "errorEmailInvalid": "Email format is invalid",
-    "errorPhoneInvalid": "Phone format is invalid",
+    "errorPhoneInvalid": "Phone must be exactly 10 digits (0XXXXXXXXX)",
     "errorCheckInInvalid": "Check-in date must be YYYY-MM-DD",
     "errorCheckOutInvalid": "Check-out date must be YYYY-MM-DD",
     "errorDateOrder": "Check-out date must be after check-in date",
@@ -252,10 +423,12 @@
     "taxesIncluded": "Taxes and fees included",
     "summaryCheckIn": "Check-in date",
     "summaryNights": "Nights",
+    "summaryGuests": "Guests",
     "summaryCurrency": "Currency",
     "validationCheckInRequired": "Please select a check-in date.",
     "validationCheckInFormat": "Invalid date format. Please use YYYY-MM-DD.",
     "validationNightsRange": "Nights must be between {min} and {max}.",
+    "validationGuestsMin": "Guests must be at least {min}.",
     "technicalGenericSafe": "Room search is temporarily unavailable.",
     "rateFallback": "Best available rate",
     "unavailableRateFallback": "Not available for selected dates"

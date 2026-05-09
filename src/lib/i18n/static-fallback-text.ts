@@ -35,9 +35,24 @@ const STATIC_FALLBACK_KEY_BY_TEXT: Record<string, string> = {
 
 type TranslateFn = (key: string) => string;
 
+function normalizeFallbackText(value: string): string {
+  return value.replace(/\r\n/g, "\n").replace(/\s+/g, " ").trim();
+}
+
+const STATIC_FALLBACK_KEY_BY_NORMALIZED_TEXT: Record<string, string> = Object.entries(
+  STATIC_FALLBACK_KEY_BY_TEXT
+).reduce<Record<string, string>>((acc, [rawText, key]) => {
+  const normalizedText = normalizeFallbackText(rawText);
+  if (normalizedText) {
+    acc[normalizedText] = key;
+  }
+  return acc;
+}, {});
+
 export function translateStaticFallbackText(value: string | null | undefined, t: TranslateFn): string {
   const text = String(value ?? "");
-  const key = STATIC_FALLBACK_KEY_BY_TEXT[text];
+  const key =
+    STATIC_FALLBACK_KEY_BY_TEXT[text] ?? STATIC_FALLBACK_KEY_BY_NORMALIZED_TEXT[normalizeFallbackText(text)];
   if (!key) return text;
   try {
     return t(key);

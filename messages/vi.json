@@ -65,7 +65,7 @@
     "footerMenuTitle": "Main menu",
     "footerContactTitle": "Contact information",
     "footerSystemTitle": "System services",
-    "copyrightPrefix": "?",
+    "copyrightPrefix": "©",
     "copyrightFallback": "All rights reserved.",
     "nav": {
       "home": "Home",
@@ -195,6 +195,73 @@
       "roomWoodenVillaName": "Wooden Villa",
       "roomWoodenVillaDescription": "Contemporary wooden villa focused on warmth and privacy.",
       "roomWoodenVillaBadge": "Wooden villa"
+    },
+    "activitiesHeading": "Our Activities",
+    "activitiesItems": {
+      "tour": {
+        "title": "Tours and Attractions",
+        "altText": "Tours and Attractions"
+      },
+      "kayak": {
+        "title": "Fun Activities",
+        "altText": "Fun Activities"
+      },
+      "travel": {
+        "title": "Travel Services",
+        "altText": "Travel Services"
+      },
+      "nature": {
+        "title": "Outdoor Activities",
+        "altText": "Outdoor Activities"
+      },
+      "dining": {
+        "title": "Food and Drinks",
+        "altText": "Food and Drinks"
+      },
+      "relax": {
+        "title": "Relaxation and Spa",
+        "altText": "Relaxation and Spa"
+      }
+    },
+    "activities": {
+      "heading": "Our Activities",
+      "items": {
+        "tour": {
+          "title": "Tours and Attractions",
+          "altText": "Tours and Attractions"
+        },
+        "kayak": {
+          "title": "Fun Activities",
+          "altText": "Fun Activities"
+        },
+        "travel": {
+          "title": "Travel Services",
+          "altText": "Travel Services"
+        },
+        "nature": {
+          "title": "Outdoor Activities",
+          "altText": "Outdoor Activities"
+        },
+        "dining": {
+          "title": "Food and Drinks",
+          "altText": "Food and Drinks"
+        },
+        "relax": {
+          "title": "Relaxation and Spa",
+          "altText": "Relaxation and Spa"
+        }
+      }
+    },
+    "mediaModal": {
+      "close": "Close",
+      "previousImage": "Previous image",
+      "nextImage": "Next image",
+      "previousActivity": "Previous activity",
+      "nextActivity": "Next activity",
+      "imageUnavailable": "Image unavailable",
+      "openImagePreview": "Open image preview: {title}",
+      "openActivityPreview": "Open activity details: {title}",
+      "activityFallbackDetail": "More details will be available soon."
     }
   },
   "LeadForm": {

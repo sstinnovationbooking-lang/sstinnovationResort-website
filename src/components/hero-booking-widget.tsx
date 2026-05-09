@@ -9,6 +9,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const MIN_NIGHTS = 1;
 const MAX_NIGHTS = 30;
+const MIN_GUESTS = 1;
+const MAX_GUESTS = 20;
 const SEARCH_TIMEOUT_MS = 20000;
 
 type RoomAvailabilityStatus = "available" | "unavailable" | "full";
@@ -31,6 +33,7 @@ type RoomSearchRateItem = {
 type RoomSearchResult = {
   checkIn: string;
   nights: number;
+  guests: number;
   currency?: string;
   availableRooms: RoomSearchRateItem[];
   unavailableRooms: RoomSearchRateItem[];
@@ -53,6 +56,13 @@ function parseNights(raw: string): number | null {
   const parsed = Number.parseInt(raw, 10);
   if (!Number.isFinite(parsed)) return null;
   if (parsed < MIN_NIGHTS || parsed > MAX_NIGHTS) return null;
+  return parsed;
+}
+
+function parseGuests(raw: string): number | null {
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed)) return null;
+  if (parsed < MIN_GUESTS || parsed > MAX_GUESTS) return null;
   return parsed;
 }
 
@@ -100,7 +110,7 @@ function normalizeRoomItem(raw: unknown, index: number, fallbackStatus: RoomAvai
   };
 }
 
-function normalizeRoomSearchResponse(payload: unknown, checkIn: string, nights: number): RoomSearchResult {
+function normalizeRoomSearchResponse(payload: unknown, checkIn: string, nights: number, guests: number): RoomSearchResult {
   if (Array.isArray(payload)) {
     const availableRooms = payload
       .map((item, index) => normalizeRoomItem(item, index, "available"))
@@ -108,6 +118,7 @@ function normalizeRoomSearchResponse(payload: unknown, checkIn: string, nights: 
     return {
       checkIn,
       nights,
+      guests,
       currency: "THB",
       availableRooms,
       unavailableRooms: [],
@@ -119,6 +130,7 @@ function normalizeRoomSearchResponse(payload: unknown, checkIn: string, nights: 
     return {
       checkIn,
       nights,
+      guests,
       currency: "THB",
       availableRooms: [],
       unavailableRooms: [],
@@ -139,6 +151,7 @@ function normalizeRoomSearchResponse(payload: unknown, checkIn: string, nights: 
   return {
     checkIn,
     nights,
+    guests,
     currency: asNonEmptyText(data.currency) ?? availableRooms[0]?.currency ?? unavailableRooms[0]?.currency ?? "THB",
     availableRooms,
     unavailableRooms,
@@ -157,6 +170,14 @@ function sanitizeErrorMessage(raw: unknown): string | undefined {
   if (noisyPattern.test(text)) return undefined;
 
   return text.slice(0, 180);
+}
+
+function isAbortLikeError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const name = String((error as { name?: unknown }).name ?? "").toLowerCase();
+  if (name === "aborterror") return true;
+  const message = String((error as { message?: unknown }).message ?? "").toLowerCase();
+  return message.includes("aborted") || message.includes("abort");
 }
 
 function formatPrice(amount: number | undefined, currency: string | undefined, locale: string): string | null {
@@ -184,6 +205,7 @@ export function HeroBookingWidget() {
   const todayIso = new Date().toISOString().slice(0, 10);
   const [checkIn, setCheckIn] = useState(() => searchParams.get("checkIn") ?? "");
   const [nights, setNights] = useState(() => searchParams.get("nights") ?? "1");
+  const [guests, setGuests] = useState(() => searchParams.get("guests") ?? "1");
   const [validationMessage, setValidationMessage] = useState<string>("");
   const [modalState, setModalState] = useState<RoomSearchModalState>({
     isOpen: false,
@@ -192,8 +214,8 @@ export function HeroBookingWidget() {
 
   const isLoading = modalState.isOpen && modalState.status === "loading";
   const roomsPageHref = tenantSlug
-    ? `/site/${tenantSlug}/rooms?checkIn=${encodeURIComponent(checkIn)}&nights=${encodeURIComponent(nights)}`
-    : `/rooms?checkIn=${encodeURIComponent(checkIn)}&nights=${encodeURIComponent(nights)}`;
+    ? `/site/${tenantSlug}/rooms?checkIn=${encodeURIComponent(checkIn)}&nights=${encodeURIComponent(nights)}&guests=${encodeURIComponent(guests)}`
+    : `/rooms?checkIn=${encodeURIComponent(checkIn)}&nights=${encodeURIComponent(nights)}&guests=${encodeURIComponent(guests)}`;
 
   const closeModal = useCallback(() => {
     if (isLoading) return;
@@ -220,7 +242,7 @@ export function HeroBookingWidget() {
     };
   }, [closeModal, isLoading, modalState.isOpen]);
 
-  function validateCriteria(): { checkIn: string; nights: number } | { message: string } {
+  function validateCriteria(): { checkIn: string; nights: number; guests: number } | { message: string } {
     const normalizedCheckIn = checkIn.trim();
     if (!normalizedCheckIn) {
       return { message: modalT("validationCheckInRequired") };
@@ -234,13 +256,19 @@ export function HeroBookingWidget() {
       return { message: modalT("validationNightsRange", { min: MIN_NIGHTS, max: MAX_NIGHTS }) };
     }
 
+    const parsedGuests = parseGuests(guests.trim());
+    if (!parsedGuests) {
+      return { message: modalT("validationGuestsMin", { min: MIN_GUESTS }) };
+    }
+
     return {
       checkIn: normalizedCheckIn,
-      nights: parsedNights
+      nights: parsedNights,
+      guests: parsedGuests
     };
   }
 
-  async function runRoomSearch(nextCheckIn: string, nextNights: number) {
+  async function runRoomSearch(nextCheckIn: string, nextNights: number, nextGuests: number) {
     setModalState({
       isOpen: true,
       status: "loading"
@@ -248,7 +276,8 @@ export function HeroBookingWidget() {
 
     const params = new URLSearchParams({
       checkIn: nextCheckIn,
-      nights: String(nextNights)
+      nights: String(nextNights),
+      guests: String(nextGuests)
     });
     const apiPath = tenantSlug ? `/api/site/${encodeURIComponent(tenantSlug)}/rooms` : "/api/site/rooms";
     const endpoint = `${apiPath}?${params.toString()}`;
@@ -271,7 +300,7 @@ export function HeroBookingWidget() {
         throw new Error(sanitizeErrorMessage(apiError) ?? modalT("technicalGenericSafe"));
       }
 
-      const normalized = normalizeRoomSearchResponse(payload, nextCheckIn, nextNights);
+      const normalized = normalizeRoomSearchResponse(payload, nextCheckIn, nextNights, nextGuests);
       if (normalized.availableRooms.length > 0) {
         setModalState({
           isOpen: true,
@@ -286,7 +315,8 @@ export function HeroBookingWidget() {
         });
       }
     } catch (error) {
-      if (process.env.NODE_ENV !== "production") {
+      const isAbortError = isAbortLikeError(error);
+      if (!isAbortError && process.env.NODE_ENV !== "production") {
         console.error("[RoomSearchModal] room search failed", error);
       }
 
@@ -314,7 +344,7 @@ export function HeroBookingWidget() {
     }
 
     setValidationMessage("");
-    await runRoomSearch(validated.checkIn, validated.nights);
+    await runRoomSearch(validated.checkIn, validated.nights, validated.guests);
   }
 
   const modalHeadingId = "room-search-modal-title";
@@ -369,6 +399,7 @@ export function HeroBookingWidget() {
                     <div className="room-search-summary">
                       <p>{modalT("summaryCheckIn")}: {modalState.data.checkIn}</p>
                       <p>{modalT("summaryNights")}: {modalState.data.nights}</p>
+                      <p>{modalT("summaryGuests")}: {modalState.data.guests}</p>
                       <p>{modalT("summaryCurrency")}: {modalState.data.currency || "THB"}</p>
                       <p>{modalT("availableCount", { count: modalState.data.totalAvailable })}</p>
                     </div>
@@ -481,7 +512,7 @@ export function HeroBookingWidget() {
                           }
 
                           setValidationMessage("");
-                          await runRoomSearch(validated.checkIn, validated.nights);
+                          await runRoomSearch(validated.checkIn, validated.nights, validated.guests);
                         }}
                         type="button"
                       >
@@ -504,6 +535,12 @@ export function HeroBookingWidget() {
     <>
       <form aria-busy={isLoading} className="hero-booking-card" onSubmit={onSearchSubmit}>
         <label className="hero-booking-cell" htmlFor="hero-search-checkin">
+          <span aria-hidden className="hero-booking-icon">
+            <svg viewBox="0 0 24 24">
+              <rect height="16" rx="3" ry="3" width="18" x="3" y="5" />
+              <path d="M8 3v4M16 3v4M3 10h18" />
+            </svg>
+          </span>
           <span>{bookingT("checkInLabel")}</span>
           <input
             disabled={isLoading}
@@ -517,6 +554,12 @@ export function HeroBookingWidget() {
           />
         </label>
         <label className="hero-booking-cell" htmlFor="hero-search-nights">
+          <span aria-hidden className="hero-booking-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 6h8a4 4 0 0 1 4 4v8H8a4 4 0 0 1-4-4z" />
+              <path d="M12 6h4a4 4 0 0 1 4 4v8h-8z" />
+            </svg>
+          </span>
           <span>{bookingT("nightsLabel")}</span>
           <input
             disabled={isLoading}
@@ -528,6 +571,27 @@ export function HeroBookingWidget() {
             required
             type="number"
             value={nights}
+          />
+        </label>
+        <label className="hero-booking-cell" htmlFor="hero-search-guests">
+          <span aria-hidden className="hero-booking-icon">
+            <svg viewBox="0 0 24 24">
+              <circle cx="9" cy="8" r="3" />
+              <circle cx="16.5" cy="9.5" r="2.5" />
+              <path d="M3 18a6 6 0 0 1 12 0" />
+              <path d="M13 18a4.5 4.5 0 0 1 8 0" />
+            </svg>
+          </span>
+          <span>{bookingT("guestsLabel")}</span>
+          <input
+            disabled={isLoading}
+            id="hero-search-guests"
+            min={1}
+            name="guests"
+            onChange={(event) => setGuests(event.target.value)}
+            required
+            type="number"
+            value={guests}
           />
         </label>
         <button className="hero-booking-btn" disabled={isLoading} ref={searchButtonRef} type="submit">

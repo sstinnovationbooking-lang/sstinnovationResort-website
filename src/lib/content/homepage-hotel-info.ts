@@ -1,4 +1,4 @@
-import type { HomepageHotelInfoDTO, HomepageHotelInfoItemDTO } from "@/lib/types/site";
+﻿import type { HomepageHotelInfoDTO, HomepageHotelInfoItemDTO, LocalizedText } from "@/lib/types/site";
 
 export const HOMEPAGE_HOTEL_INFO_CONTENT_KEY = "homepage.hotelInfo";
 
@@ -68,17 +68,34 @@ function cleanText(value: unknown): string {
   return String(value ?? "").trim();
 }
 
+function normalizeLocalizedText(value: unknown): LocalizedText | null {
+  if (typeof value === "string") {
+    const normalized = cleanText(value);
+    return normalized || null;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+
+  const record: Record<string, string> = {};
+  for (const [key, raw] of Object.entries(value)) {
+    const text = cleanText(raw);
+    if (!text) continue;
+    record[key] = text;
+  }
+
+  return Object.keys(record).length > 0 ? record : null;
+}
+
 function normalizeHotelInfoItem(value: unknown, index: number): HomepageHotelInfoItemDTO | null {
   if (!value || typeof value !== "object") return null;
   const raw = value as Partial<HomepageHotelInfoItemDTO>;
-  const title = cleanText(raw.title);
+  const title = normalizeLocalizedText(raw.title);
   if (!title) return null;
 
   return {
     id: cleanText(raw.id) || `hotel-info-${index + 1}`,
     iconKey: cleanText(raw.iconKey) || "info",
     title,
-    description: cleanText(raw.description),
+    description: normalizeLocalizedText(raw.description) ?? "",
     order: typeof raw.order === "number" ? raw.order : index + 1,
     isVisible: raw.isVisible === false ? false : true
   };
@@ -87,7 +104,7 @@ function normalizeHotelInfoItem(value: unknown, index: number): HomepageHotelInf
 export function isValidHomepageHotelInfo(value: unknown): value is HomepageHotelInfoDTO {
   if (!value || typeof value !== "object") return false;
   const candidate = value as Partial<HomepageHotelInfoDTO>;
-  if (!cleanText(candidate.heading)) return false;
+  if (!normalizeLocalizedText(candidate.heading)) return false;
   if (!Array.isArray(candidate.items)) return false;
   const normalized = candidate.items
     .map((item, index) => normalizeHotelInfoItem(item, index))
@@ -101,7 +118,7 @@ export function sanitizeHomepageHotelInfo(value: unknown): HomepageHotelInfoDTO 
   }
 
   const candidate = value as Partial<HomepageHotelInfoDTO>;
-  const heading = cleanText(candidate.heading) || DEFAULT_HOMEPAGE_HOTEL_INFO.heading;
+  const heading = normalizeLocalizedText(candidate.heading) ?? DEFAULT_HOMEPAGE_HOTEL_INFO.heading;
   const items = Array.isArray(candidate.items)
     ? candidate.items
       .map((item, index) => normalizeHotelInfoItem(item, index))

@@ -1,9 +1,11 @@
-"use client";
+﻿"use client";
 
 import type { JSX } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
+import { DEFAULT_LOCALE, normalizeLocale } from "@/i18n/config";
 import { DEFAULT_HOMEPAGE_HOTEL_INFO, sanitizeHomepageHotelInfo } from "@/lib/content/homepage-hotel-info";
+import { getLocalizedValue } from "@/lib/i18n/localized";
 import type { HomepageHotelInfoItemDTO, SiteHomeDTO } from "@/lib/types/site";
 
 interface HomepageHotelInfoProps {
@@ -91,8 +93,8 @@ function HotelInfoItem({ item }: { item: HomepageHotelInfoItemDTO }) {
         <HotelInfoIcon iconKey={item.iconKey} />
       </div>
       <div className="hotel-info-text">
-        <h3 className="hotel-info-title">{item.title}</h3>
-        {item.description ? <p className="hotel-info-description">{item.description}</p> : null}
+        <h3 className="hotel-info-title">{String(item.title ?? "")}</h3>
+        {item.description ? <p className="hotel-info-description">{String(item.description)}</p> : null}
       </div>
     </article>
   );
@@ -100,7 +102,14 @@ function HotelInfoItem({ item }: { item: HomepageHotelInfoItemDTO }) {
 
 export function HomepageHotelInfo({ home }: HomepageHotelInfoProps) {
   const t = useTranslations("ResortHome");
+  const locale = useLocale();
+  const resolvedLocale = normalizeLocale(locale) ?? DEFAULT_LOCALE;
   const { section, visibleItems, useStaticTranslationFallback } = resolveHotelInfo(home);
+
+  function localized(value: unknown, fallback = ""): string {
+    return getLocalizedValue(value, resolvedLocale, fallback);
+  }
+
   function tryTranslate(key: string, fallback: string): string {
     try {
       return t(key as never);
@@ -108,6 +117,7 @@ export function HomepageHotelInfo({ home }: HomepageHotelInfoProps) {
       return fallback;
     }
   }
+
   if (section.isVisible === false || visibleItems.length === 0) {
     return null;
   }
@@ -116,7 +126,11 @@ export function HomepageHotelInfo({ home }: HomepageHotelInfoProps) {
     <section aria-labelledby="hotel-info-title" className="hotel-info-section reveal" id="hotel-info">
       <div className="shell">
         <div className="hotel-info-head">
-          <h2 id="hotel-info-title">{tryTranslate("hotelInfoHeading", section.heading)}</h2>
+          <h2 id="hotel-info-title">
+            {useStaticTranslationFallback
+              ? tryTranslate("hotelInfoHeading", localized(section.heading))
+              : localized(section.heading, tryTranslate("hotelInfoHeading", ""))}
+          </h2>
         </div>
 
         <div className="hotel-info-grid">
@@ -124,11 +138,13 @@ export function HomepageHotelInfo({ home }: HomepageHotelInfoProps) {
             <HotelInfoItem
               item={{
                 ...item,
-                title: useStaticTranslationFallback ? tryTranslate(`hotelInfoItems.${item.id}.title`, item.title) : item.title,
+                title: useStaticTranslationFallback
+                  ? tryTranslate(`hotelInfoItems.${item.id}.title`, localized(item.title))
+                  : localized(item.title),
                 description: item.description
                   ? useStaticTranslationFallback
-                    ? tryTranslate(`hotelInfoItems.${item.id}.description`, item.description)
-                    : item.description
+                    ? tryTranslate(`hotelInfoItems.${item.id}.description`, localized(item.description))
+                    : localized(item.description)
                   : item.description
               }}
               key={item.id}

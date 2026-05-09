@@ -1,4 +1,4 @@
-import type { RoomsIntroDTO } from "@/lib/types/site";
+import type { LocalizedText, RoomsIntroDTO } from "@/lib/types/site";
 
 export const ROOMS_INTRO_CONTENT_KEY = "homepage.roomsIntro";
 
@@ -14,8 +14,24 @@ function sanitizeText(value: unknown): string {
   return String(value ?? "").trim();
 }
 
+function normalizeLocalizedText(value: unknown): LocalizedText | null {
+  if (typeof value === "string") {
+    const normalized = sanitizeText(value);
+    return normalized || null;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+
+  const record: Record<string, string> = {};
+  for (const [key, raw] of Object.entries(value)) {
+    const text = sanitizeText(raw);
+    if (!text) continue;
+    record[key] = text;
+  }
+  return Object.keys(record).length > 0 ? record : null;
+}
+
 function isValidText(value: unknown): boolean {
-  return sanitizeText(value).length > 0;
+  return normalizeLocalizedText(value) !== null;
 }
 
 export function isValidRoomsIntro(value: unknown): value is RoomsIntroDTO {
@@ -35,9 +51,9 @@ export function sanitizeRoomsIntro(value: unknown): RoomsIntroDTO {
 
   const candidate = value as RoomsIntroDTO;
   return {
-    eyebrow: sanitizeText(candidate.eyebrow),
-    heading: sanitizeText(candidate.heading),
-    description: sanitizeText(candidate.description),
+    eyebrow: normalizeLocalizedText(candidate.eyebrow) ?? DEFAULT_ROOMS_INTRO.eyebrow,
+    heading: normalizeLocalizedText(candidate.heading) ?? DEFAULT_ROOMS_INTRO.heading,
+    description: normalizeLocalizedText(candidate.description) ?? DEFAULT_ROOMS_INTRO.description,
     isVisible: candidate.isVisible === false ? false : true
   };
 }

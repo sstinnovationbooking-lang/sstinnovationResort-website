@@ -1,5 +1,7 @@
 param(
-  [int]$Port = 3000
+  [int]$Port = 3000,
+  [int[]]$FallbackPorts = @(3001, 3002),
+  [switch]$ForcePreferredPort
 )
 
 $ErrorActionPreference = "Stop"
@@ -39,22 +41,59 @@ function Get-PortPids {
   return $pids | Where-Object { $_ -gt 0 } | Sort-Object -Unique
 }
 
-Write-Host "Checking port $Port ..."
-$portPids = Get-PortPids -TargetPort $Port
+function Get-CandidatePorts {
+  param(
+    [int]$PreferredPort,
+    [int[]]$AlternativePorts
+  )
 
-if ($portPids.Count -gt 0) {
-  foreach ($processId in $portPids) {
-    if ($processId -eq $PID) { continue }
-    try {
-      Write-Host "Stopping PID $processId on port $Port ..."
-      Stop-Process -Id $processId -Force -ErrorAction Stop
-    } catch {
-      Write-Warning "Failed to stop PID ${processId}: $($_.Exception.Message)"
-    }
+  $orderedUniquePorts = @()
+  foreach ($candidatePort in @($PreferredPort) + $AlternativePorts) {
+    if ($candidatePort -le 0) { continue }
+    if ($orderedUniquePorts -contains $candidatePort) { continue }
+    $orderedUniquePorts += $candidatePort
   }
-  Start-Sleep -Seconds 1
-} else {
-  Write-Host "Port $Port is free."
+
+  return $orderedUniquePorts
+}
+
+$candidatePorts = Get-CandidatePorts -PreferredPort $Port -AlternativePorts $FallbackPorts
+if ($candidatePorts.Count -eq 0) {
+  throw "No valid dev ports were provided."
+}
+
+$selectedPort = $null
+
+foreach ($candidatePort in $candidatePorts) {
+  $portPids = Get-PortPids -TargetPort $candidatePort
+  if ($portPids.Count -eq 0) {
+    $selectedPort = $candidatePort
+    break
+  }
+
+  if ($ForcePreferredPort -and $candidatePort -eq $Port) {
+    foreach ($processId in $portPids) {
+      if ($processId -eq $PID) { continue }
+      try {
+        Write-Host "Stopping PID $processId on preferred port $Port ..."
+        Stop-Process -Id $processId -Force -ErrorAction Stop
+      } catch {
+        Write-Warning "Failed to stop PID ${processId}: $($_.Exception.Message)"
+      }
+    }
+    Start-Sleep -Seconds 1
+    $preferredPortPids = Get-PortPids -TargetPort $Port
+    if ($preferredPortPids.Count -eq 0) {
+      $selectedPort = $Port
+      break
+    }
+  } else {
+    Write-Host "Port $candidatePort is in use by PID(s): $($portPids -join ', ')"
+  }
+}
+
+if (-not $selectedPort) {
+  throw "No available port found. Tried: $($candidatePorts -join ', ')."
 }
 
 $lockPath = Join-Path $PSScriptRoot "..\.next\dev\lock"
@@ -83,5 +122,11 @@ if (-not (Test-Path $nextCli)) {
   throw "Next CLI not found at node_modules\\next\\dist\\bin\\next. Run npm install first."
 }
 
-Write-Host "Starting Next.js dev server on port $Port ..."
-& $nodePath $nextCli dev --webpack --port $Port
+if ($selectedPort -ne $Port) {
+  Write-Host "Preferred port $Port is busy. Using fallback port $selectedPort."
+} else {
+  Write-Host "Using port $selectedPort."
+}
+
+Write-Host "Starting Next.js dev server on port $selectedPort ..."
+& $nodePath $nextCli dev --webpack --port $selectedPort
