@@ -99,8 +99,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npx vercel --version
-          npx vercel whoami --token="$VERCEL_TOKEN"
+          npx --yes vercel --version
+          npx --yes vercel whoami --token="$VERCEL_TOKEN"
 
           HTTP_STATUS="$(curl -sS -o /tmp/vercel_project_check.json -w "%{http_code}" \
             -H "Authorization: Bearer $VERCEL_TOKEN" \
@@ -128,10 +128,10 @@ jobs:
         run: npm run lint
 
       - name: Pull Vercel project settings
-        run: npx vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+        run: npx --yes vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
 
       - name: Build project artifacts
-        run: npx vercel build --prod --token="$VERCEL_TOKEN"
+        run: npx --yes vercel build --prod --token="$VERCEL_TOKEN"
 
       - name: Deploy to Vercel production
-        run: npx vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+        run: npx --yes vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
