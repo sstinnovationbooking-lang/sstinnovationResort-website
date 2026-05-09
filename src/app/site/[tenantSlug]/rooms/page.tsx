@@ -10,11 +10,18 @@ import { getContentAdapter } from "@/lib/content/get-adapter";
 import { parseRoomSearchCriteriaFromSearchParams } from "@/lib/search/room-search";
 import { classifyStatusFromError, safeDevErrorDetail } from "@/lib/status-notice";
 import { resolveTenant } from "@/lib/tenant-resolver";
+import { listTenantSlugs } from "@/lib/tenants/registry";
 import type { RoomCardDTO, SiteHomeDTO } from "@/lib/types/site";
 
 interface PageProps {
   params: Promise<{ tenantSlug: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return listTenantSlugs().map((tenantSlug) => ({ tenantSlug }));
 }
 
 function getBasePathFromHeaders(headerStore: Awaited<ReturnType<typeof headers>>): string | undefined {

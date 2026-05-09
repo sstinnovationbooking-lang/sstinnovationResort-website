@@ -9,10 +9,17 @@ import { loadMessages } from "@/i18n/messages";
 import { getContentAdapter } from "@/lib/content/get-adapter";
 import { classifyStatusFromError, safeDevErrorDetail } from "@/lib/status-notice";
 import { resolveTenant } from "@/lib/tenant-resolver";
+import { listTenantSlugs } from "@/lib/tenants/registry";
 import type { SiteHomeDTO } from "@/lib/types/site";
 
 interface PageProps {
   params: Promise<{ tenantSlug: string }>;
+}
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return listTenantSlugs().map((tenantSlug) => ({ tenantSlug }));
 }
 
 function getBasePathFromHeaders(headerStore: Awaited<ReturnType<typeof headers>>): string | undefined {

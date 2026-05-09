@@ -16,10 +16,17 @@ import { getContentAdapter } from "@/lib/content/get-adapter";
 import { getLocalizedValue } from "@/lib/i18n/localized";
 import { classifyStatusFromError, safeDevErrorDetail } from "@/lib/status-notice";
 import { resolveTenant } from "@/lib/tenant-resolver";
+import { listTenantSlugs } from "@/lib/tenants/registry";
 import type { SiteHomeDTO } from "@/lib/types/site";
 
 interface PageProps {
   params: Promise<{ tenantSlug: string }>;
+}
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return listTenantSlugs().map((tenantSlug) => ({ tenantSlug }));
 }
 
 function isDemoTenantSlug(tenantSlug: string): boolean {

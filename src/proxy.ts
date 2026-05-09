@@ -7,6 +7,7 @@ import {
   LOCALE_QUERY_PARAM,
   normalizeLocale
 } from "@/i18n/config";
+import { isKnownTenantSlug } from "@/lib/tenants/registry";
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
@@ -18,8 +19,21 @@ function cookieOptions() {
   };
 }
 
+function tenantSlugFromSitePath(pathname: string): string | null {
+  const match = pathname.match(/^\/site\/([^/?#]+)/i);
+  if (!match?.[1]) return null;
+  return match[1].trim().toLowerCase();
+}
+
 export function proxy(request: NextRequest) {
   const nextUrl = request.nextUrl;
+  const pathTenantSlug = tenantSlugFromSitePath(nextUrl.pathname);
+
+  // Explicit unknown tenant routes must return true 404.
+  if (pathTenantSlug && !isKnownTenantSlug(pathTenantSlug)) {
+    return new NextResponse("Not Found", { status: 404 });
+  }
+
   const localeQuery = normalizeLocale(nextUrl.searchParams.get(LOCALE_QUERY_PARAM));
 
   if (localeQuery) {
@@ -44,4 +58,3 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\..*).*)"]
 };
-

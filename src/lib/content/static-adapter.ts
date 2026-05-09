@@ -12,15 +12,28 @@ function normalizeTenantSlug(tenantSlug?: string | null): string {
   return normalized || getDefaultTenantSlug();
 }
 
-function resolveStaticTenantSlug(tenantSlug?: string | null): string {
-  const candidate = normalizeTenantSlug(tenantSlug);
+function resolveStaticTenantSlug(
+  tenantSlug?: string | null,
+  options?: { allowDefaultFallback?: boolean }
+): string | null {
+  const normalizedInput = String(tenantSlug ?? "").trim().toLowerCase();
+  const allowDefaultFallback = options?.allowDefaultFallback ?? true;
+
+  if (!normalizedInput) {
+    return allowDefaultFallback ? getDefaultTenantSlug() : null;
+  }
+
+  const candidate = normalizeTenantSlug(normalizedInput);
   if (getTenantBySlug(candidate)) return candidate;
-  return getDefaultTenantSlug();
+  return null;
 }
 
 export class StaticContentAdapter implements ContentAdapter {
   async getSiteHome(tenantSlug?: string | null) {
-    const resolvedTenantSlug = resolveStaticTenantSlug(tenantSlug);
+    const resolvedTenantSlug = resolveStaticTenantSlug(tenantSlug, { allowDefaultFallback: true });
+    if (!resolvedTenantSlug) {
+      throw new Error("Unknown tenant slug.");
+    }
     const data = getStaticHomeByTenant(resolvedTenantSlug);
     if (!data) {
       throw new Error("Unable to load tenant content.");
@@ -29,7 +42,10 @@ export class StaticContentAdapter implements ContentAdapter {
   }
 
   async getRooms(tenantSlug?: string | null, criteria?: RoomSearchCriteria) {
-    const resolvedTenantSlug = resolveStaticTenantSlug(tenantSlug);
+    const resolvedTenantSlug = resolveStaticTenantSlug(tenantSlug, { allowDefaultFallback: true });
+    if (!resolvedTenantSlug) {
+      throw new Error("Unknown tenant slug.");
+    }
     const tenant = getTenantBySlug(resolvedTenantSlug);
     const rooms = sanitizeRoomsPayload(getStaticRoomsByTenant(resolvedTenantSlug), tenant ?? undefined);
 
@@ -44,7 +60,10 @@ export class StaticContentAdapter implements ContentAdapter {
       throw new Error(errors.join(", "));
     }
 
-    const resolvedTenantSlug = resolveStaticTenantSlug(tenantSlug);
+    const resolvedTenantSlug = resolveStaticTenantSlug(tenantSlug, { allowDefaultFallback: true });
+    if (!resolvedTenantSlug) {
+      throw new Error("Unknown tenant slug.");
+    }
     return {
       ok: true as const,
       referenceId: `static-${resolvedTenantSlug}-${Date.now()}`
