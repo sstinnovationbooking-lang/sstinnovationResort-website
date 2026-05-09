@@ -5,15 +5,12 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { HomepageActivities } from "@/components/homepage-activities";
 import { FeaturedRoomGallery } from "@/components/featured-room-gallery";
-import { BackToTopButton } from "@/components/back-to-top-button";
-import { FooterCopyrightLegal } from "@/components/footer-copyright-legal";
-import { FooterSocialLinks } from "@/components/footer-social-links";
 import { HeroBookingWidget } from "@/components/hero-booking-widget";
 import { HomepageAmenities } from "@/components/homepage-amenities";
 import { HomepageHotelInfo } from "@/components/homepage-hotel-info";
 import { HomepageRoomHighlights } from "@/components/homepage-room-highlights";
+import { ResortSiteFooter } from "@/components/resort-site-footer";
 import { ResortTopNavbar } from "@/components/top-navbar";
-import { DEFAULT_SITE_FOOTER, sanitizeSiteFooter } from "@/lib/content/footer";
 import { DEFAULT_ROOMS_INTRO } from "@/lib/content/rooms-intro";
 import { resolveSiteContact } from "@/lib/content/site-contact";
 import { DEFAULT_LOCALE, normalizeLocale } from "@/i18n/config";
@@ -31,13 +28,6 @@ export function ResortHome({ home, navbar }: ResortHomeProps) {
   const locale = useLocale();
   const resolvedLocale = normalizeLocale(locale) ?? DEFAULT_LOCALE;
   const [isBookingCardVisible, setIsBookingCardVisible] = useState(true);
-  const footer = sanitizeSiteFooter(home.footer ?? DEFAULT_SITE_FOOTER);
-  const footerMenuItems = footer.menuItems?.length
-    ? footer.menuItems
-    : navbar?.leftLinks?.length
-      ? navbar.leftLinks
-      : DEFAULT_SITE_FOOTER.menuItems ?? [];
-  const footerSystemItems = footer.systemLinks ?? DEFAULT_SITE_FOOTER.systemLinks ?? [];
   const siteContact = resolveSiteContact(home, resolvedLocale);
   const navbarPhoneDisplay = siteContact.phone;
   const roomsIntro = home.roomsIntro;
@@ -60,18 +50,6 @@ export function ResortHome({ home, navbar }: ResortHomeProps) {
   const heroEyebrow = getLocalizedValue(home.hero.eyebrow, resolvedLocale, "");
   const heroTitle = getLocalizedValue(home.hero.title, resolvedLocale, "");
   const heroSubtitle = getLocalizedValue(home.hero.subtitle, resolvedLocale, "");
-  const footerBrandName = getLocalizedValue(footer.brandName, resolvedLocale, "SST INNOVATION RESORT");
-  const footerDescription = getLocalizedValue(footer.description, resolvedLocale, "");
-
-  function resolveMenuLabel(label: string, href?: string): string {
-    const normalized = String(href ?? "").trim().toLowerCase();
-    if (normalized === "/") return t("nav.home");
-    if (normalized === "/rooms") return t("nav.rooms");
-    if (normalized === "/activities") return t("nav.activities");
-    if (normalized === "/about") return t("nav.about");
-    if (normalized === "/contact") return t("nav.contact");
-    return label;
-  }
 
   useEffect(() => {
     if (!navbar?.showSearchStrip) return;
@@ -132,6 +110,9 @@ export function ResortHome({ home, navbar }: ResortHomeProps) {
             <a className="hero-cta-btn" href={`/site/${home.tenant.tenantSlug}/rooms`}>
               {t("heroBookNow")}
             </a>
+            <a className="hero-cta-link" href={`/site/${home.tenant.tenantSlug}/contact`}>
+              {t("nav.contact")}
+            </a>
           </div>
         </div>
       </section>
@@ -151,67 +132,7 @@ export function ResortHome({ home, navbar }: ResortHomeProps) {
       <HomepageAmenities home={home} />
       <HomepageHotelInfo home={home} />
       <HomepageActivities home={home} />
-
-      {footer.isVisible !== false ? (
-        <>
-          <footer className="site-footer" id="footer">
-            <div className="shell footer-shell">
-              <div className="footer-grid">
-                <section className="footer-col footer-brand" aria-label="Resort brand">
-                  <h3 className="footer-brand-name">{footerBrandName || "SST INNOVATION RESORT"}</h3>
-                  <p>{translateStaticFallbackText(footerDescription, t)}</p>
-                  <FooterSocialLinks locale={resolvedLocale} socialLinks={footer.socialLinks} />
-                </section>
-
-                <section className="footer-col footer-menu" aria-label="Footer menu">
-                  <h4>{t("footerMenuTitle")}</h4>
-                  <ul>
-                    {footerMenuItems.map((item) => (
-                      <li key={`footer-menu-${item.label}-${item.href ?? "nohref"}`}>
-                        {item.href ? (
-                          <a href={item.href}>{resolveMenuLabel(getLocalizedValue(item.label, resolvedLocale, ""), item.href)}</a>
-                        ) : (
-                          <span>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-
-                <section className="footer-col footer-contact" aria-label="Contact information">
-                  <h4>{siteContact.footerTitle || t("footerContactTitle")}</h4>
-                  <ul>
-                    <li>{siteContact.address}</li>
-                    <li>{siteContact.phone}</li>
-                    <li>{siteContact.email}</li>
-                    {siteContact.openingHours ? <li>{translateStaticFallbackText(siteContact.openingHours, t)}</li> : null}
-                  </ul>
-                </section>
-
-                <section className="footer-col footer-system" aria-label="System information">
-                  <h4>{t("footerSystemTitle")}</h4>
-                  <ul>
-                    {footerSystemItems.map((item) => (
-                      <li key={`footer-system-${item.label}-${item.href ?? "nohref"}`}>
-                        {item.href ? (
-                          <a href={item.href}>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</a>
-                        ) : (
-                          <span>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              </div>
-
-              <div className="footer-bottom">
-                <FooterCopyrightLegal footer={footer} locale={resolvedLocale} tenantBrand={home.tenant.brand} />
-              </div>
-            </div>
-          </footer>
-          <BackToTopButton />
-        </>
-      ) : null}
+      <ResortSiteFooter home={home} navbar={navbar} />
     </main>
   );
 }

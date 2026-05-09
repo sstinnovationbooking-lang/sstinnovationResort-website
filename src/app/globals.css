@@ -1250,6 +1250,10 @@ a {
 
 .hero-banner-actions {
   margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.72rem;
+  align-items: center;
 }
 
 .hero-cta-btn {
@@ -1269,6 +1273,26 @@ a {
 
 .hero-cta-btn:hover {
   background: #f3f6f8;
+}
+
+.hero-cta-link {
+  height: 48px;
+  padding: 0 1.05rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(18, 28, 34, 0.18);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 126px;
+}
+
+.hero-cta-link:hover {
+  background: rgba(18, 28, 34, 0.28);
 }
 
 @media (min-width: 768px) {
@@ -1295,6 +1319,15 @@ a {
 
   .hero-cta-btn:active {
     transform: scale(0.98);
+  }
+
+  .hero-cta-link {
+    transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+  }
+
+  .hero-cta-link:hover {
+    transform: translateY(-2px);
+    border-color: #fff;
   }
 }
 
@@ -2044,22 +2077,45 @@ p {
   font-weight: 700;
 }
 
-.rooms-load-error {
+.rooms-state-card {
   margin-bottom: 1rem;
-  padding: 0.8rem 0.95rem;
-  border: 1px solid #e1cfc2;
-  background: #fff7f2;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.7rem;
+  border-radius: 14px;
+  border: 1px solid #d4e0d7;
+  background: #fbfdfb;
+  padding: 0.95rem 1rem;
+  display: grid;
+  gap: 0.45rem;
 }
 
-.rooms-load-error p {
+.rooms-state-card h3 {
   margin: 0;
+  color: #1f3a2e;
+  font-size: 1.03rem;
+}
+
+.rooms-state-card p {
+  margin: 0;
+  color: #456155;
+}
+
+.rooms-state-card--error {
+  border-color: #e5c8b8;
+  background: #fff7f2;
+}
+
+.rooms-state-card--error h3 {
   color: #6c2e15;
-  font-weight: 600;
+}
+
+.rooms-state-card--error p {
+  color: #7d3b1f;
+}
+
+.rooms-state-actions {
+  margin-top: 0.28rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.56rem;
 }
 
 .rooms-availability-list {
@@ -2099,16 +2155,6 @@ p {
   background: #fbfdfb;
   border-radius: 14px;
   padding: 1rem;
-}
-
-.rooms-empty-state p {
-  margin: 0;
-}
-
-.rooms-empty-title {
-  font-weight: 700;
-  color: #1f362b;
-  margin-bottom: 0.3rem !important;
 }
 
 .rooms-desktop-groups {
@@ -2979,6 +3025,10 @@ p {
   .rooms-load-error {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .rooms-state-actions {
+    flex-direction: column;
   }
 
   .room-detail-modal {

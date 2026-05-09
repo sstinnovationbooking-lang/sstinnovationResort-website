@@ -3,18 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
-import { BackToTopButton } from "@/components/back-to-top-button";
-import { FooterCopyrightLegal } from "@/components/footer-copyright-legal";
-import { FooterSocialLinks } from "@/components/footer-social-links";
 import { RoomAvailabilityList } from "@/components/room-availability-list";
+import { ResortSiteFooter } from "@/components/resort-site-footer";
 import { RoomsSearchFeedbackModal } from "@/components/rooms-search-feedback-modal";
 import { RoomsSearchCard } from "@/components/rooms-search-card";
 import { ResortTopNavbar } from "@/components/top-navbar";
 import { normalizeRoomSearchCriteria, sanitizeRoomsPayload } from "@/lib/content/rooms";
-import { DEFAULT_SITE_FOOTER, sanitizeSiteFooter } from "@/lib/content/footer";
 import { resolveSiteContact } from "@/lib/content/site-contact";
 import { DEFAULT_LOCALE, normalizeLocale } from "@/i18n/config";
-import { getLocalizedValue } from "@/lib/i18n/localized";
 import { translateStaticFallbackText } from "@/lib/i18n/static-fallback-text";
 import type { NavbarSettingsDTO, RoomCardDTO, RoomSearchCriteria, SiteBookingSettingsDTO, SiteHomeDTO } from "@/lib/types/site";
 
@@ -119,20 +115,12 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
   const [lastSearchCriteria, setLastSearchCriteria] = useState<RoomSearchCriteria | undefined>(undefined);
   const searchAbortRef = useRef<AbortController | null>(null);
 
-  const footer = sanitizeSiteFooter(home.footer ?? DEFAULT_SITE_FOOTER);
-  const footerMenuItems = footer.menuItems?.length
-    ? footer.menuItems
-    : navbar?.leftLinks?.length
-      ? navbar.leftLinks
-      : DEFAULT_SITE_FOOTER.menuItems ?? [];
-  const footerSystemItems = footer.systemLinks ?? DEFAULT_SITE_FOOTER.systemLinks ?? [];
   const siteContact = resolveSiteContact(home, resolvedLocale);
   const navbarPhoneDisplay = siteContact.phone;
-  const footerBrandName = getLocalizedValue(footer.brandName, resolvedLocale, "SST INNOVATION RESORT");
-  const footerDescription = getLocalizedValue(footer.description, resolvedLocale, "");
   const retryHref = buildRoomsRetryHref(home.tenant.tenantSlug, activeSearchCriteria ?? searchCriteria);
   const isSearchActive = hasActiveSearch(activeSearchCriteria);
   const bookingSettings = normalizeBookingSettings(home.ui?.booking);
+  const contactHref = `/site/${home.tenant.tenantSlug}/contact`;
   const searchCardKey = `${activeSearchCriteria?.checkIn ?? "none"}-${activeSearchCriteria?.nights ?? "1"}-${activeSearchCriteria?.guests ?? "2"}`;
 
   useEffect(() => {
@@ -153,13 +141,13 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
     window.history.replaceState(null, "", nextHref);
   }, [home.tenant.tenantSlug]);
 
-  const closeFeedback = useCallback(() => {
+  const closeFeedback = () => {
     if (feedbackState === "loading") return;
     setFeedbackState("hidden");
     setFeedbackDetail(undefined);
-  }, [feedbackState]);
+  };
 
-  const executeSearch = useCallback(async (criteria: RoomSearchCriteria) => {
+  const executeSearch = async (criteria: RoomSearchCriteria) => {
     const checkIn = String(criteria.checkIn ?? "").trim();
     const rawNights = Number(criteria.nights ?? 0);
     const rawGuests = Number(criteria.guests ?? 0);
@@ -244,9 +232,9 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
       }
       setIsSearching(false);
     }
-  }, [home.tenant.tenantSlug, t, updateRoomsUrl]);
+  };
 
-  const onClearSearch = useCallback(() => {
+  const onClearSearch = () => {
     searchAbortRef.current?.abort();
     searchAbortRef.current = null;
     setFeedbackState("hidden");
@@ -256,17 +244,7 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
     setActiveSearchCriteria(undefined);
     setDisplayRooms(rooms);
     updateRoomsUrl(undefined);
-  }, [rooms, updateRoomsUrl]);
-
-  function resolveMenuLabel(label: string, href?: string): string {
-    const normalized = String(href ?? "").trim().toLowerCase();
-    if (normalized === "/") return t("nav.home");
-    if (normalized === "/rooms") return t("nav.rooms");
-    if (normalized === "/activities") return t("nav.activities");
-    if (normalized === "/about") return t("nav.about");
-    if (normalized === "/contact") return t("nav.contact");
-    return label;
-  }
+  };
 
   return (
     <main className="site-main rooms-page" id="hero">
@@ -292,11 +270,17 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
 
         <section className="shell section reveal rooms-page-list" id="rooms">
           {roomsLoadError ? (
-            <div className="rooms-load-error" role="status">
-              <p>{t("roomsFailedToLoad")}</p>
-              <a className="btn btn-ghost btn-compact" href={retryHref}>
-                {t("roomsTryAgain")}
-              </a>
+            <div className="rooms-state-card rooms-state-card--error" role="status">
+              <h3>{t("roomsFailedToLoad")}</h3>
+              <p>{t("serviceUnavailable")}</p>
+              <div className="rooms-state-actions">
+                <a className="btn btn-ghost btn-compact" href={retryHref}>
+                  {t("roomsTryAgain")}
+                </a>
+                <a className="btn btn-primary btn-compact" href={contactHref}>
+                  {t("nav.contact")}
+                </a>
+              </div>
             </div>
           ) : null}
           {displayRooms.length > 0 ? (
@@ -309,7 +293,20 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
               tenantSlug={home.tenant.tenantSlug}
             />
           ) : (
-            <p className="empty-state">{translateStaticFallbackText(t("roomsNoRoomAvailable"), t)}</p>
+            <div className="rooms-state-card rooms-state-card--empty">
+              <h3>{translateStaticFallbackText(t("roomsNoRoomAvailable"), t)}</h3>
+              <p>{translateStaticFallbackText(t("roomsAdjustDates"), t)}</p>
+              <div className="rooms-state-actions">
+                {isSearchActive ? (
+                  <button className="btn btn-ghost btn-compact" onClick={onClearSearch} type="button">
+                    {t("roomsSearchClear")}
+                  </button>
+                ) : null}
+                <a className="btn btn-primary btn-compact" href={contactHref}>
+                  {t("nav.contact")}
+                </a>
+              </div>
+            </div>
           )}
         </section>
       </section>
@@ -319,67 +316,7 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
         onRetry={lastSearchCriteria ? () => void executeSearch(lastSearchCriteria) : undefined}
         state={feedbackState}
       />
-
-      {footer.isVisible !== false ? (
-        <>
-          <footer className="site-footer" id="footer">
-            <div className="shell footer-shell">
-              <div className="footer-grid">
-                <section aria-label="Resort brand" className="footer-col footer-brand">
-                  <h3 className="footer-brand-name">{footerBrandName || "SST INNOVATION RESORT"}</h3>
-                  <p>{translateStaticFallbackText(footerDescription, t)}</p>
-                  <FooterSocialLinks locale={resolvedLocale} socialLinks={footer.socialLinks} />
-                </section>
-
-                <section aria-label="Footer menu" className="footer-col footer-menu">
-                  <h4>{t("footerMenuTitle")}</h4>
-                  <ul>
-                    {footerMenuItems.map((item) => (
-                      <li key={`footer-menu-${item.label}-${item.href ?? "nohref"}`}>
-                        {item.href ? (
-                          <a href={item.href}>{resolveMenuLabel(getLocalizedValue(item.label, resolvedLocale, ""), item.href)}</a>
-                        ) : (
-                          <span>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-
-                <section aria-label="Contact information" className="footer-col footer-contact">
-                  <h4>{siteContact.footerTitle || t("footerContactTitle")}</h4>
-                  <ul>
-                    <li>{siteContact.address}</li>
-                    <li>{siteContact.phone}</li>
-                    <li>{siteContact.email}</li>
-                    {siteContact.openingHours ? <li>{translateStaticFallbackText(siteContact.openingHours, t)}</li> : null}
-                  </ul>
-                </section>
-
-                <section aria-label="System information" className="footer-col footer-system">
-                  <h4>{t("footerSystemTitle")}</h4>
-                  <ul>
-                    {footerSystemItems.map((item) => (
-                      <li key={`footer-system-${item.label}-${item.href ?? "nohref"}`}>
-                        {item.href ? (
-                          <a href={item.href}>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</a>
-                        ) : (
-                          <span>{translateStaticFallbackText(getLocalizedValue(item.label, resolvedLocale, ""), t)}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              </div>
-
-              <div className="footer-bottom">
-                <FooterCopyrightLegal footer={footer} locale={resolvedLocale} tenantBrand={home.tenant.brand} />
-              </div>
-            </div>
-          </footer>
-          <BackToTopButton />
-        </>
-      ) : null}
+      <ResortSiteFooter home={home} navbar={navbar} />
     </main>
   );
 }
