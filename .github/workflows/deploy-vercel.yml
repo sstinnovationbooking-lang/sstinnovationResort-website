@@ -115,17 +115,8 @@ jobs:
 
           echo "::notice::Vercel token can access org/project successfully."
 
-      - name: Checkout repository (git)
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git init .
-          git remote remove origin >/dev/null 2>&1 || true
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          git -c http.extraheader="AUTHORIZATION: bearer ${{ github.token }}" fetch --no-tags --prune --depth=1 origin "${GITHUB_SHA}"
-          git checkout --force FETCH_HEAD
-          test -f package.json || (echo "::error::Checkout failed: package.json not found in workspace." && exit 1)
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
