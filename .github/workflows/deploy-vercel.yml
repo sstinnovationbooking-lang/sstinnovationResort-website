@@ -29,13 +29,40 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          flag() {
+            if [ -n "${1:-}" ]; then
+              echo "true"
+            else
+              echo "false"
+            fi
+          }
+
+          TOKEN_SECRET_SET="$(flag "${VERCEL_TOKEN_SECRET:-}")"
+          TOKEN_VAR_SET="$(flag "${VERCEL_TOKEN_VAR:-}")"
+          ORG_SECRET_SET="$(flag "${VERCEL_ORG_ID_SECRET:-}")"
+          ORG_VAR_SET="$(flag "${VERCEL_ORG_ID_VAR:-}")"
+          PROJECT_SECRET_SET="$(flag "${VERCEL_PROJECT_ID_SECRET:-}")"
+          PROJECT_VAR_SET="$(flag "${VERCEL_PROJECT_ID_VAR:-}")"
+
+          echo "::notice::Credential flags => token(secret=${TOKEN_SECRET_SET}, var=${TOKEN_VAR_SET}), org(secret=${ORG_SECRET_SET}, var=${ORG_VAR_SET}), project(secret=${PROJECT_SECRET_SET}, var=${PROJECT_VAR_SET})"
+
           VERCEL_TOKEN="${VERCEL_TOKEN_SECRET:-${VERCEL_TOKEN_VAR:-}}"
           VERCEL_ORG_ID="${VERCEL_ORG_ID_SECRET:-${VERCEL_ORG_ID_VAR:-}}"
           VERCEL_PROJECT_ID="${VERCEL_PROJECT_ID_SECRET:-${VERCEL_PROJECT_ID_VAR:-}}"
 
-          test -n "${VERCEL_TOKEN:-}" || (echo "::error::Missing VERCEL_TOKEN (set as Secret or Variable)." && exit 1)
-          test -n "${VERCEL_ORG_ID:-}" || (echo "::error::Missing VERCEL_ORG_ID (set as Secret or Variable)." && exit 1)
-          test -n "${VERCEL_PROJECT_ID:-}" || (echo "::error::Missing VERCEL_PROJECT_ID (set as Secret or Variable)." && exit 1)
+          test -n "${VERCEL_TOKEN:-}" || (echo "::error::Missing VERCEL_TOKEN. Set it in repo secret, or Environment 'production' secret/variable." && exit 1)
+          test -n "${VERCEL_ORG_ID:-}" || (echo "::error::Missing VERCEL_ORG_ID. Set it in repo secret/variable, or Environment 'production' secret/variable." && exit 1)
+          test -n "${VERCEL_PROJECT_ID:-}" || (echo "::error::Missing VERCEL_PROJECT_ID. Set it in repo secret/variable, or Environment 'production' secret/variable." && exit 1)
+
+          # Prevent accidentally using placeholder values from docs/checklists.
+          if echo "$VERCEL_ORG_ID" | grep -Eqi '^(your[-_ ]?org|org[-_ ]?id|example)'; then
+            echo "::error::VERCEL_ORG_ID looks like a placeholder value."
+            exit 1
+          fi
+          if echo "$VERCEL_PROJECT_ID" | grep -Eqi '^(your[-_ ]?project|project[-_ ]?id|example)'; then
+            echo "::error::VERCEL_PROJECT_ID looks like a placeholder value."
+            exit 1
+          fi
 
           # Prevent using VERCEL_OIDC_TOKEN as VERCEL_TOKEN.
           if echo "$VERCEL_TOKEN" | grep -Eq '^eyJ[A-Za-z0-9_-]*\.'; then
@@ -45,9 +72,18 @@ jobs:
           fi
 
           echo "::add-mask::$VERCEL_TOKEN"
+          echo "::add-mask::$VERCEL_ORG_ID"
+          echo "::add-mask::$VERCEL_PROJECT_ID"
           echo "VERCEL_TOKEN=$VERCEL_TOKEN" >> "$GITHUB_ENV"
           echo "VERCEL_ORG_ID=$VERCEL_ORG_ID" >> "$GITHUB_ENV"
           echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID" >> "$GITHUB_ENV"
+
+          {
+            echo "### Credential source diagnostics"
+            echo "- token: secret=${TOKEN_SECRET_SET}, variable=${TOKEN_VAR_SET}"
+            echo "- org id: secret=${ORG_SECRET_SET}, variable=${ORG_VAR_SET}"
+            echo "- project id: secret=${PROJECT_SECRET_SET}, variable=${PROJECT_VAR_SET}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Runtime diagnostics
         shell: bash
@@ -59,18 +95,8 @@ jobs:
           node --version
           npm --version
 
-      - name: Checkout repository (git)
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          if [ ! -d .git ]; then
-            git init .
-          fi
-          git remote remove origin >/dev/null 2>&1 || true
-          git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
-          git fetch --depth=1 origin "${GITHUB_SHA}"
-          git checkout --force FETCH_HEAD
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: npm ci
