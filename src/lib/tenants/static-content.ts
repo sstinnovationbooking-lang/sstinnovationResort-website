@@ -1,6 +1,8 @@
 ﻿import { getTenantBySlug } from "@/lib/tenants/registry";
 import { toTenantDTO } from "@/lib/tenants/registry";
 import type {
+  CampingContentDTO,
+  CampingImageItemDTO,
   HomepageActivitiesDTO,
   HomepageAmenitiesDTO,
   HomepageHotelInfoDTO,
@@ -451,6 +453,368 @@ function cloneDefaultHomepageActivities(images: string[]): HomepageActivitiesDTO
     }))
   };
 }
+
+function buildCampingContent(options: {
+  heroImages: string[];
+  galleryImages: string[];
+  reservationMode: { th: string; en: string };
+  capacity: { th: string; en: string };
+  optionALabel?: { th: string; en: string };
+  optionBLabel?: { th: string; en: string };
+}): CampingContentDTO {
+  const optionA = options.optionALabel ?? { th: "ลานกางเต็นท์", en: "Bring your own tent" };
+  const optionB = options.optionBLabel ?? { th: "เช่าเต็นท์รีสอร์ต", en: "Resort tent rental" };
+  const heroImages = options.heroImages.filter((item) => String(item).trim().length > 0);
+  const galleryImages = options.galleryImages.filter((item) => String(item).trim().length > 0);
+  const toMediaItems = (items: string[], key: "hero" | "gallery"): CampingImageItemDTO[] =>
+    items.slice(0, 6).map((src, index) => ({
+      id: `camp-${key}-${index + 1}`,
+      src,
+      altText: {
+        "th-TH": key === "hero" ? `ภาพสไลด์แคมป์ ${index + 1}` : `ภาพแกลเลอรีแคมป์ ${index + 1}`,
+        "en-US": key === "hero" ? `Camping hero slide ${index + 1}` : `Camping gallery image ${index + 1}`
+      },
+      title: {
+        "th-TH": key === "hero" ? `บรรยากาศโซนแคมป์ ${index + 1}` : `โซนแคมป์ปิ้ง ${index + 1}`,
+        "en-US": key === "hero" ? `Camping atmosphere ${index + 1}` : `Camping zone ${index + 1}`
+      },
+      description: {
+        "th-TH": "รูปภาพตัวอย่างสำหรับเทมเพลต (เปลี่ยนตามรีสอร์ตได้ในอนาคต)",
+        "en-US": "Template sample image (tenant-specific updates can come from backend later)."
+      },
+      order: index + 1,
+      isVisible: true
+    }));
+  const heroImageItems = toMediaItems(heroImages, "hero");
+  const galleryImageItems = toMediaItems(galleryImages, "gallery");
+
+  return {
+    heroEyebrow: {
+      "th-TH": "Modern Camping by SST Resort Template",
+      "en-US": "Modern camping by SST resort template"
+    },
+    heroTitle: {
+      "th-TH": "Premium Camping Experience",
+      "en-US": "Premium camping experience"
+    },
+    heroSubtitle: {
+      "th-TH": "รองรับทั้งสายแคมป์ที่นำเต็นท์มาเอง และผู้เข้าพักที่ต้องการเช่าเต็นท์พร้อมบริการจากรีสอร์ต",
+      "en-US": "Built for both self-camping guests and resort-managed tent rentals with ready-to-use services."
+    },
+    heroImageUrl: heroImages[0] ?? "",
+    heroImages: heroImageItems,
+    heroPrimaryCtaLabel: {
+      "th-TH": "ติดต่อ / จองแคมป์",
+      "en-US": "Contact / Reserve camping"
+    },
+    heroPrimaryCtaHref: "/contact",
+    heroSecondaryCtaLabel: {
+      "th-TH": "ดูห้องพักและแพ็กเกจ",
+      "en-US": "View rooms and packages"
+    },
+    heroSecondaryCtaHref: "/rooms",
+    overviewTitle: {
+      "th-TH": "โซนแคมป์ปิ้งที่ปรับตามแต่ละรีสอร์ต",
+      "en-US": "Tenant-ready camping setup"
+    },
+    overviewDescription: {
+      "th-TH":
+        "แต่ละเจ้าของรีสอร์ตสามารถกำหนดราคา บริการ เงื่อนไข และความพร้อมใช้งานได้เอง ข้อมูลในหน้านี้จึงออกแบบให้ต่อยอดกับ backend/central ได้ทันที",
+      "en-US":
+        "Each resort owner can configure pricing, services, conditions, and availability. This page model is designed for future backend and central integration."
+    },
+    quickInfoTitle: {
+      "th-TH": "ข้อมูลสำคัญก่อนจอง",
+      "en-US": "Quick trust information"
+    },
+    quickInfoItems: [
+      {
+        id: "check-in",
+        title: { "th-TH": "เช็กอิน", "en-US": "Check-in" },
+        description: { "th-TH": "ตั้งแต่ 14:00 น.", "en-US": "From 14:00" },
+        iconKey: "clock",
+        order: 1,
+        isVisible: true
+      },
+      {
+        id: "check-out",
+        title: { "th-TH": "เช็กเอาต์", "en-US": "Check-out" },
+        description: { "th-TH": "ภายใน 11:00 น.", "en-US": "Before 11:00" },
+        iconKey: "clock",
+        order: 2,
+        isVisible: true
+      },
+      {
+        id: "capacity",
+        title: { "th-TH": "ความจุโดยประมาณ", "en-US": "Capacity" },
+        description: { "th-TH": options.capacity.th, "en-US": options.capacity.en },
+        iconKey: "users",
+        order: 3,
+        isVisible: true
+      },
+      {
+        id: "reservation",
+        title: { "th-TH": "สถานะการจอง", "en-US": "Reservation status" },
+        description: { "th-TH": options.reservationMode.th, "en-US": options.reservationMode.en },
+        iconKey: "shield",
+        order: 4,
+        isVisible: true
+      }
+    ],
+    serviceTypesTitle: {
+      "th-TH": "บริการแคมป์ปิ้ง",
+      "en-US": "Camping Services"
+    },
+    serviceTypes: [
+      {
+        id: "bring-your-own-tent",
+        name: { "th-TH": optionA.th, "en-US": optionA.en },
+        description: {
+          "th-TH": "เหมาะสำหรับผู้เข้าพักที่มีอุปกรณ์แคมป์ของตนเองและต้องการใช้บริการพื้นที่ลานกางเต็นท์",
+          "en-US": "For guests bringing their own equipment and using the resort camping zone."
+        },
+        priceTHB: 150,
+        durationText: { "th-TH": "ต่อคน / ต่อคืน", "en-US": "Per person / night" },
+        includedItems: [
+          { "th-TH": "พื้นที่กางเต็นท์", "en-US": "Tent pitch area" },
+          { "th-TH": "ห้องน้ำส่วนกลาง", "en-US": "Shared bathrooms" },
+          { "th-TH": "จุดจอดรถตามโซน", "en-US": "Designated parking zone" }
+        ],
+        recommendedFor: {
+          "th-TH": "เหมาะกับสายแคมป์ที่มีอุปกรณ์ครบ",
+          "en-US": "Recommended for experienced self-campers"
+        },
+        ctaLabel: { "th-TH": "สอบถามเงื่อนไขลานกางเต็นท์", "en-US": "Check pitch conditions" },
+        ctaHref: "/contact",
+        badge: { "th-TH": "เริ่มต้น 150", "en-US": "From 150" },
+        priceNote: {
+          "th-TH": "ราคาอาจปรับตามวันเข้าพักและจำนวนผู้เข้าพัก",
+          "en-US": "Price may vary by date, season, and occupancy."
+        },
+        iconKey: "tent",
+        order: 1,
+        isVisible: true
+      },
+      {
+        id: "resort-tent-rental",
+        name: { "th-TH": optionB.th, "en-US": optionB.en },
+        description: {
+          "th-TH": "รีสอร์ตจัดเต็นท์และอุปกรณ์พื้นฐานให้พร้อม เน้นความสะดวกสำหรับผู้เข้าพักที่ไม่ต้องการเตรียมอุปกรณ์เอง",
+          "en-US": "Resort-managed tent setup with essential equipment ready for convenient stays."
+        },
+        priceTHB: 450,
+        durationText: { "th-TH": "เริ่มต้นต่อคน / ต่อคืน", "en-US": "Starting per person / night" },
+        includedItems: [
+          { "th-TH": "เต็นท์ตามขนาดที่เลือก", "en-US": "Tent based on selected size" },
+          { "th-TH": "เครื่องนอนพื้นฐาน", "en-US": "Basic bedding" },
+          { "th-TH": "สิทธิ์ใช้สิ่งอำนวยความสะดวกร่วม", "en-US": "Access to shared facilities" }
+        ],
+        recommendedFor: {
+          "th-TH": "เหมาะกับผู้เริ่มต้นและครอบครัว",
+          "en-US": "Recommended for beginners and families"
+        },
+        ctaLabel: { "th-TH": "ดูแพ็กเกจเช่าเต็นท์", "en-US": "View rental options" },
+        ctaHref: "/contact",
+        badge: { "th-TH": "เริ่มต้น 450", "en-US": "From 450" },
+        priceNote: {
+          "th-TH": "ราคาและอุปกรณ์ขึ้นกับแพ็กเกจและเงื่อนไขของรีสอร์ต",
+          "en-US": "Pricing and inclusions depend on package and resort conditions."
+        },
+        iconKey: "star",
+        order: 2,
+        isVisible: true
+      }
+    ],
+    facilitiesTitle: {
+      "th-TH": "สิ่งอำนวยความสะดวกในโซนแคมป์",
+      "en-US": "Camping facilities"
+    },
+    facilities: [
+      {
+        id: "bathroom",
+        title: { "th-TH": "ห้องน้ำและจุดอาบน้ำ", "en-US": "Bathrooms and showers" },
+        description: { "th-TH": "แยกโซนชาย/หญิง ทำความสะอาดตามรอบ", "en-US": "Separate male/female zones with scheduled cleaning." },
+        iconKey: "water",
+        order: 1,
+        isVisible: true
+      },
+      {
+        id: "electricity",
+        title: { "th-TH": "จุดไฟฟ้า / ปลั๊กพ่วง", "en-US": "Power points" },
+        description: { "th-TH": "มีจุดจ่ายไฟในพื้นที่ที่กำหนด", "en-US": "Power points available in designated areas." },
+        iconKey: "bolt",
+        order: 2,
+        isVisible: true
+      },
+      {
+        id: "parking",
+        title: { "th-TH": "ที่จอดรถ", "en-US": "Parking" },
+        description: { "th-TH": "จอดรถใกล้โซนแคมป์ตามผังพื้นที่", "en-US": "On-site parking near camping zones." },
+        iconKey: "car",
+        order: 3,
+        isVisible: true
+      },
+      {
+        id: "cooking",
+        title: { "th-TH": "ลานทำอาหาร / BBQ", "en-US": "Cooking and BBQ area" },
+        description: { "th-TH": "มีโซนสำหรับทำอาหารและนั่งพักรวม", "en-US": "Shared area for cooking, grilling, and gathering." },
+        iconKey: "fire",
+        order: 4,
+        isVisible: true
+      },
+      {
+        id: "signal",
+        title: { "th-TH": "สัญญาณโทรศัพท์ / Wi‑Fi", "en-US": "Phone signal / Wi-Fi" },
+        description: { "th-TH": "ให้บริการตามพื้นที่และเงื่อนไขรีสอร์ต", "en-US": "Coverage depends on area and resort conditions." },
+        iconKey: "wifi",
+        order: 5,
+        isVisible: true
+      }
+    ],
+    rulesTitle: {
+      "th-TH": "กฎระเบียบและความปลอดภัย",
+      "en-US": "Rules and safety"
+    },
+    rules: [
+      {
+        id: "quiet-hours",
+        title: { "th-TH": "ช่วงเวลาเงียบ", "en-US": "Quiet hours" },
+        description: { "th-TH": "22:00 - 06:00 น. งดใช้เสียงดัง", "en-US": "22:00 - 06:00. Please keep noise low." },
+        iconKey: "moon",
+        order: 1,
+        isVisible: true
+      },
+      {
+        id: "fire-policy",
+        title: { "th-TH": "นโยบายการก่อไฟ", "en-US": "Campfire policy" },
+        description: { "th-TH": "ห้ามก่อไฟบนพื้นหญ้า ให้ใช้จุดที่รีสอร์ตกำหนด", "en-US": "No campfire on grass. Use only designated fire points." },
+        iconKey: "shield",
+        order: 2,
+        isVisible: true
+      },
+      {
+        id: "pet-policy",
+        title: { "th-TH": "นโยบายสัตว์เลี้ยง", "en-US": "Pet policy" },
+        description: { "th-TH": "ขึ้นกับเงื่อนไขแต่ละรีสอร์ต โปรดสอบถามก่อนจอง", "en-US": "Depends on each resort policy. Please confirm before booking." },
+        iconKey: "paw",
+        order: 3,
+        isVisible: true
+      },
+      {
+        id: "waste-policy",
+        title: { "th-TH": "การคัดแยกขยะ", "en-US": "Waste separation" },
+        description: { "th-TH": "กรุณาแยกขยะและทิ้งตามจุดที่กำหนด", "en-US": "Please separate waste and dispose at designated points." },
+        iconKey: "leaf",
+        order: 4,
+        isVisible: true
+      }
+    ],
+    addOnsTitle: {
+      "th-TH": "บริการเสริมและอุปกรณ์เช่า",
+      "en-US": "Add-ons and rental equipment"
+    },
+    addOns: [
+      {
+        id: "addon-tent",
+        name: { "th-TH": "เต็นท์เช่า", "en-US": "Tent rental" },
+        description: { "th-TH": "ขนาด 2-4 ท่านตามความต้องการ", "en-US": "2-4 guest sizes available." },
+        priceTHB: 450,
+        durationText: { "th-TH": "เริ่มต้น / คืน", "en-US": "Starting / night" },
+        priceNote: { "th-TH": "ขึ้นกับรุ่นและจำนวนผู้เข้าพัก", "en-US": "Depends on model and occupancy." },
+        iconKey: "tent",
+        order: 1,
+        isVisible: true
+      },
+      {
+        id: "addon-bedding",
+        name: { "th-TH": "ชุดเครื่องนอน", "en-US": "Bedding set" },
+        description: { "th-TH": "ที่นอน ผ้าห่ม หมอน", "en-US": "Mattress, blanket, and pillows." },
+        priceTHB: 120,
+        durationText: { "th-TH": "ต่อชุด", "en-US": "Per set" },
+        iconKey: "moon",
+        order: 2,
+        isVisible: true
+      },
+      {
+        id: "addon-grill",
+        name: { "th-TH": "เตาปิ้งย่าง / เตาแก๊ส", "en-US": "Grill / Stove" },
+        description: { "th-TH": "อุปกรณ์ทำอาหารสำหรับโซนกลางแจ้ง", "en-US": "Cooking equipment for outdoor use." },
+        priceTHB: 180,
+        durationText: { "th-TH": "ต่อชุด", "en-US": "Per set" },
+        iconKey: "fire",
+        order: 3,
+        isVisible: true
+      }
+    ],
+    galleryTitle: {
+      "th-TH": "ภาพบรรยากาศโซนแคมป์",
+      "en-US": "Camping Atmosphere Gallery"
+    },
+    galleryModalTitle: {
+      "th-TH": "บรรยากาศแคมป์ปิ้ง",
+      "en-US": "Camping atmosphere"
+    },
+    galleryModalDescription: {
+      "th-TH": "ตัวอย่างภาพบรรยากาศของเทมเพลต สามารถปรับเป็นภาพจริงของแต่ละรีสอร์ตได้จากระบบหลังบ้านในอนาคต",
+      "en-US": "Template preview images that can later be replaced by each resort's live content from backend systems."
+    },
+    galleryModalCtaLabel: {
+      "th-TH": "ติดต่อเพื่อจองแคมป์",
+      "en-US": "Contact to reserve camping"
+    },
+    galleryModalCtaHref: "/contact",
+    galleryImages: galleryImageItems,
+    galleryItems: galleryImages.slice(0, 3).map((imageUrl, index) => ({
+      id: `camp-gallery-${index + 1}`,
+      title: { "th-TH": `บรรยากาศแคมป์ ${index + 1}`, "en-US": `Camping view ${index + 1}` },
+      sizeText: { "th-TH": "โซนแคมป์ปิ้ง", "en-US": "Camping area" },
+      imageUrl,
+      altText: { "th-TH": `ภาพแคมป์ปิ้ง ${index + 1}`, "en-US": `Camping image ${index + 1}` },
+      order: index + 1,
+      isVisible: true
+    })),
+    ctaTitle: {
+      "th-TH": "ต้องการข้อเสนอแคมป์ที่เหมาะกับทริปของคุณ?",
+      "en-US": "Need a camping option matched to your trip?"
+    },
+    ctaDescription: {
+      "th-TH": "แจ้งจำนวนผู้เข้าพัก วันที่เข้าพัก และรูปแบบบริการที่ต้องการ ทีมงานจะช่วยแนะนำแพ็กเกจที่เหมาะที่สุด",
+      "en-US": "Share guest count, stay dates, and preferred camping type. Our team will help recommend the best-fit option."
+    },
+    ctaPrimaryLabel: {
+      "th-TH": "ติดต่อเพื่อจองแคมป์",
+      "en-US": "Contact to reserve"
+    },
+    ctaSecondaryLabel: {
+      "th-TH": "ดูห้องพักทั้งหมด",
+      "en-US": "View all rooms"
+    },
+    isVisible: true
+  };
+}
+
+const TENANT_CAMPING_CONTENT: Record<string, CampingContentDTO> = {
+  "forest-escape": buildCampingContent({
+    heroImages: ["/camping/forest/hero-1.svg", "/camping/forest/hero-2.svg", "/camping/forest/hero-3.svg"],
+    galleryImages: ["/camping/forest/hero-1.svg", "/camping/forest/hero-2.svg", "/camping/forest/hero-3.svg"],
+    reservationMode: { th: "รับจองล่วงหน้าและ Walk-in บางวัน", en: "Reservation + limited walk-in" },
+    capacity: { th: "ประมาณ 80 คน / คืน", en: "Approx. 80 guests / night" }
+  }),
+  "lake-serenity": buildCampingContent({
+    heroImages: ["/camping/lake/hero-1.svg", "/camping/lake/hero-2.svg", "/camping/lake/hero-3.svg"],
+    galleryImages: ["/camping/lake/hero-1.svg", "/camping/lake/hero-2.svg", "/camping/lake/hero-3.svg"],
+    reservationMode: { th: "แนะนำจองล่วงหน้า", en: "Advance reservation recommended" },
+    capacity: { th: "ประมาณ 60 คน / คืน", en: "Approx. 60 guests / night" }
+  }),
+  "demo-resort": buildCampingContent({
+    heroImages: ["/camping/demo/hero-1.svg", "/camping/demo/hero-2.svg", "/camping/demo/hero-3.svg"],
+    galleryImages: ["/camping/demo/hero-1.svg", "/camping/demo/hero-2.svg", "/camping/demo/hero-3.svg"],
+    reservationMode: { th: "โหมดทดสอบการจอง", en: "Demo reservation mode" },
+    capacity: { th: "ประมาณ 30 คน / คืน", en: "Approx. 30 guests / night" },
+    optionALabel: { th: "โหมดเดโม: นำเต็นท์มาเอง", en: "Demo: Bring your own tent" },
+    optionBLabel: { th: "โหมดเดโม: เช่าเต็นท์รีสอร์ต", en: "Demo: Resort tent rental" }
+  })
+};
 
 const TENANT_CONTENT: Record<string, TenantStaticContent> = {
   "forest-escape": {
@@ -1159,4 +1523,20 @@ export function getStaticHomeByTenant(tenantSlug: string): SiteHomeDTO | null {
 export function getStaticRoomsByTenant(tenantSlug: string): RoomCardDTO[] {
   const content = TENANT_CONTENT[tenantSlug];
   return content?.rooms ?? [];
+}
+
+export function getStaticCampingByTenant(tenantSlug: string): CampingContentDTO | null {
+  const content = TENANT_CAMPING_CONTENT[tenantSlug];
+  if (!content) return null;
+  return {
+    ...content,
+    heroImages: content.heroImages?.map((item) => ({ ...item })),
+    quickInfoItems: content.quickInfoItems.map((item) => ({ ...item })),
+    serviceTypes: content.serviceTypes.map((item) => ({ ...item, includedItems: item.includedItems?.map((x) => x) })),
+    facilities: content.facilities.map((item) => ({ ...item })),
+    rules: content.rules.map((item) => ({ ...item })),
+    addOns: content.addOns.map((item) => ({ ...item, includedItems: item.includedItems?.map((x) => x) })),
+    galleryImages: content.galleryImages?.map((item) => ({ ...item })),
+    galleryItems: content.galleryItems.map((item) => ({ ...item }))
+  };
 }

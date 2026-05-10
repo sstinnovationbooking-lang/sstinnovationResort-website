@@ -21,7 +21,35 @@ interface RoomAvailabilityListProps {
 }
 
 const FALLBACK_ROOM_IMAGE =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23e9efe8'/%3E%3Cstop offset='1' stop-color='%23dfe9df'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='800' fill='url(%23g)'/%3E%3Cpath d='M90 620c165-150 330-150 495 0s330 150 495 0' fill='none' stroke='%23c0d2c3' stroke-width='24' stroke-linecap='round'/%3E%3C/svg%3E";
+  "/placeholders/room-sample.svg";
+
+interface RoomAvailabilityImageProps {
+  src: string;
+  alt: string;
+  sizes: string;
+  priority?: boolean;
+  className?: string;
+}
+
+function RoomAvailabilityImage({ src, alt, sizes, priority = false, className }: RoomAvailabilityImageProps) {
+  const [hasError, setHasError] = useState(false);
+  const normalizedSrc = String(src ?? "").trim();
+  const resolvedSrc = normalizedSrc && !hasError ? normalizedSrc : FALLBACK_ROOM_IMAGE;
+
+  return (
+    <Image
+      alt={alt}
+      className={className}
+      fill
+      loading={priority ? "eager" : "lazy"}
+      onError={() => setHasError(true)}
+      priority={priority}
+      sizes={sizes}
+      src={resolvedSrc}
+      unoptimized
+    />
+  );
+}
 
 function buildRoomSelectHref(tenantSlug: string, roomId: string, criteria: ReturnType<typeof normalizeRoomSearchCriteria>): string {
   const params = new URLSearchParams();
@@ -159,15 +187,12 @@ export function RoomAvailabilityList({
                     onClick={() => setSelectedRoom(room)}
                     type="button"
                   >
-                    <Image
+                    <RoomAvailabilityImage
                       alt={room.title || room.name}
                       className="room-availability-image"
-                      fill
-                      loading={index === 0 ? "eager" : "lazy"}
                       priority={index === 0}
                       sizes="(max-width: 1199px) 40vw, 360px"
                       src={room.imageUrl}
-                      unoptimized
                     />
                   </button>
                   <div className="room-availability-copy">

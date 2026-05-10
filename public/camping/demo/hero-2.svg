@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-label="Demo resort camp test scene">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10273a"/>
+      <stop offset="58%" stop-color="#265d78"/>
+      <stop offset="100%" stop-color="#d9c9ab"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="980" fill="url(#sky)"/>
+  <circle cx="1280" cy="220" r="80" fill="#f6e8c8" opacity="0.8"/>
+  <path d="M0 712 C190 664 360 662 546 714 C730 768 916 772 1108 726 C1286 684 1434 692 1600 754 V980 H0 Z" fill="#274a57"/>
+  <path d="M0 804 C220 760 430 770 640 822 C866 878 1094 878 1318 834 C1426 812 1520 816 1600 844 V980 H0 Z" fill="#1b3744"/>
+  <path d="M676 704 L768 566 L860 704 Z" fill="#f2d7a7"/>
+  <rect x="740" y="704" width="56" height="60" fill="#d9b985"/>
+  <path d="M1012 724 L1084 612 L1158 724 Z" fill="#efdfbf"/>
+  <rect x="1061" y="724" width="46" height="52" fill="#d8c2a1"/>
+</svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-label="Forest camping night">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f1d2b"/>
+      <stop offset="58%" stop-color="#19354a"/>
+      <stop offset="100%" stop-color="#274c57"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="980" fill="url(#sky)"/>
+  <circle cx="1240" cy="178" r="70" fill="#f7f0d9"/>
+  <g fill="#f7f0d9" opacity="0.9">
+    <circle cx="230" cy="170" r="3"/><circle cx="320" cy="250" r="2.6"/><circle cx="420" cy="120" r="2.8"/>
+    <circle cx="580" cy="180" r="2.4"/><circle cx="740" cy="120" r="2.6"/><circle cx="900" cy="220" r="2.5"/>
+    <circle cx="1080" cy="130" r="2.4"/><circle cx="1360" cy="260" r="2.3"/>
+  </g>
+  <path d="M0 700 C180 640 350 648 520 700 C700 756 920 760 1110 710 C1260 670 1400 678 1600 740 V980 H0 Z" fill="#1c3b3f"/>
+  <path d="M0 790 C200 730 390 740 610 804 C800 858 1010 860 1240 814 C1380 785 1490 790 1600 832 V980 H0 Z" fill="#132c2f"/>
+  <path d="M610 668 L720 515 L830 668 Z" fill="#d6b57d"/>
+  <rect x="688" y="668" width="64" height="58" fill="#c19b61"/>
+  <path d="M935 705 L1002 615 L1068 705 Z" fill="#dbc089"/>
+  <rect x="982" y="705" width="36" height="42" fill="#c9a36c"/>
+</svg>

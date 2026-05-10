@@ -50,13 +50,19 @@ interface RoomMobileCardProps {
   imagePriority?: boolean;
 }
 
-const FALLBACK_ROOM_IMAGE =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23e9efe8'/%3E%3Cstop offset='1' stop-color='%23dfe9df'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='800' fill='url(%23g)'/%3E%3Cpath d='M90 620c165-150 330-150 495 0s330 150 495 0' fill='none' stroke='%23c0d2c3' stroke-width='24' stroke-linecap='round'/%3E%3C/svg%3E";
+const FALLBACK_ROOM_IMAGE = "/placeholders/room-sample.svg";
+
+function normalizeImageSource(value: unknown): string {
+  const normalized = String(value ?? "").trim();
+  if (!normalized) return "";
+  if (normalized === "undefined" || normalized === "null") return "";
+  return normalized;
+}
 
 export function RoomMobileCard({ room, locale, priceSuffix, onOpenDetails, imagePriority = false }: RoomMobileCardProps) {
   const t = useTranslations("ResortHome");
   const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null);
-  const normalizedImageSrc = String(room.imageUrl || "").trim();
+  const normalizedImageSrc = normalizeImageSource(room.imageUrl);
   const imageSrc =
     normalizedImageSrc && failedImageSrc !== normalizedImageSrc
       ? normalizedImageSrc

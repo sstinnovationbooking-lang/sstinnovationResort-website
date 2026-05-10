@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { DEFAULT_LOCALE, normalizeLocale } from "@/i18n/config";
 import { getLocalizedValue } from "@/lib/i18n/localized";
-import type { NavbarSettingsDTO } from "@/lib/types/site";
+import type { NavbarLinkDTO, NavbarSettingsDTO } from "@/lib/types/site";
 
 interface ResortTopNavbarProps {
   brand: string;
@@ -20,6 +20,8 @@ interface ResortTopNavbarProps {
     isVisible?: boolean;
   };
 }
+
+const TH_CAMPING_LABEL = "\u0E41\u0E04\u0E21\u0E1B\u0E4C\u0E1B\u0E34\u0E49\u0E07";
 
 const STARTER_NAVBAR: NavbarSettingsDTO = {
   mode: "transparent",
@@ -101,6 +103,10 @@ function resolveTenantAwareNavHref(href: string, tenantSlug: string | null): str
     return `/site/${tenantSlug}/rooms`;
   }
 
+  if (normalized.toLowerCase() === "/camping") {
+    return `/site/${tenantSlug}/camping`;
+  }
+
   return normalized;
 }
 
@@ -138,11 +144,30 @@ function renderPhoneIcon() {
   );
 }
 
+function ensureCampingLink(links: NavbarLinkDTO[], locale: "th" | "en"): NavbarLinkDTO[] {
+  const normalizedLinks = links.map((item) => ({ ...item }));
+  const hasCamping = normalizedLinks.some((item) => normalizeNavHref(item.href).toLowerCase() === "/camping");
+  if (hasCamping) return normalizedLinks;
+
+  const insertIndex = normalizedLinks.findIndex((item) => normalizeNavHref(item.href).toLowerCase() === "/rooms");
+  const campingLink: NavbarLinkDTO = {
+    label: locale === "th" ? TH_CAMPING_LABEL : "Camping",
+    href: "/camping"
+  };
+
+  if (insertIndex < 0) {
+    return [...normalizedLinks, campingLink];
+  }
+
+  return [...normalizedLinks.slice(0, insertIndex + 1), campingLink, ...normalizedLinks.slice(insertIndex + 1)];
+}
+
 export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarProps) {
   const t = useTranslations("Layout");
   const locale = useLocale();
   const resolvedLocale = normalizeLocale(locale) ?? DEFAULT_LOCALE;
   const settings = withFallback(navbar);
+  const leftLinks = ensureCampingLink(settings.leftLinks, resolvedLocale);
   const pathname = usePathname();
   const currentTenantSlug = resolveTenantSlugFromPathname(pathname);
   const tenantHomeHref = currentTenantSlug ? `/site/${currentTenantSlug}` : "/";
@@ -224,6 +249,7 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
     const routeKey = toActiveRouteKey(href).toLowerCase();
     if (routeKey === "/") return t("nav.home");
     if (routeKey === "/rooms") return t("nav.rooms");
+    if (routeKey === "/camping") return resolvedLocale === "th" ? TH_CAMPING_LABEL : "Camping";
     if (routeKey === "/activities") return t("nav.activities");
     if (routeKey === "/about") return t("nav.about");
     if (routeKey === "/contact") return t("nav.contact");
@@ -254,7 +280,7 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
         </Link>
 
         <nav className="top-main-menu" aria-label="Primary">
-          {settings.leftLinks.map((item) => {
+          {leftLinks.map((item) => {
             const href = resolveTenantAwareNavHref(item.href, currentTenantSlug);
             const isActive = toActiveRouteKey(href).toLowerCase() === activeRouteKey;
             const label = resolveNavLabel(item.label, href);
@@ -299,7 +325,7 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
         </div>
 
         <nav aria-label="Mobile Primary" className="mobile-nav-links">
-          {settings.leftLinks.map((item, index) => {
+          {leftLinks.map((item, index) => {
             const href = resolveTenantAwareNavHref(item.href, currentTenantSlug);
             const isActive = toActiveRouteKey(href).toLowerCase() === activeRouteKey;
             const label = resolveNavLabel(item.label, href);

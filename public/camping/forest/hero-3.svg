@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-label="Forest family camping">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#16322f"/>
+      <stop offset="52%" stop-color="#2f7b66"/>
+      <stop offset="100%" stop-color="#e7d9b8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="980" fill="url(#sky)"/>
+  <path d="M0 710 C190 650 370 648 540 706 C700 760 860 772 1070 714 C1250 664 1410 680 1600 748 V980 H0 Z" fill="#2a5a49"/>
+  <path d="M0 790 C220 750 430 760 630 812 C820 862 1025 864 1260 824 C1380 802 1495 808 1600 846 V980 H0 Z" fill="#1b3c30"/>
+  <path d="M470 700 L560 566 L650 700 Z" fill="#f0d3a0"/>
+  <rect x="532" y="700" width="56" height="64" fill="#d5b07c"/>
+  <path d="M760 688 L850 554 L940 688 Z" fill="#eed8ae"/>
+  <rect x="822" y="688" width="56" height="64" fill="#d8ba8f"/>
+  <path d="M1090 714 L1162 600 L1234 714 Z" fill="#f2dfbd"/>
+  <rect x="1138" y="714" width="48" height="56" fill="#d9c09a"/>
+</svg>

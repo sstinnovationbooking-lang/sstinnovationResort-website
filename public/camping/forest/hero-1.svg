@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-label="Forest camping sunrise">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#18332a"/>
+      <stop offset="55%" stop-color="#2f6b55"/>
+      <stop offset="100%" stop-color="#d9c28f"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.78" cy="0.22" r="0.28">
+      <stop offset="0%" stop-color="#fff4d3" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#fff4d3" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="980" fill="url(#sky)"/>
+  <rect width="1600" height="980" fill="url(#sun)"/>
+  <path d="M0 690 C180 620 330 620 520 690 C680 750 840 760 1020 700 C1190 645 1350 655 1600 735 V980 H0 Z" fill="#244a3d"/>
+  <path d="M0 760 C220 700 410 705 620 770 C790 822 930 835 1120 792 C1290 754 1430 755 1600 820 V980 H0 Z" fill="#173529"/>
+  <path d="M680 640 L760 500 L840 640 Z" fill="#f0d7a7"/>
+  <rect x="734" y="640" width="52" height="52" fill="#dec08e"/>
+  <circle cx="1010" cy="700" r="26" fill="#ffb068"/>
+  <circle cx="1010" cy="700" r="52" fill="#ffb068" opacity="0.22"/>
+</svg>

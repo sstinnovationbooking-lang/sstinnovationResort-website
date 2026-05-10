@@ -40,6 +40,7 @@ export function ResortContactPage({ home, navbar }: ResortContactPageProps) {
     const normalized = String(href ?? "").trim().toLowerCase();
     if (normalized === "/") return t("nav.home");
     if (normalized === "/rooms") return t("nav.rooms");
+    if (normalized === "/camping") return resolvedLocale === "th" ? "\u0E41\u0E04\u0E21\u0E1B\u0E4C\u0E1B\u0E34\u0E49\u0E07" : "Camping";
     if (normalized === "/activities") return t("nav.activities");
     if (normalized === "/about") return t("nav.about");
     if (normalized === "/contact") return t("nav.contact");

@@ -283,31 +283,33 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
               </div>
             </div>
           ) : null}
-          {displayRooms.length > 0 ? (
-            <RoomAvailabilityList
-              bookingSettings={bookingSettings}
-              isSearchActive={isSearchActive}
-              onClearSearch={isSearchActive ? onClearSearch : undefined}
-              rooms={displayRooms}
-              searchCriteria={activeSearchCriteria}
-              tenantSlug={home.tenant.tenantSlug}
-            />
-          ) : (
-            <div className="rooms-state-card rooms-state-card--empty">
-              <h3>{translateStaticFallbackText(t("roomsNoRoomAvailable"), t)}</h3>
-              <p>{translateStaticFallbackText(t("roomsAdjustDates"), t)}</p>
-              <div className="rooms-state-actions">
-                {isSearchActive ? (
-                  <button className="btn btn-ghost btn-compact" onClick={onClearSearch} type="button">
-                    {t("roomsSearchClear")}
-                  </button>
-                ) : null}
-                <a className="btn btn-primary btn-compact" href={contactHref}>
-                  {t("nav.contact")}
-                </a>
+          {!roomsLoadError ? (
+            displayRooms.length > 0 ? (
+              <RoomAvailabilityList
+                bookingSettings={bookingSettings}
+                isSearchActive={isSearchActive}
+                onClearSearch={isSearchActive ? onClearSearch : undefined}
+                rooms={displayRooms}
+                searchCriteria={activeSearchCriteria}
+                tenantSlug={home.tenant.tenantSlug}
+              />
+            ) : (
+              <div className="rooms-state-card rooms-state-card--empty">
+                <h3>{translateStaticFallbackText(t("roomsNoRoomAvailable"), t)}</h3>
+                <p>{translateStaticFallbackText(t("roomsAdjustDates"), t)}</p>
+                <div className="rooms-state-actions">
+                  {isSearchActive ? (
+                    <button className="btn btn-ghost btn-compact" onClick={onClearSearch} type="button">
+                      {t("roomsSearchClear")}
+                    </button>
+                  ) : null}
+                  <a className="btn btn-primary btn-compact" href={contactHref}>
+                    {t("nav.contact")}
+                  </a>
+                </div>
               </div>
-            </div>
-          )}
+            )
+          ) : null}
         </section>
       </section>
       <RoomsSearchFeedbackModal

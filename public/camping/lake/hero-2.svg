@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-label="Lake serenity camp sunset">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#162e43"/>
+      <stop offset="55%" stop-color="#2f6f8f"/>
+      <stop offset="100%" stop-color="#e5cba0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="980" fill="url(#sky)"/>
+  <circle cx="1242" cy="246" r="84" fill="#ffe3b7" opacity="0.82"/>
+  <path d="M0 734 C220 690 428 702 638 758 C832 812 1020 822 1210 780 C1384 742 1498 744 1600 772 V980 H0 Z" fill="#2c6076"/>
+  <path d="M0 820 C236 788 454 806 676 858 C884 906 1120 904 1344 862 C1458 840 1548 842 1600 858 V980 H0 Z" fill="#21495b"/>
+  <path d="M742 728 L836 586 L930 728 Z" fill="#f0d5a1"/>
+  <rect x="808" y="728" width="56" height="62" fill="#d8b882"/>
+</svg>

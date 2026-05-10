@@ -25,7 +25,7 @@ type BookingFeedbackState = "hidden" | "loading" | "success" | "error";
 type BookingAvailabilityState = "idle" | "checking" | "available" | "soldout" | "error";
 
 const FALLBACK_ROOM_IMAGE =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23e9efe8'/%3E%3Cstop offset='1' stop-color='%23dfe9df'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='800' fill='url(%23g)'/%3E%3Cpath d='M90 620c165-150 330-150 495 0s330 150 495 0' fill='none' stroke='%23c0d2c3' stroke-width='24' stroke-linecap='round'/%3E%3C/svg%3E";
+  "/placeholders/room-sample.svg";
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const THAI_PHONE_PATTERN = /^0\d{9}$/;
@@ -174,6 +174,7 @@ export function RoomDetailModal({
   const [bookingReferenceId, setBookingReferenceId] = useState<string | undefined>(undefined);
   const [availabilityState, setAvailabilityState] = useState<BookingAvailabilityState>("idle");
   const [availabilityErrorText, setAvailabilityErrorText] = useState<string | undefined>(undefined);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
   const scrollRestoreRef = useRef(0);
   const availabilityAbortRef = useRef<AbortController | null>(null);
   const hasSearchSummary = Boolean(String(searchCriteria?.checkIn ?? "").trim());
@@ -236,6 +237,7 @@ export function RoomDetailModal({
     return null;
   }
   const activeRoom = room;
+  const roomFailurePrefix = activeRoom.id;
 
   const handleClose = () => {
     availabilityAbortRef.current?.abort();
@@ -255,7 +257,9 @@ export function RoomDetailModal({
     setFeedbackMessage(undefined);
   };
 
-  const currentImage = galleryImages[activeImageIndex] || activeRoom.imageUrl || FALLBACK_ROOM_IMAGE;
+  const currentImageRaw = galleryImages[activeImageIndex] || activeRoom.imageUrl || FALLBACK_ROOM_IMAGE;
+  const currentImageFailureKey = `${roomFailurePrefix}::${currentImageRaw}`;
+  const currentImage = failedImages[currentImageFailureKey] ? FALLBACK_ROOM_IMAGE : currentImageRaw;
   const statusLabel = activeRoom.statusLabel || (activeRoom.isAvailable ? t("roomStatusAvailable") : t("roomStatusUnavailable"));
   const availableRoomsLabel =
     typeof activeRoom.availableRooms === "number" ? String(Math.max(0, activeRoom.availableRooms)) : t("roomNotSpecified");
@@ -536,6 +540,7 @@ export function RoomDetailModal({
                     alt={activeRoom.title || activeRoom.name}
                     className="room-detail-main-image"
                     fill
+                    onError={() => setFailedImages((prev) => ({ ...prev, [currentImageFailureKey]: true }))}
                     sizes="(max-width: 767px) 100vw, 48vw"
                     src={currentImage}
                     unoptimized
@@ -543,17 +548,28 @@ export function RoomDetailModal({
                 </div>
                 {galleryImages.length > 1 ? (
                   <div className="room-detail-gallery" aria-label={t("roomImagesLabel")}>
-                    {galleryImages.map((imageUrl, index) => (
-                      <button
-                        aria-label={`${t("roomImagesLabel")} ${index + 1}`}
-                        className={`room-detail-gallery-thumb ${index === activeImageIndex ? "active" : ""}`}
-                        key={`${activeRoom.id}-img-${imageUrl}-${index}`}
-                        onClick={() => setActiveImageIndex(index)}
-                        type="button"
-                      >
-                        <Image alt={`${activeRoom.title || activeRoom.name} ${index + 1}`} fill sizes="96px" src={imageUrl} unoptimized />
-                      </button>
-                    ))}
+                    {galleryImages.map((imageUrl, index) => {
+                      const thumbFailureKey = `${roomFailurePrefix}::${imageUrl}`;
+                      const thumbSrc = failedImages[thumbFailureKey] ? FALLBACK_ROOM_IMAGE : imageUrl;
+                      return (
+                        <button
+                          aria-label={`${t("roomImagesLabel")} ${index + 1}`}
+                          className={`room-detail-gallery-thumb ${index === activeImageIndex ? "active" : ""}`}
+                          key={`${activeRoom.id}-img-${imageUrl}-${index}`}
+                          onClick={() => setActiveImageIndex(index)}
+                          type="button"
+                        >
+                          <Image
+                            alt={`${activeRoom.title || activeRoom.name} ${index + 1}`}
+                            fill
+                            onError={() => setFailedImages((prev) => ({ ...prev, [thumbFailureKey]: true }))}
+                            sizes="96px"
+                            src={thumbSrc}
+                            unoptimized
+                          />
+                        </button>
+                      );
+                    })}
                   </div>
                 ) : null}
               </div>

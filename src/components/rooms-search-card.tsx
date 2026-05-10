@@ -9,6 +9,7 @@ const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const MIN_NIGHTS = 1;
 const MAX_NIGHTS = 30;
 const MIN_GUESTS = 1;
+const MAX_GUESTS = 20;
 
 interface RoomsSearchCardProps {
   initialCriteria?: RoomSearchCriteria;
@@ -79,6 +80,7 @@ export function RoomsSearchCard({ initialCriteria, isSearching = false, onSearch
             <input
               disabled={isSearching}
               id="rooms-search-nights"
+              inputMode="numeric"
               max={MAX_NIGHTS}
               min={MIN_NIGHTS}
               name="nights"
@@ -102,6 +104,8 @@ export function RoomsSearchCard({ initialCriteria, isSearching = false, onSearch
             <input
               disabled={isSearching}
               id="rooms-search-guests"
+              inputMode="numeric"
+              max={MAX_GUESTS}
               min={MIN_GUESTS}
               name="guests"
               onChange={(event) => setGuests(event.target.value)}

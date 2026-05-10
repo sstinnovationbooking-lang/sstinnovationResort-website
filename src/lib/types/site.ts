@@ -143,6 +143,78 @@ export type HomepageActivitiesDTO = {
   items: HomepageActivityItemDTO[];
 };
 
+export type CampingHighlightItemDTO = {
+  id: string;
+  title: LocalizedText;
+  description: LocalizedText;
+  iconKey?: string;
+  order: number;
+  isVisible: boolean;
+};
+
+export type CampingPackageItemDTO = {
+  id: string;
+  name: LocalizedText;
+  description: LocalizedText;
+  priceTHB: number;
+  durationText: LocalizedText;
+  includedItems?: LocalizedText[];
+  recommendedFor?: LocalizedText;
+  ctaLabel?: LocalizedText;
+  ctaHref?: string;
+  badge?: LocalizedText;
+  priceNote?: LocalizedText;
+  iconKey?: string;
+  order: number;
+  isVisible: boolean;
+};
+
+export type CampingImageItemDTO = {
+  id: string;
+  src: string;
+  altText: LocalizedText;
+  title?: LocalizedText;
+  description?: LocalizedText;
+  order?: number;
+  isVisible?: boolean;
+};
+
+export type CampingContentDTO = {
+  heroEyebrow: LocalizedText;
+  heroTitle: LocalizedText;
+  heroSubtitle: LocalizedText;
+  heroImageUrl: string;
+  heroImages?: CampingImageItemDTO[];
+  heroPrimaryCtaLabel: LocalizedText;
+  heroPrimaryCtaHref?: string;
+  heroSecondaryCtaLabel: LocalizedText;
+  heroSecondaryCtaHref?: string;
+  overviewTitle: LocalizedText;
+  overviewDescription: LocalizedText;
+  quickInfoTitle: LocalizedText;
+  quickInfoItems: CampingHighlightItemDTO[];
+  serviceTypesTitle: LocalizedText;
+  serviceTypes: CampingPackageItemDTO[];
+  facilitiesTitle: LocalizedText;
+  facilities: CampingHighlightItemDTO[];
+  rulesTitle: LocalizedText;
+  rules: CampingHighlightItemDTO[];
+  addOnsTitle: LocalizedText;
+  addOns: CampingPackageItemDTO[];
+  galleryTitle: LocalizedText;
+  galleryModalTitle?: LocalizedText;
+  galleryModalDescription?: LocalizedText;
+  galleryModalCtaLabel?: LocalizedText;
+  galleryModalCtaHref?: string;
+  galleryImages?: CampingImageItemDTO[];
+  galleryItems: FeaturedGalleryItemDTO[];
+  ctaTitle: LocalizedText;
+  ctaDescription: LocalizedText;
+  ctaPrimaryLabel: LocalizedText;
+  ctaSecondaryLabel?: LocalizedText;
+  isVisible?: boolean;
+};
+
 export type FooterMenuItemDTO = {
   label: LocalizedText;
   href?: string;
@@ -262,6 +334,7 @@ export type SiteHomeDTO = {
   tenant: TenantProfileDTO;
   hero: HeroDTO;
   roomsIntro?: RoomsIntroDTO;
+  camping?: CampingContentDTO;
   homepageRoomHighlights?: HomepageRoomHighlightsDTO;
   roomsFeaturedGallery?: FeaturedGalleryItemDTO[];
   homepageActivities?: HomepageActivitiesDTO;
