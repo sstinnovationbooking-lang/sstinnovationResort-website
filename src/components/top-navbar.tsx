@@ -22,6 +22,8 @@ interface ResortTopNavbarProps {
 }
 
 const TH_CAMPING_LABEL = "\u0E41\u0E04\u0E21\u0E1B\u0E4C\u0E1B\u0E34\u0E49\u0E07";
+const TH_ARTICLES_LABEL = "\u0E1A\u0E17\u0E04\u0E27\u0E32\u0E21";
+const EN_ARTICLES_LABEL = "Articles";
 
 const STARTER_NAVBAR: NavbarSettingsDTO = {
   mode: "transparent",
@@ -107,6 +109,18 @@ function resolveTenantAwareNavHref(href: string, tenantSlug: string | null): str
     return `/site/${tenantSlug}/camping`;
   }
 
+  if (normalized.toLowerCase() === "/activities") {
+    return `/site/${tenantSlug}#activities-gallery`;
+  }
+
+  if (normalized.toLowerCase() === "/about") {
+    return `/site/${tenantSlug}#hotel-info`;
+  }
+
+  if (normalized.toLowerCase() === "/articles") {
+    return `/site/${tenantSlug}/articles`;
+  }
+
   return normalized;
 }
 
@@ -162,6 +176,10 @@ function ensureCampingLink(links: NavbarLinkDTO[], locale: "th" | "en"): NavbarL
   return [...normalizedLinks.slice(0, insertIndex + 1), campingLink, ...normalizedLinks.slice(insertIndex + 1)];
 }
 
+function getArticlesLabel(locale: "th" | "en"): string {
+  return locale === "th" ? TH_ARTICLES_LABEL : EN_ARTICLES_LABEL;
+}
+
 export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarProps) {
   const t = useTranslations("Layout");
   const locale = useLocale();
@@ -173,7 +191,10 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
   const tenantHomeHref = currentTenantSlug ? `/site/${currentTenantSlug}` : "/";
   const activeRouteKey = toActiveRouteKey(pathname);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openDesktopSubmenu, setOpenDesktopSubmenu] = useState<string | null>(null);
+  const [isMobileAboutSubmenuOpen, setIsMobileAboutSubmenuOpen] = useState(false);
   const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const desktopMainMenuRef = useRef<HTMLElement | null>(null);
   const mobileNavPanelRef = useRef<HTMLDivElement | null>(null);
   const mobileFirstLinkRef = useRef<HTMLAnchorElement | null>(null);
   const phoneDisplay = String(siteContact?.phoneDisplay ?? "").trim();
@@ -193,6 +214,30 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
       document.body.style.overflow = previousOverflow;
     };
   }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    if (!openDesktopSubmenu) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+      if (!target) return;
+      if (desktopMainMenuRef.current?.contains(target)) return;
+      setOpenDesktopSubmenu(null);
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpenDesktopSubmenu(null);
+      }
+    };
+
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [openDesktopSubmenu]);
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
@@ -240,6 +285,7 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
 
   function closeMobileMenu(restoreFocus = false) {
     setIsMobileMenuOpen(false);
+    setIsMobileAboutSubmenuOpen(false);
     if (restoreFocus) {
       window.setTimeout(() => mobileMenuButtonRef.current?.focus(), 0);
     }
@@ -250,6 +296,7 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
     if (routeKey === "/") return t("nav.home");
     if (routeKey === "/rooms") return t("nav.rooms");
     if (routeKey === "/camping") return resolvedLocale === "th" ? TH_CAMPING_LABEL : "Camping";
+    if (routeKey === "/articles") return getArticlesLabel(resolvedLocale);
     if (routeKey === "/activities") return t("nav.activities");
     if (routeKey === "/about") return t("nav.about");
     if (routeKey === "/contact") return t("nav.contact");
@@ -266,7 +313,15 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
           aria-expanded={isMobileMenuOpen}
           aria-label={isMobileMenuOpen ? t("closeMenu") : t("openMenu")}
           className={`mobile-menu-btn ${isMobileMenuOpen ? "is-open" : ""}`}
-          onClick={() => setIsMobileMenuOpen((value) => !value)}
+          onClick={() =>
+            setIsMobileMenuOpen((value) => {
+              const next = !value;
+              if (!next) {
+                setIsMobileAboutSubmenuOpen(false);
+              }
+              return next;
+            })
+          }
           ref={mobileMenuButtonRef}
           type="button"
         >
@@ -279,11 +334,68 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
           {renderLogo(brand, settings)}
         </Link>
 
-        <nav className="top-main-menu" aria-label="Primary">
+        <nav className="top-main-menu" aria-label="Primary" ref={desktopMainMenuRef}>
           {leftLinks.map((item) => {
+            const routeKey = toActiveRouteKey(item.href).toLowerCase();
             const href = resolveTenantAwareNavHref(item.href, currentTenantSlug);
-            const isActive = toActiveRouteKey(href).toLowerCase() === activeRouteKey;
-            const label = resolveNavLabel(item.label, href);
+            const isActive = routeKey === activeRouteKey;
+            const label = resolveNavLabel(item.label, item.href);
+
+            if (routeKey === "/about") {
+              const articlesHref = resolveTenantAwareNavHref("/articles", currentTenantSlug);
+              const isAboutGroupActive = activeRouteKey === "/about" || activeRouteKey === "/articles";
+              const isSubmenuOpen = openDesktopSubmenu === "about";
+              const aboutLabel = label;
+
+              return (
+                <div
+                  className={`top-menu-item top-menu-item--has-submenu ${isSubmenuOpen ? "is-open" : ""} ${isAboutGroupActive ? "is-active" : ""}`}
+                  key={`${item.label}-${item.href}`}
+                  onMouseEnter={() => setOpenDesktopSubmenu("about")}
+                  onMouseLeave={() => setOpenDesktopSubmenu(null)}
+                >
+                  <div className="top-submenu-anchor-row">
+                    <Link
+                      aria-current={activeRouteKey === "/about" ? "page" : undefined}
+                      className={`top-submenu-trigger ${isAboutGroupActive ? "active" : ""}`}
+                      href={href}
+                    >
+                      <span>{aboutLabel}</span>
+                    </Link>
+                    <button
+                      aria-controls="top-about-submenu"
+                      aria-expanded={isSubmenuOpen}
+                      aria-haspopup="menu"
+                      className={`top-submenu-toggle-btn ${isAboutGroupActive ? "active" : ""}`}
+                      onClick={() => setOpenDesktopSubmenu((value) => (value === "about" ? null : "about"))}
+                      onKeyDown={(event) => {
+                        if (event.key === "ArrowDown" || event.key === " " || event.key === "Enter") {
+                          event.preventDefault();
+                          setOpenDesktopSubmenu("about");
+                        }
+                      }}
+                      type="button"
+                    >
+                      <span aria-hidden className="top-submenu-caret">v</span>
+                      <span className="visually-hidden">{getArticlesLabel(resolvedLocale)}</span>
+                    </button>
+                  </div>
+
+                  <div className="top-submenu-panel" id="top-about-submenu" role="menu">
+                    <Link
+                      aria-current={activeRouteKey === "/articles" ? "page" : undefined}
+                      className={activeRouteKey === "/articles" ? "active" : undefined}
+                      href={articlesHref}
+                      onClick={() => setOpenDesktopSubmenu(null)}
+                      role="menuitem"
+                    >
+                      {getArticlesLabel(resolvedLocale)}
+                    </Link>
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <Link
                 aria-current={isActive ? "page" : undefined}
@@ -326,9 +438,58 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
 
         <nav aria-label="Mobile Primary" className="mobile-nav-links">
           {leftLinks.map((item, index) => {
+            const routeKey = toActiveRouteKey(item.href).toLowerCase();
             const href = resolveTenantAwareNavHref(item.href, currentTenantSlug);
-            const isActive = toActiveRouteKey(href).toLowerCase() === activeRouteKey;
-            const label = resolveNavLabel(item.label, href);
+            const isActive = routeKey === activeRouteKey;
+            const label = resolveNavLabel(item.label, item.href);
+            const firstLinkRef = index === 0 ? mobileFirstLinkRef : undefined;
+
+            if (routeKey === "/about") {
+              const articlesHref = resolveTenantAwareNavHref("/articles", currentTenantSlug);
+              const isAboutGroupActive = activeRouteKey === "/about" || activeRouteKey === "/articles";
+
+              return (
+                <div
+                  className={`mobile-nav-submenu ${isMobileAboutSubmenuOpen ? "is-open" : ""} ${isAboutGroupActive ? "is-active" : ""}`}
+                  key={`mobile-link-${item.label}-${item.href}`}
+                >
+                  <div className={`mobile-nav-submenu-top ${isAboutGroupActive ? "active" : ""}`}>
+                    <Link
+                      aria-current={activeRouteKey === "/about" ? "page" : undefined}
+                      className={`mobile-nav-submenu-main-link ${activeRouteKey === "/about" ? "active" : ""}`}
+                      href={href}
+                      onClick={() => closeMobileMenu()}
+                      ref={firstLinkRef}
+                    >
+                      <span>{label}</span>
+                      <span aria-hidden>{">"}</span>
+                    </Link>
+                    <button
+                      aria-controls="mobile-about-submenu"
+                      aria-expanded={isMobileAboutSubmenuOpen}
+                      className={`mobile-nav-submenu-trigger ${isAboutGroupActive ? "active" : ""}`}
+                      onClick={() => setIsMobileAboutSubmenuOpen((value) => !value)}
+                      type="button"
+                    >
+                      <span aria-hidden>{isMobileAboutSubmenuOpen ? "-" : "+"}</span>
+                    </button>
+                  </div>
+
+                  <div className="mobile-nav-submenu-links" id="mobile-about-submenu">
+                    <Link
+                      aria-current={activeRouteKey === "/articles" ? "page" : undefined}
+                      className={activeRouteKey === "/articles" ? "active" : undefined}
+                      href={articlesHref}
+                      onClick={() => closeMobileMenu()}
+                    >
+                      <span>{getArticlesLabel(resolvedLocale)}</span>
+                      <span aria-hidden>{">"}</span>
+                    </Link>
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <Link
                 aria-current={isActive ? "page" : undefined}
@@ -336,7 +497,7 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
                 href={href}
                 key={`mobile-link-${item.label}-${item.href}`}
                 onClick={() => closeMobileMenu()}
-                ref={index === 0 ? mobileFirstLinkRef : undefined}
+                ref={firstLinkRef}
               >
               <span>{label}</span>
               <span aria-hidden>{">"}</span>
@@ -363,3 +524,4 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
     </header>
   );
 }
+
