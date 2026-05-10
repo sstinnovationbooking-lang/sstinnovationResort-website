@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { RoomAvailabilityList } from "@/components/room-availability-list";
 import { ResortSiteFooter } from "@/components/resort-site-footer";
+import { SiteAlertNotice } from "@/components/site-alert-notice";
 import { RoomsSearchFeedbackModal } from "@/components/rooms-search-feedback-modal";
 import { RoomsSearchCard } from "@/components/rooms-search-card";
 import { ResortTopNavbar } from "@/components/top-navbar";
@@ -12,6 +13,7 @@ import { normalizeRoomSearchCriteria, sanitizeRoomsPayload } from "@/lib/content
 import { resolveSiteContact } from "@/lib/content/site-contact";
 import { DEFAULT_LOCALE, normalizeLocale } from "@/i18n/config";
 import { translateStaticFallbackText } from "@/lib/i18n/static-fallback-text";
+import { normalizeRoomSearchCheckInInput } from "@/lib/search/room-search";
 import type { NavbarSettingsDTO, RoomCardDTO, RoomSearchCriteria, SiteBookingSettingsDTO, SiteHomeDTO } from "@/lib/types/site";
 
 interface ResortRoomsPageProps {
@@ -58,11 +60,15 @@ function toSafeErrorDetail(error: unknown): string | undefined {
   return text.slice(0, 220);
 }
 
-function filterAvailableRooms(rooms: RoomCardDTO[]): RoomCardDTO[] {
+function filterAvailableRooms(rooms: RoomCardDTO[], criteria?: Pick<RoomSearchCriteria, "guests">): RoomCardDTO[] {
+  const guests = Number(criteria?.guests ?? 0);
   return rooms.filter((room) => {
     const availabilityCount = typeof room.availableRooms === "number" ? room.availableRooms : undefined;
-    if (availabilityCount !== undefined) return availabilityCount > 0;
-    if (typeof room.isAvailable === "boolean") return room.isAvailable;
+    const isAvailable = availabilityCount !== undefined ? availabilityCount > 0 : typeof room.isAvailable === "boolean" ? room.isAvailable : true;
+    if (!isAvailable) return false;
+    if (guests >= 1 && typeof room.maxGuests === "number" && room.maxGuests > 0) {
+      return room.maxGuests >= guests;
+    }
     return true;
   });
 }
@@ -106,7 +112,7 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
   const hasInitialSearch = hasActiveSearch(searchCriteria);
   const initialCriteria = hasInitialSearch ? normalizeRoomSearchCriteria(searchCriteria) : undefined;
   const [displayRooms, setDisplayRooms] = useState<RoomCardDTO[]>(
-    hasInitialSearch ? filterAvailableRooms(rooms) : rooms
+    hasInitialSearch ? filterAvailableRooms(rooms, initialCriteria) : rooms
   );
   const [activeSearchCriteria, setActiveSearchCriteria] = useState<RoomSearchCriteria | undefined>(initialCriteria);
   const [isSearching, setIsSearching] = useState(false);
@@ -148,7 +154,7 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
   };
 
   const executeSearch = async (criteria: RoomSearchCriteria) => {
-    const checkIn = String(criteria.checkIn ?? "").trim();
+    const checkIn = normalizeRoomSearchCheckInInput(criteria.checkIn) ?? "";
     const rawNights = Number(criteria.nights ?? 0);
     const rawGuests = Number(criteria.guests ?? 0);
 
@@ -207,7 +213,7 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
       }
 
       const normalizedRooms = sanitizeRoomsPayload(payload);
-      const availableRooms = filterAvailableRooms(normalizedRooms);
+      const availableRooms = filterAvailableRooms(normalizedRooms, nextCriteria);
       setActiveSearchCriteria(nextCriteria);
       setDisplayRooms(availableRooms);
 
@@ -248,6 +254,7 @@ export function ResortRoomsPage({ home, rooms, searchCriteria, roomsLoadError, n
 
   return (
     <main className="site-main rooms-page" id="hero">
+      <SiteAlertNotice alerts={home.ui?.alerts} tenantSlug={home.tenant.tenantSlug} />
       <ResortTopNavbar
         brand={home.tenant.brand}
         navbar={navbar}

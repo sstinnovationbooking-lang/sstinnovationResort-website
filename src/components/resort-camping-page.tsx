@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 
 import { CampingHeroSlider } from "@/components/camping-hero-slider";
 import { ResortSiteFooter } from "@/components/resort-site-footer";
+import { SiteAlertNotice } from "@/components/site-alert-notice";
 import { ResortTopNavbar } from "@/components/top-navbar";
 import { DEFAULT_LOCALE, normalizeLocale } from "@/i18n/config";
 import { resolveCampingContent } from "@/lib/content/camping";
@@ -129,6 +130,7 @@ export function ResortCampingPage({ home, navbar }: ResortCampingPageProps) {
 
   return (
     <main className="site-main camping-page" id="hero">
+      <SiteAlertNotice alerts={home.ui?.alerts} tenantSlug={home.tenant.tenantSlug} />
       <ResortTopNavbar
         brand={home.tenant.brand}
         navbar={navbar}

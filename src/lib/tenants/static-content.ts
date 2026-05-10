@@ -38,6 +38,8 @@ const forestRooms: RoomCardDTO[] = [
     cancellationPolicy: "Free cancellation up to 72 hours before check-in.",
     taxFeeNote: "Taxes and fees not included",
     lowAvailabilityThreshold: 2,
+    zoneId: "zone-a",
+    zoneName: { "th-TH": "โซน A", "en-US": "Zone A" },
     roomType: "Villa",
     category: "Private",
     sortOrder: 1,
@@ -66,6 +68,8 @@ const forestRooms: RoomCardDTO[] = [
     cancellationPolicy: "Free cancellation up to 48 hours before check-in.",
     taxFeeNote: "Taxes and fees not included",
     lowAvailabilityThreshold: 2,
+    zoneId: "zone-b",
+    zoneName: { "th-TH": "โซน B", "en-US": "Zone B" },
     roomType: "Cabin",
     category: "Mountain view",
     sortOrder: 2,
@@ -94,6 +98,8 @@ const forestRooms: RoomCardDTO[] = [
     cancellationPolicy: "Non-refundable rate for selected stay dates.",
     taxFeeNote: "Taxes and fees not included",
     lowAvailabilityThreshold: 1,
+    zoneId: "zone-a",
+    zoneName: { "th-TH": "โซน A", "en-US": "Zone A" },
     roomType: "Pool Villa",
     category: "Private",
     sortOrder: 3,
@@ -142,6 +148,8 @@ const lakeRooms: RoomCardDTO[] = [
     cancellationPolicy: "Free cancellation up to 72 hours before check-in.",
     taxFeeNote: "Taxes and fees not included",
     lowAvailabilityThreshold: 2,
+    zoneId: "lake-east",
+    zoneName: { "th-TH": "โซนริมทะเลสาบ", "en-US": "Lakeside Zone" },
     roomType: "Suite",
     category: "Lake view",
     sortOrder: 1,
@@ -170,6 +178,8 @@ const lakeRooms: RoomCardDTO[] = [
     cancellationPolicy: "Free cancellation up to 48 hours before check-in.",
     taxFeeNote: "Taxes and fees not included",
     lowAvailabilityThreshold: 1,
+    zoneId: "lake-garden",
+    zoneName: { "th-TH": "โซนสวน", "en-US": "Garden Zone" },
     roomType: "Villa",
     category: "Private",
     sortOrder: 2,
@@ -1507,6 +1517,20 @@ const TENANT_CONTENT: Record<string, TenantStaticContent> = {
           contactRoute: "/contact",
           paymentOptions: ["full"],
           defaultPaymentOption: "full"
+        },
+        alerts: {
+          enabled: true,
+          mode: "banner_maintenance",
+          noticeId: "demo-maint-window-01",
+          bannerMessage: {
+            "th-TH": "แจ้งเพื่อทราบ: จะมีการปรับปรุงระบบและเว็บไซต์ ในช่วงเวลา 01:00 - 04:00 น.",
+            "en-US": "Notice: System and website maintenance is scheduled from 01:00 - 04:00."
+          },
+          bannerDetail: {
+            "th-TH": "ในช่วงเวลาดังกล่าว อาจไม่สามารถใช้งานบางฟังก์ชันได้ ขออภัยในความไม่สะดวก",
+            "en-US": "During this period, some features may be temporarily unavailable."
+          },
+          dismissible: true
         }
       }
     }

@@ -1,15 +1,17 @@
-"use client";
+﻿"use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 
-import { FooterSocialLinks } from "@/components/footer-social-links";
 import { BackToTopButton } from "@/components/back-to-top-button";
 import { FooterCopyrightLegal } from "@/components/footer-copyright-legal";
-import { LeadForm } from "@/components/lead-form";
+import { FooterSocialLinks } from "@/components/footer-social-links";
+import { SiteAlertNotice } from "@/components/site-alert-notice";
 import { ResortTopNavbar } from "@/components/top-navbar";
-import { DEFAULT_SITE_FOOTER, sanitizeSiteFooter } from "@/lib/content/footer";
-import { resolveSiteContact } from "@/lib/content/site-contact";
 import { DEFAULT_LOCALE, normalizeLocale } from "@/i18n/config";
+import { DEFAULT_SITE_FOOTER, sanitizeSiteFooter } from "@/lib/content/footer";
+import { resolveMapEmbed, shouldResolveMapViaServer, type ResolvedMapEmbed } from "@/lib/content/map-embed";
+import { resolveSiteContact } from "@/lib/content/site-contact";
 import { formatPhoneByLocale } from "@/lib/i18n/format";
 import { getLocalizedValue } from "@/lib/i18n/localized";
 import { translateStaticFallbackText } from "@/lib/i18n/static-fallback-text";
@@ -35,12 +37,67 @@ export function ResortContactPage({ home, navbar }: ResortContactPageProps) {
   const navbarPhoneDisplay = siteContact.phone;
   const footerBrandName = getLocalizedValue(footer.brandName, resolvedLocale, "SST INNOVATION RESORT");
   const footerDescription = getLocalizedValue(footer.description, resolvedLocale, "");
+  const mapUrl = String(siteContact.mapUrl ?? "").trim();
+  const fallbackMapEmbed = resolveMapEmbed(mapUrl);
+  const [resolvedMapBySource, setResolvedMapBySource] = useState<{ source: string; value: ResolvedMapEmbed } | null>(null);
+  const mapEmbed = resolvedMapBySource?.source === mapUrl ? resolvedMapBySource.value : fallbackMapEmbed;
+  const addressFallbackEmbedSrc = siteContact.address
+    ? `https://www.google.com/maps?output=embed&q=${encodeURIComponent(siteContact.address)}`
+    : null;
+  const mapFrameSrc = mapEmbed.embedSrc ?? addressFallbackEmbedSrc;
+  const mapExternalUrl =
+    mapEmbed.externalUrl ??
+    (siteContact.address ? `https://www.google.com/maps?q=${encodeURIComponent(siteContact.address)}` : null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!shouldResolveMapViaServer(mapUrl)) {
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    const controller = new AbortController();
+    const endpoint = `/api/site/map-embed?url=${encodeURIComponent(mapUrl)}`;
+
+    fetch(endpoint, {
+      method: "GET",
+      cache: "no-store",
+      signal: controller.signal
+    })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return (await response.json()) as Partial<ResolvedMapEmbed> | null;
+      })
+      .then((payload) => {
+        if (!isMounted || !payload) return;
+        const embedSrc = String(payload.embedSrc ?? "").trim() || null;
+        const externalUrl = String(payload.externalUrl ?? "").trim() || null;
+        if (!embedSrc && !externalUrl) return;
+        setResolvedMapBySource({
+          source: mapUrl,
+          value: {
+            embedSrc,
+            externalUrl
+          }
+        });
+      })
+      .catch(() => {
+        // Keep fallback map when resolver fails.
+      });
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [mapUrl]);
 
   function resolveMenuLabel(label: string, href?: string): string {
     const normalized = String(href ?? "").trim().toLowerCase();
     if (normalized === "/") return t("nav.home");
     if (normalized === "/rooms") return t("nav.rooms");
-    if (normalized === "/camping") return resolvedLocale === "th" ? "\u0E41\u0E04\u0E21\u0E1B\u0E4C\u0E1B\u0E34\u0E49\u0E07" : "Camping";
+    if (normalized === "/camping") return resolvedLocale === "th" ? "แคมป์ปิ้ง" : "Camping";
     if (normalized === "/activities") return t("nav.activities");
     if (normalized === "/about") return t("nav.about");
     if (normalized === "/contact") return t("nav.contact");
@@ -49,6 +106,7 @@ export function ResortContactPage({ home, navbar }: ResortContactPageProps) {
 
   return (
     <main className="site-main contact-page" id="hero">
+      <SiteAlertNotice alerts={home.ui?.alerts} tenantSlug={home.tenant.tenantSlug} />
       <ResortTopNavbar
         brand={home.tenant.brand}
         navbar={navbar}
@@ -80,9 +138,32 @@ export function ResortContactPage({ home, navbar }: ResortContactPageProps) {
             {siteContact.openingHours ? <p>{translateStaticFallbackText(siteContact.openingHours, t)}</p> : null}
             <p>{siteContact.address}</p>
           </div>
-          <div id="lead-form">
-            <h2 className="visually-hidden">{t("leadFormTitle")}</h2>
-            <LeadForm tenantSlug={home.tenant.tenantSlug} />
+
+          <div className="contact-map-card" id="contact-map">
+            <h3>{resolvedLocale === "th" ? "แผนที่รีสอร์ต" : "Resort Map"}</h3>
+            {mapFrameSrc ? (
+              <div className="contact-map-frame-wrap">
+                <iframe
+                  allowFullScreen
+                  className="contact-map-frame"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={mapFrameSrc}
+                  title={resolvedLocale === "th" ? "แผนที่รีสอร์ต" : "Resort map"}
+                />
+              </div>
+            ) : (
+              <p className="contact-map-empty">
+                {resolvedLocale === "th"
+                  ? "ยังไม่มีลิงก์แผนที่จากระบบหลังบ้าน"
+                  : "No map link configured from backoffice yet."}
+              </p>
+            )}
+            {mapExternalUrl ? (
+              <a className="btn btn-primary" href={mapExternalUrl} rel="noreferrer" target="_blank">
+                {resolvedLocale === "th" ? "เปิดแผนที่" : "Open map"}
+              </a>
+            ) : null}
           </div>
         </section>
       </section>
@@ -150,3 +231,4 @@ export function ResortContactPage({ home, navbar }: ResortContactPageProps) {
     </main>
   );
 }
+

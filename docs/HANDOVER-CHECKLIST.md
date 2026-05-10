@@ -1,4 +1,4 @@
-# HANDOVER CHECKLIST (Single Template + Multi-tenant)
+﻿# HANDOVER CHECKLIST (Single Template + Multi-tenant)
 
 Use this checklist before final handoff to backend/admin team and central platform team.
 
@@ -32,7 +32,10 @@ Project scope now:
 ## 3) Core Architecture Validation
 
 - [ ] Tenant route works: `/site/{tenantSlug}`
+- [ ] About route works: `/site/{tenantSlug}/about`
+- [ ] Articles route works: `/site/{tenantSlug}/articles`
 - [ ] Rooms route works: `/site/{tenantSlug}/rooms`
+- [ ] Contact route works: `/site/{tenantSlug}/contact`
 - [ ] i18n only uses `th-TH` and `en-US`
 - [ ] Default locale is `th-TH`
 - [ ] Locale persistence works (cookie/localStorage)
@@ -77,11 +80,12 @@ Project scope now:
 
 ## 7) Functional Smoke Test
 
-- [ ] Home page loads correctly for at least 1 tenant
-- [ ] Rooms search state works: loading / error / no-result
-- [ ] Room detail modal works on desktop and mobile
-- [ ] Booking/lead action works with validation
-- [ ] No broken text (`????`) or missing translation keys
+- [ ] Home page loads correctly for at least 2 tenants
+- [ ] About/Articles routes load for at least 2 tenants
+- [ ] Rooms zone filter works and keeps tenant scope
+- [ ] Contact map renders from Google map link/embed
+- [ ] Alert modes render correctly from `ui.alerts`
+- [ ] No broken text or missing translation keys
 
 ---
 
@@ -99,7 +103,8 @@ Project scope now:
 - [ ] Share current deploy commit SHA
 - [ ] Share env/secrets ownership (who rotates and manages)
 - [ ] Share API contract docs and fallback behavior summary
-- [ ] Share known limitations and next-phase plan (multi-template phase later)
+- [ ] Share `ui.booking` and `ui.alerts` payload docs
+- [ ] Share known limitations and next-phase plan
 
 ---
 
@@ -120,17 +125,20 @@ Release mode:
 
 ---
 
-## Final Review Snapshot (2026-05-09)
+## Final Review Snapshot (2026-05-11)
 
-- [x] Release gate local checks passed:
+- [x] Local quality gates passed:
 - [x] `npm run lint`
 - [x] `npm run typecheck`
 - [x] `npm run build`
-- [x] Production deploy workflow is green (latest confirmed passing commit: `909049f`)
-- [x] Production smoke (HTTP reachability) passed on:
-- [x] `https://sstinnovationresort-website.vercel.app/`
-- [x] `https://sstinnovationresort-website.vercel.app/site/demo-resort`
-- [x] `https://sstinnovationresort-website.vercel.app/site/demo-resort/rooms`
-- [ ] Final canonical production domain to share externally is confirmed by owner team
-- [ ] Unknown-tenant behavior is signed off by product/backend (`/site/tenant-not-found` currently returns HTTP 200 page response)
-- [ ] Locale switch smoke is signed off in real browser (server-side response currently remains `lang="th-TH"` without explicit cookie redirect evidence in HTTP checks)
+- [x] Local smoke route checks passed:
+- [x] `/site/demo-resort/articles`
+- [x] `/site/forest-escape/articles`
+- [x] `/site/demo-resort`
+- [x] `/site/demo-resort/rooms`
+- [x] `/site/demo-resort/camping`
+- [x] `/site/demo-resort/contact`
+- [x] `/site/forest-escape`
+- [x] `/site/tenant-not-found` (returns HTTP 404 in local smoke)
+- [x] Contact page map iframe rendered in smoke response checks
+- [ ] Production smoke re-check and sign-off still required before external release

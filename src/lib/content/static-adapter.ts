@@ -1,7 +1,7 @@
 import { validateLeadPayload } from "@/lib/dto/lead";
 import { sanitizeSiteHomeDTO } from "@/lib/dto/normalize";
 import { getDefaultTenantSlug } from "@/lib/env";
-import { sanitizeRoomsPayload } from "@/lib/content/rooms";
+import { normalizeRoomSearchCriteria, sanitizeRoomsPayload } from "@/lib/content/rooms";
 import { getStaticHomeByTenant, getStaticRoomsByTenant } from "@/lib/tenants/static-content";
 import { getTenantBySlug } from "@/lib/tenants/registry";
 import type { ContentAdapter } from "@/lib/content/types";
@@ -48,10 +48,23 @@ export class StaticContentAdapter implements ContentAdapter {
     }
     const tenant = getTenantBySlug(resolvedTenantSlug);
     const rooms = sanitizeRoomsPayload(getStaticRoomsByTenant(resolvedTenantSlug), tenant ?? undefined);
+    const normalizedCriteria = normalizeRoomSearchCriteria(criteria);
+    const guests = Number(normalizedCriteria.guests ?? 0);
+    const hasSearchDate = Boolean(normalizedCriteria.checkIn);
+    const searchFilteredRooms = hasSearchDate
+      ? rooms.filter((room) => {
+          const isAvailable = typeof room.availableRooms === "number" ? room.availableRooms > 0 : room.isAvailable !== false;
+          if (!isAvailable) return false;
+          if (guests >= 1 && typeof room.maxGuests === "number" && room.maxGuests > 0) {
+            return room.maxGuests >= guests;
+          }
+          return true;
+        })
+      : rooms;
 
     // Static mode keeps mock data simple while preserving backend-compatible query shape.
-    if (!criteria?.nights || criteria.nights <= 3) return rooms;
-    return [...rooms].sort((a, b) => (a.pricePerNight ?? a.nightlyPriceTHB) - (b.pricePerNight ?? b.nightlyPriceTHB));
+    if (!criteria?.nights || criteria.nights <= 3) return searchFilteredRooms;
+    return [...searchFilteredRooms].sort((a, b) => (a.pricePerNight ?? a.nightlyPriceTHB) - (b.pricePerNight ?? b.nightlyPriceTHB));
   }
 
   async submitLead(tenantSlug: string | null | undefined, payload: LeadRequestDTO) {

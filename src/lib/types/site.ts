@@ -215,6 +215,49 @@ export type CampingContentDTO = {
   isVisible?: boolean;
 };
 
+export type AboutSectionItemDTO = {
+  id: string;
+  title: LocalizedText;
+  description?: LocalizedText;
+  href?: string;
+  order: number;
+  isVisible: boolean;
+};
+
+export type AboutPageDTO = {
+  eyebrow?: LocalizedText;
+  heading: LocalizedText;
+  subtitle?: LocalizedText;
+  description?: LocalizedText;
+  content?: LocalizedText;
+  imageUrl?: string;
+  imageAlt?: LocalizedText;
+  sections?: AboutSectionItemDTO[];
+  isVisible?: boolean;
+};
+
+export type ArticleCardItemDTO = {
+  id: string;
+  title: LocalizedText;
+  excerpt?: LocalizedText;
+  href?: string;
+  slug?: string;
+  imageUrl?: string;
+  imageAlt?: LocalizedText;
+  category?: LocalizedText;
+  publishedAt?: string;
+  order: number;
+  isVisible: boolean;
+};
+
+export type ArticlesPageDTO = {
+  eyebrow?: LocalizedText;
+  heading: LocalizedText;
+  description?: LocalizedText;
+  items: ArticleCardItemDTO[];
+  isVisible?: boolean;
+};
+
 export type FooterMenuItemDTO = {
   label: LocalizedText;
   href?: string;
@@ -290,6 +333,8 @@ export type RoomCardDTO = {
   tenantSlug?: string;
   ownerId?: string;
   resortId?: string;
+  zoneId?: string;
+  zoneName?: LocalizedText;
   name: string;
   title?: string;
   description: string;
@@ -334,6 +379,8 @@ export type SiteHomeDTO = {
   tenant: TenantProfileDTO;
   hero: HeroDTO;
   roomsIntro?: RoomsIntroDTO;
+  aboutPage?: AboutPageDTO;
+  articlesPage?: ArticlesPageDTO;
   camping?: CampingContentDTO;
   homepageRoomHighlights?: HomepageRoomHighlightsDTO;
   roomsFeaturedGallery?: FeaturedGalleryItemDTO[];
@@ -387,9 +434,35 @@ export type SiteBookingSettingsDTO = {
   depositPercent?: number;
 };
 
+export type SiteAlertMode =
+  | "none"
+  | "lock_maintenance"
+  | "lock_payment_overdue"
+  | "banner_maintenance";
+
+export type SiteAlertButtonDTO = {
+  label: LocalizedText;
+  href?: string;
+  style?: "primary" | "secondary";
+};
+
+export type SiteAlertSettingsDTO = {
+  enabled?: boolean;
+  mode?: SiteAlertMode;
+  noticeId?: string;
+  title?: LocalizedText;
+  message?: LocalizedText;
+  description?: LocalizedText;
+  bannerMessage?: LocalizedText;
+  bannerDetail?: LocalizedText;
+  dismissible?: boolean;
+  buttons?: SiteAlertButtonDTO[];
+};
+
 export type SiteUiSettingsDTO = {
   navbar?: NavbarSettingsDTO;
   booking?: SiteBookingSettingsDTO;
+  alerts?: SiteAlertSettingsDTO;
 };
 
 export type LeadRequestDTO = {

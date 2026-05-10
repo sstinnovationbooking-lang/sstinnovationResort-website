@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -114,7 +114,7 @@ function resolveTenantAwareNavHref(href: string, tenantSlug: string | null): str
   }
 
   if (normalized.toLowerCase() === "/about") {
-    return `/site/${tenantSlug}#hotel-info`;
+    return `/site/${tenantSlug}/about`;
   }
 
   if (normalized.toLowerCase() === "/articles") {
@@ -191,10 +191,8 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
   const tenantHomeHref = currentTenantSlug ? `/site/${currentTenantSlug}` : "/";
   const activeRouteKey = toActiveRouteKey(pathname);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [openDesktopSubmenu, setOpenDesktopSubmenu] = useState<string | null>(null);
   const [isMobileAboutSubmenuOpen, setIsMobileAboutSubmenuOpen] = useState(false);
   const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null);
-  const desktopMainMenuRef = useRef<HTMLElement | null>(null);
   const mobileNavPanelRef = useRef<HTMLDivElement | null>(null);
   const mobileFirstLinkRef = useRef<HTMLAnchorElement | null>(null);
   const phoneDisplay = String(siteContact?.phoneDisplay ?? "").trim();
@@ -214,30 +212,6 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
       document.body.style.overflow = previousOverflow;
     };
   }, [isMobileMenuOpen]);
-
-  useEffect(() => {
-    if (!openDesktopSubmenu) return;
-
-    const onPointerDown = (event: PointerEvent) => {
-      const target = event.target as Node | null;
-      if (!target) return;
-      if (desktopMainMenuRef.current?.contains(target)) return;
-      setOpenDesktopSubmenu(null);
-    };
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpenDesktopSubmenu(null);
-      }
-    };
-
-    window.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [openDesktopSubmenu]);
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
@@ -334,7 +308,7 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
           {renderLogo(brand, settings)}
         </Link>
 
-        <nav className="top-main-menu" aria-label="Primary" ref={desktopMainMenuRef}>
+        <nav className="top-main-menu" aria-label="Primary">
           {leftLinks.map((item) => {
             const routeKey = toActiveRouteKey(item.href).toLowerCase();
             const href = resolveTenantAwareNavHref(item.href, currentTenantSlug);
@@ -344,15 +318,12 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
             if (routeKey === "/about") {
               const articlesHref = resolveTenantAwareNavHref("/articles", currentTenantSlug);
               const isAboutGroupActive = activeRouteKey === "/about" || activeRouteKey === "/articles";
-              const isSubmenuOpen = openDesktopSubmenu === "about";
               const aboutLabel = label;
 
               return (
                 <div
-                  className={`top-menu-item top-menu-item--has-submenu ${isSubmenuOpen ? "is-open" : ""} ${isAboutGroupActive ? "is-active" : ""}`}
+                  className={`top-menu-item top-menu-item--has-submenu ${isAboutGroupActive ? "is-active" : ""}`}
                   key={`${item.label}-${item.href}`}
-                  onMouseEnter={() => setOpenDesktopSubmenu("about")}
-                  onMouseLeave={() => setOpenDesktopSubmenu(null)}
                 >
                   <div className="top-submenu-anchor-row">
                     <Link
@@ -362,23 +333,6 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
                     >
                       <span>{aboutLabel}</span>
                     </Link>
-                    <button
-                      aria-controls="top-about-submenu"
-                      aria-expanded={isSubmenuOpen}
-                      aria-haspopup="menu"
-                      className={`top-submenu-toggle-btn ${isAboutGroupActive ? "active" : ""}`}
-                      onClick={() => setOpenDesktopSubmenu((value) => (value === "about" ? null : "about"))}
-                      onKeyDown={(event) => {
-                        if (event.key === "ArrowDown" || event.key === " " || event.key === "Enter") {
-                          event.preventDefault();
-                          setOpenDesktopSubmenu("about");
-                        }
-                      }}
-                      type="button"
-                    >
-                      <span aria-hidden className="top-submenu-caret">v</span>
-                      <span className="visually-hidden">{getArticlesLabel(resolvedLocale)}</span>
-                    </button>
                   </div>
 
                   <div className="top-submenu-panel" id="top-about-submenu" role="menu">
@@ -386,7 +340,6 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
                       aria-current={activeRouteKey === "/articles" ? "page" : undefined}
                       className={activeRouteKey === "/articles" ? "active" : undefined}
                       href={articlesHref}
-                      onClick={() => setOpenDesktopSubmenu(null)}
                       role="menuitem"
                     >
                       {getArticlesLabel(resolvedLocale)}
@@ -524,4 +477,5 @@ export function ResortTopNavbar({ brand, navbar, siteContact }: ResortTopNavbarP
     </header>
   );
 }
+
 

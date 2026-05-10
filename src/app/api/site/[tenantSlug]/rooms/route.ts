@@ -23,11 +23,20 @@ export async function GET(request: Request, context: RouteContext) {
       getContentMode() === "api"
         ? await fetchBackendRooms(tenant, criteria)
         : await getContentAdapter().getRooms(tenantSlug, criteria);
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate"
+      }
+    });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "failed to load rooms" },
-      { status: 502 }
+      {
+        status: 502,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate"
+        }
+      }
     );
   }
 }

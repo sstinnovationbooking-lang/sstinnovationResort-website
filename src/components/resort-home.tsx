@@ -10,6 +10,7 @@ import { HomepageAmenities } from "@/components/homepage-amenities";
 import { HomepageHotelInfo } from "@/components/homepage-hotel-info";
 import { HomepageRoomHighlights } from "@/components/homepage-room-highlights";
 import { ResortSiteFooter } from "@/components/resort-site-footer";
+import { SiteAlertNotice } from "@/components/site-alert-notice";
 import { ResortTopNavbar } from "@/components/top-navbar";
 import { DEFAULT_ROOMS_INTRO } from "@/lib/content/rooms-intro";
 import { resolveSiteContact } from "@/lib/content/site-contact";
@@ -78,6 +79,7 @@ export function ResortHome({ home, navbar }: ResortHomeProps) {
 
   return (
     <main aria-labelledby="hero-title" className="site-main">
+      <SiteAlertNotice alerts={home.ui?.alerts} tenantSlug={home.tenant.tenantSlug} />
       <ResortTopNavbar
         brand={home.tenant.brand}
         navbar={navbar}

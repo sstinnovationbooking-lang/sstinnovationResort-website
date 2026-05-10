@@ -13,6 +13,8 @@ export interface RoomCardViewModel {
   tenantSlug?: string;
   ownerId?: string;
   resortId?: string;
+  zoneId?: string;
+  zoneName?: string;
   name: string;
   title: string;
   description: string;
@@ -100,6 +102,7 @@ export function RoomMobileCard({ room, locale, priceSuffix, onOpenDetails, image
 
       <div className="room-mobile-card-body">
         <h3>{room.title || room.name}</h3>
+        {room.zoneName ? <p className="room-mobile-zone">{room.zoneName}</p> : null}
         <p className="room-mobile-card-description">{room.description}</p>
         <div className="room-mobile-policy">
           <p className="room-mobile-policy-title">{t("roomCancellationPolicy")}</p>

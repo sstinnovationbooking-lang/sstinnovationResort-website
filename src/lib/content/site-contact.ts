@@ -24,6 +24,8 @@ const DEFAULT_FOOTER_CONTACT_TITLE: LocalizedText = {
   en: "Contact information"
 };
 
+const DEFAULT_TEMPLATE_MAP_URL = "https://maps.app.goo.gl/o5KacUwbLLT7B5E76";
+
 export interface ResolvedSiteContact {
   phone: string;
   email: string;
@@ -84,7 +86,7 @@ export function resolveSiteContact(home: SiteHomeDTO, locale: AppLocale): Resolv
     DEFAULT_SITE_FOOTER.contact.supportHours
   );
   const address = resolveTextCandidates(locale, contactRecord.address, footer.contact.address, DEFAULT_SITE_FOOTER.contact.address);
-  const mapUrl = resolvePlainCandidates(contactRecord.mapUrl);
+  const mapUrl = resolvePlainCandidates(contactRecord.mapUrl, DEFAULT_TEMPLATE_MAP_URL);
   const facebookUrl = resolvePlainCandidates(contactRecord.facebookUrl);
   const contactTitle = resolveTextCandidates(locale, contactRecord.contactTitle, DEFAULT_CONTACT_TITLE);
   const footerTitle = resolveTextCandidates(locale, contactRecord.footerTitle, DEFAULT_FOOTER_CONTACT_TITLE);

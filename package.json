@@ -10,7 +10,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:contract:ui-alerts": "node scripts/test-ui-alerts-contract.js",
+    "test:contract:ui-booking": "node scripts/test-ui-booking-contract.js",
+    "test:contracts": "npm run test:contract:ui-alerts && npm run test:contract:ui-booking",
+    "test:integration": "node scripts/test-integration-suite.js",
+    "test": "npm run test:contracts && npm run test:integration",
+    "smoke:rooms-zones": "node scripts/smoke-rooms-zones.js",
+    "smoke:handoff": "node scripts/smoke-handoff.js"
   },
   "dependencies": {
     "next": "16.2.4",

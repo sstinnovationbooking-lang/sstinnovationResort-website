@@ -11,6 +11,7 @@ interface RoomAvailabilityTableProps {
   onOpenDetails: (room: RoomCardViewModel) => void;
   labels: {
     roomOptions: string;
+    zone: string;
     cancellationPolicy: string;
     guests: string;
     pricePerRoomPerNight: string;
@@ -52,6 +53,7 @@ export function RoomAvailabilityTable({ room, locale, labels, onOpenDetails }: R
           <tr>
             <td>
               <p className="room-option-title">{room.title || room.name}</p>
+              {room.zoneName ? <p className="room-option-zone">{labels.zone}: {room.zoneName}</p> : null}
               {room.roomType ? <p className="room-option-type">{room.roomType}</p> : null}
             </td>
             <td>

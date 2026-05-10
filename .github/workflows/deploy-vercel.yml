@@ -133,6 +133,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Handoff Test Suite
+        run: npm test
+
       - name: Pull Vercel project settings
         run: npx --yes vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
 

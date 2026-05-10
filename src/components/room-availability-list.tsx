@@ -8,6 +8,7 @@ import { RoomAvailabilityTable } from "@/components/room-availability-table";
 import { RoomDetailModal } from "@/components/room-detail-modal";
 import { RoomMobileCard, type RoomCardViewModel } from "@/components/room-mobile-card";
 import { DEFAULT_LOCALE, normalizeLocale } from "@/i18n/config";
+import { getLocalizedValue } from "@/lib/i18n/localized";
 import { normalizeRoomSearchCriteria } from "@/lib/content/rooms";
 import type { RoomSearchCriteria, RoomCardDTO, SiteBookingSettingsDTO } from "@/lib/types/site";
 
@@ -67,6 +68,11 @@ function toStringArray(value: unknown): string[] {
     .filter(Boolean);
 }
 
+function normalizeZoneId(value: string): string {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  return normalized.replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "") || "general";
+}
+
 export function RoomAvailabilityList({
   rooms,
   tenantSlug,
@@ -80,6 +86,7 @@ export function RoomAvailabilityList({
   const resolvedLocale = normalizeLocale(locale) ?? DEFAULT_LOCALE;
   const criteria = normalizeRoomSearchCriteria(searchCriteria);
   const [selectedRoom, setSelectedRoom] = useState<RoomCardViewModel | null>(null);
+  const [selectedZoneId, setSelectedZoneId] = useState<string>("all");
 
   const roomModels: RoomCardViewModel[] = useMemo(
     () =>
@@ -94,6 +101,9 @@ export function RoomAvailabilityList({
         const roomName = String(room.name || room.title || `Room ${index + 1}`);
         const roomTitle = String(room.title || room.name || roomName);
         const roomType = String(room.roomType || room.category || "").trim() || undefined;
+        const zoneLabel = getLocalizedValue(room.zoneName, resolvedLocale, "");
+        const hasZoneConfig = Boolean(String(room.zoneId ?? "").trim() || zoneLabel);
+        const zoneId = hasZoneConfig ? normalizeZoneId(String((room.zoneId ?? zoneLabel) || "general")) : undefined;
         const statusLabel = isAvailable ? t("roomStatusAvailable") : availableRooms === 0 ? t("roomStatusSoldOut") : t("roomStatusUnavailable");
         const lowAvailabilityLabel =
           isAvailable && typeof availableRooms === "number" && availableRooms > 0 && availableRooms <= lowAvailabilityThreshold
@@ -105,6 +115,8 @@ export function RoomAvailabilityList({
           tenantSlug: room.tenantSlug,
           ownerId: room.ownerId,
           resortId: room.resortId,
+          zoneId: zoneId || undefined,
+          zoneName: zoneLabel || undefined,
           name: roomName,
           title: roomTitle,
           description: String(room.description || t("roomsAdjustDates")),
@@ -139,8 +151,35 @@ export function RoomAvailabilityList({
           lowAvailabilityLabel
         };
       }),
-    [criteria, rooms, t, tenantSlug]
+    [criteria, resolvedLocale, rooms, t, tenantSlug]
   );
+
+  const zoneFilters = useMemo(() => {
+    const map = new Map<string, { id: string; label: string; availableCount: number }>();
+    roomModels.forEach((room) => {
+      const zoneId = String(room.zoneId ?? "").trim();
+      if (!zoneId) return;
+      const label = String(room.zoneName ?? "").trim() || (resolvedLocale === "th" ? "โซนทั่วไป" : "General zone");
+      const availableCount = typeof room.availableRooms === "number" ? Math.max(0, room.availableRooms) : room.isAvailable ? 1 : 0;
+      const existing = map.get(zoneId);
+      if (existing) {
+        existing.availableCount += availableCount;
+        return;
+      }
+      map.set(zoneId, { id: zoneId, label, availableCount });
+    });
+    return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
+  }, [resolvedLocale, roomModels]);
+
+  const effectiveSelectedZoneId = useMemo(
+    () => (selectedZoneId === "all" || zoneFilters.some((zone) => zone.id === selectedZoneId) ? selectedZoneId : "all"),
+    [selectedZoneId, zoneFilters]
+  );
+
+  const filteredRoomModels = useMemo(() => {
+    if (effectiveSelectedZoneId === "all" || zoneFilters.length === 0) return roomModels;
+    return roomModels.filter((room) => String(room.zoneId ?? "").trim() === effectiveSelectedZoneId);
+  }, [effectiveSelectedZoneId, roomModels, zoneFilters.length]);
 
   const selectedRoomForModal = useMemo(() => {
     if (!selectedRoom) return null;
@@ -150,6 +189,43 @@ export function RoomAvailabilityList({
   return (
     <section className="rooms-availability-list" aria-labelledby="rooms-availability-title">
       <header className="rooms-availability-head">
+        {zoneFilters.length > 0 ? (
+          <div className="rooms-zone-filter" aria-label={resolvedLocale === "th" ? "ตัวกรองโซนห้องพัก" : "Room zone filter"}>
+            <div className="rooms-zone-filter-head">
+              <h3>{resolvedLocale === "th" ? "โซนห้องพัก" : "Room zones"}</h3>
+              <p>
+                {resolvedLocale === "th"
+                  ? "เลือกโซนเพื่อกรองห้องพัก หรือเลือกทั้งหมดเพื่อดูทุกโซน"
+                  : "Select a zone to filter rooms, or choose all zones."}
+              </p>
+            </div>
+            <div className="rooms-zone-filter-options">
+                <button
+                aria-pressed={effectiveSelectedZoneId === "all"}
+                className={`rooms-zone-pill ${effectiveSelectedZoneId === "all" ? "is-active" : ""}`}
+                onClick={() => setSelectedZoneId("all")}
+                type="button"
+              >
+                <span>{resolvedLocale === "th" ? "ทั้งหมด" : "All zones"}</span>
+                <strong>{roomModels.length}</strong>
+              </button>
+              {zoneFilters.map((zone) => (
+                <button
+                  aria-pressed={effectiveSelectedZoneId === zone.id}
+                  className={`rooms-zone-pill ${effectiveSelectedZoneId === zone.id ? "is-active" : ""}`}
+                  key={zone.id}
+                  onClick={() => setSelectedZoneId(zone.id)}
+                  type="button"
+                >
+                  <span>{zone.label}</span>
+                  <strong>
+                    {zone.availableCount} {zone.availableCount === 1 ? t("roomUnit") : t("roomsUnit")}
+                  </strong>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <h2 id="rooms-availability-title">
           {isSearchActive ? t("roomsSearchResultsTitle") : t("roomsAvailabilityTitle")}
         </h2>
@@ -160,6 +236,11 @@ export function RoomAvailabilityList({
               <span>{t("roomsAvailabilityCheckIn")}: {criteria.checkIn || "-"}</span>
               <span>{t("roomsAvailabilityNights")}: {criteria.nights}</span>
               <span>{t("roomsAvailabilityGuests")}: {criteria.guests}</span>
+              {effectiveSelectedZoneId !== "all" ? (
+                <span>
+                  {resolvedLocale === "th" ? "โซน" : "Zone"}: {zoneFilters.find((zone) => zone.id === effectiveSelectedZoneId)?.label ?? "-"}
+                </span>
+              ) : null}
             </div>
             {onClearSearch ? (
               <button className="btn btn-ghost btn-compact rooms-clear-search-btn" onClick={onClearSearch} type="button">
@@ -170,15 +251,21 @@ export function RoomAvailabilityList({
         ) : null}
       </header>
 
-      {roomModels.length === 0 ? (
+      {filteredRoomModels.length === 0 ? (
         <div className="rooms-empty-state">
           <p className="rooms-empty-title">{t("roomsNoRoomAvailable")}</p>
-          <p>{t("roomsAdjustDates")}</p>
+          <p>
+            {effectiveSelectedZoneId === "all"
+              ? t("roomsAdjustDates")
+              : resolvedLocale === "th"
+                ? "ยังไม่พบห้องว่างในโซนที่เลือก"
+                : "No available rooms in the selected zone."}
+          </p>
         </div>
       ) : (
         <>
           <div className="rooms-desktop-groups">
-            {roomModels.map((room, index) => (
+            {filteredRoomModels.map((room, index) => (
               <article className="room-availability-group" key={`desktop-${room.id}`}>
                 <div className="room-availability-identity">
                   <button
@@ -212,6 +299,7 @@ export function RoomAvailabilityList({
                 <RoomAvailabilityTable
                   labels={{
                     roomOptions: t("roomOptions"),
+                    zone: resolvedLocale === "th" ? "โซน" : "Zone",
                     cancellationPolicy: t("roomCancellationPolicy"),
                     guests: t("roomGuests"),
                     pricePerRoomPerNight: t("roomPricePerRoomPerNight"),
@@ -232,7 +320,7 @@ export function RoomAvailabilityList({
           </div>
 
           <div className="rooms-mobile-cards">
-            {roomModels.map((room, index) => (
+            {filteredRoomModels.map((room, index) => (
               <RoomMobileCard
                 imagePriority={index === 0}
                 key={`mobile-${room.id}`}

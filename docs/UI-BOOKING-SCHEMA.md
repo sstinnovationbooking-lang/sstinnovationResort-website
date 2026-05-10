@@ -104,3 +104,7 @@ These examples match current tenant setup in this project.
   - `GET /api/site/home`
   - `GET /api/site/rooms?checkIn=YYYY-MM-DD&nights=1..30`
   - `POST /api/site/leads`
+
+## CI Contract Test
+- Script: `npm run test:contract:ui-booking`
+- Aggregated contract suite: `npm run test:contracts`

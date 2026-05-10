@@ -2896,3 +2896,115 @@ npm run build
 - Handoff notes:
   - Backend/central teams do not need payload/schema changes for this update.
   - Continue providing tenant-scoped room detail fields as before; this is a frontend UX/accessibility improvement only.
+
+## Latest Update (2026-05-11): Handoff Stabilization + Central Alerts Payload
+
+### Scope completed in this round
+- Tenant-aware navigation/content updates:
+  - Added About page route: `/site/{tenantSlug}/about`
+  - Added Articles page route: `/site/{tenantSlug}/articles`
+  - Added About submenu behavior in top navbar with Articles item and active-state handling
+- Central alert integration from `home.ui.alerts`:
+  - `lock_maintenance` (lock popup)
+  - `lock_payment_overdue` (lock popup)
+  - `banner_maintenance` (top banner, non-lock)
+- Contact map reliability:
+  - Improved map embed resolver for Google iframe embeds and `maps.app.goo.gl` links
+- Rooms stability pass:
+  - Tenant-safe zone-ready room listing/search behavior preserved
+
+### Architecture/contract confirmation (unchanged)
+- Single Template + Multi-tenant architecture remains unchanged
+- Tenant isolation remains unchanged:
+  - `tenantSlug`, `ownerId`, `resortId`
+- BFF identity headers remain unchanged:
+  - `x-tenant-slug`, `x-tenant-id`, `x-resort-id`, `x-owner-id`, `x-internal-secret` (optional)
+- Fallback chain remains unchanged:
+  1. owner backend
+  2. central platform
+  3. local static fallback
+- Frontend still does not send tenant identity fields directly
+
+### i18n confirmation
+- Website language scope remains only:
+  - `th-TH`
+  - `en-US`
+- Default locale remains `th-TH`
+
+### Local validation results (2026-05-11)
+- `npm run lint`: pass
+- `npm run typecheck`: pass
+- `npm run build`: pass
+- Smoke routes: pass
+  - `/site/demo-resort/articles` (200)
+  - `/site/forest-escape/articles` (200)
+  - `/site/demo-resort` (200)
+  - `/site/demo-resort/rooms` (200)
+  - `/site/demo-resort/camping` (200)
+  - `/site/demo-resort/contact` (200)
+  - `/site/forest-escape` (200)
+  - `/site/tenant-not-found` (404)
+
+### New handoff docs for backend/admin + central teams
+- `docs/UI-ALERTS-SCHEMA.md`
+- `docs/schemas/ui.alerts.schema.json`
+- `docs/HANDOVER-REPORT-2026-05-11.md`
+- Existing booking contract docs remain:
+  - `docs/UI-BOOKING-SCHEMA.md`
+  - `docs/schemas/ui.booking.schema.json`
+
+### Current system stage
+- Stage: **Template-safe handoff ready for backend/central integration**
+- Next stage: connect live central/backoffice payloads in `CONTENT_MODE=api` and run production sign-off.
+
+### Contract Test Update
+- Added CI-ready contract test for central alerts payload:
+  - `npm run test:contract:ui-alerts`
+  - `npm run test:contracts`
+- Included in workflow:
+  - `.github/workflows/deploy-vercel.yml` (step: `Contract Test (ui.alerts)`)
+
+## Latest Update (2026-05-11 Round 2): API Payload Integration + Handoff CI Suite
+
+### Backend/Central payload integration (`CONTENT_MODE=api`)
+- Integrated and hardened payload mapping for:
+  - `home.ui.alerts`
+  - `aboutPage`
+  - `articlesPage`
+- Added runtime sanitization for backend/central payloads (backward-compatible), including:
+  - aboutPage alias support: `heading/title`, `description/summary`, `content/body`, `imageUrl/image/coverImage`, `sections`
+  - articlesPage alias support: `items/articles/list`, `href/url/link`, `slug/articleSlug`, `publishedAt/publishDate/createdAt`, `category/tag`
+- Added API fallback merge behavior (without changing architecture):
+  - backend first
+  - central fallback for missing/invalid `aboutPage`, `articlesPage`, `ui.alerts`
+  - static fallback when backend+central unavailable
+
+### Map embed safety
+- Map embed resolver remains safe-by-default:
+  - accepts only Google Maps embed domains for iframe rendering
+  - unsafe/non-Google URLs are rejected from embed rendering
+  - invalid inputs fallback safely (no crash, no unsafe iframe source)
+
+### Handoff CI test suite (single suite)
+- Added contract tests:
+  - `npm run test:contract:ui-alerts`
+  - `npm run test:contract:ui-booking`
+- Added integration tests:
+  - `npm run test:integration`
+  - covers `CONTENT_MODE=api` mapping + fallback + map embed resolver behavior
+- Added aggregate suite:
+  - `npm run test:contracts`
+  - `npm test` (contracts + integration)
+- CI workflow updated:
+  - `.github/workflows/deploy-vercel.yml` now runs `npm test`
+
+### Smoke command (handoff)
+- Added handoff smoke route check command:
+  - `npm run smoke:handoff`
+  - validates:
+    - `/`
+    - `/site/demo-resort`
+    - `/site/demo-resort/rooms`
+    - `/site/forest-escape`
+    - `/site/forest-escape/rooms`
+    - `/site/tenant-not-found` (must be 404)

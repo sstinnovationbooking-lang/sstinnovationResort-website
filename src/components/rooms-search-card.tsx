@@ -3,9 +3,9 @@
 import { FormEvent, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
+import { normalizeRoomSearchCheckInInput } from "@/lib/search/room-search";
 import type { RoomSearchCriteria } from "@/lib/types/site";
 
-const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const MIN_NIGHTS = 1;
 const MAX_NIGHTS = 30;
 const MIN_GUESTS = 1;
@@ -37,7 +37,7 @@ export function RoomsSearchCard({ initialCriteria, isSearching = false, onSearch
     const nextCheckIn = String(checkIn ?? "").trim();
     const parsedNights = parsePositiveInt(nights, 0);
     const parsedGuests = parsePositiveInt(guests, 0);
-    const normalizedCheckIn = ISO_DATE_PATTERN.test(nextCheckIn) ? nextCheckIn : "";
+    const normalizedCheckIn = normalizeRoomSearchCheckInInput(nextCheckIn) ?? "";
     onSearch({
       checkIn: normalizedCheckIn,
       nights: parsedNights,

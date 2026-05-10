@@ -15,8 +15,10 @@ import { isValidHomepageActivities } from "@/lib/content/homepage-activities";
 import { isValidHomepageAmenities } from "@/lib/content/homepage-amenities";
 import { isValidHomepageHotelInfo } from "@/lib/content/homepage-hotel-info";
 import { isValidHomepageRoomHighlights } from "@/lib/content/homepage-room-highlights";
+import { isValidAboutPage, isValidArticlesPage } from "@/lib/content/page-payload";
 import { isValidRoomsFeaturedGallery } from "@/lib/content/rooms-featured-gallery";
 import { isValidRoomsIntro } from "@/lib/content/rooms-intro";
+import { isValidSiteAlertSettings } from "@/lib/content/site-ui";
 import { sanitizeRoomsPayload } from "@/lib/content/rooms";
 import { toRoomSearchQueryString } from "@/lib/search/room-search";
 import { getStaticHomeByTenant, getStaticRoomsByTenant } from "@/lib/tenants/static-content";
@@ -29,6 +31,51 @@ import type {
   SiteHomeDTO,
   TenantContext
 } from "@/lib/types/site";
+
+function resolveAboutPageFallback(
+  primaryHome: SiteHomeDTO,
+  centralHome: SiteHomeDTO | undefined,
+  staticHome: SiteHomeDTO | null
+): SiteHomeDTO["aboutPage"] {
+  if (isValidAboutPage(primaryHome.aboutPage)) return primaryHome.aboutPage;
+  if (centralHome && isValidAboutPage(centralHome.aboutPage)) return centralHome.aboutPage;
+  if (staticHome && isValidAboutPage(staticHome.aboutPage)) return staticHome.aboutPage;
+  return primaryHome.aboutPage;
+}
+
+function resolveArticlesPageFallback(
+  primaryHome: SiteHomeDTO,
+  centralHome: SiteHomeDTO | undefined,
+  staticHome: SiteHomeDTO | null
+): SiteHomeDTO["articlesPage"] {
+  if (isValidArticlesPage(primaryHome.articlesPage)) return primaryHome.articlesPage;
+  if (centralHome && isValidArticlesPage(centralHome.articlesPage)) return centralHome.articlesPage;
+  if (staticHome && isValidArticlesPage(staticHome.articlesPage)) return staticHome.articlesPage;
+  return primaryHome.articlesPage;
+}
+
+function hasValidAlerts(home: SiteHomeDTO | null | undefined): boolean {
+  return Boolean(home && isValidSiteAlertSettings(home.ui?.alerts));
+}
+
+function resolveUiFallback(
+  primaryHome: SiteHomeDTO,
+  centralHome: SiteHomeDTO | undefined,
+  staticHome: SiteHomeDTO | null
+): SiteHomeDTO["ui"] {
+  const primaryUi = primaryHome.ui;
+  if (hasValidAlerts(primaryHome)) return primaryUi;
+
+  const fallbackAlerts =
+    hasValidAlerts(centralHome)
+      ? centralHome?.ui?.alerts
+      : hasValidAlerts(staticHome)
+        ? staticHome?.ui?.alerts
+        : undefined;
+
+  if (!fallbackAlerts) return primaryUi;
+  return { ...(primaryUi ?? {}), alerts: fallbackAlerts };
+}
 
 function resolveFooterSocialLinks(
   primaryFooter: SiteFooterDTO | undefined,
@@ -164,6 +211,8 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
     ) {
       return {
         ...backendHome,
+        aboutPage: resolveAboutPageFallback(backendHome, undefined, staticHome),
+        articlesPage: resolveArticlesPageFallback(backendHome, undefined, staticHome),
         homepageActivities:
           needsActivitiesFallback && isValidHomepageActivities(staticHome?.homepageActivities)
             ? staticHome?.homepageActivities
@@ -198,7 +247,8 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
         contact:
           needsContactFallback && staticHome && isValidSiteContact(staticHome.contact)
             ? staticHome.contact
-            : backendHome.contact
+            : backendHome.contact,
+        ui: resolveUiFallback(backendHome, undefined, staticHome)
       };
     }
 
@@ -206,6 +256,8 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
       const centralHome = await fetchHomeFromBaseUrl(centralBaseUrl, tenant, centralSecret);
       return {
         ...backendHome,
+        aboutPage: resolveAboutPageFallback(backendHome, centralHome, staticHome),
+        articlesPage: resolveArticlesPageFallback(backendHome, centralHome, staticHome),
         homepageActivities:
           needsActivitiesFallback && isValidHomepageActivities(centralHome.homepageActivities)
             ? centralHome.homepageActivities
@@ -255,7 +307,8 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
             ? centralHome.contact
             : needsContactFallback && staticHome && isValidSiteContact(staticHome.contact)
               ? staticHome.contact
-              : backendHome.contact
+              : backendHome.contact,
+        ui: resolveUiFallback(backendHome, centralHome, staticHome)
       };
     } catch {
       // Keep backend home payload; fallback defaults will be sanitized in DTO normalization.
@@ -263,6 +316,8 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
 
     return {
       ...backendHome,
+      aboutPage: resolveAboutPageFallback(backendHome, undefined, staticHome),
+      articlesPage: resolveArticlesPageFallback(backendHome, undefined, staticHome),
       homepageActivities:
         needsActivitiesFallback && isValidHomepageActivities(staticHome?.homepageActivities)
           ? staticHome?.homepageActivities
@@ -297,7 +352,8 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
       contact:
         needsContactFallback && staticHome && isValidSiteContact(staticHome.contact)
           ? staticHome.contact
-          : backendHome.contact
+          : backendHome.contact,
+      ui: resolveUiFallback(backendHome, undefined, staticHome)
     };
   } catch (backendError) {
     if (!centralBaseUrl) {
@@ -308,6 +364,8 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
       const centralHome = await fetchHomeFromBaseUrl(centralBaseUrl, tenant, centralSecret);
       return {
         ...centralHome,
+        aboutPage: resolveAboutPageFallback(centralHome, undefined, staticHome),
+        articlesPage: resolveArticlesPageFallback(centralHome, undefined, staticHome),
         homepageActivities:
           isValidHomepageActivities(centralHome.homepageActivities)
             ? centralHome.homepageActivities
@@ -356,7 +414,8 @@ export async function fetchBackendHome(tenant: TenantContext): Promise<SiteHomeD
             ? centralHome.contact
             : staticHome && isValidSiteContact(staticHome.contact)
               ? staticHome.contact
-              : centralHome.contact
+              : centralHome.contact,
+        ui: resolveUiFallback(centralHome, undefined, staticHome)
       };
     } catch (centralError) {
       const backendMessage = backendError instanceof Error ? backendError.message : "primary backend unavailable";

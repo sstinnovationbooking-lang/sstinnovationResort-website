@@ -1,14 +1,14 @@
-# Project Context (Persistent)
+﻿# Project Context (Persistent)
 
-Last updated: 2026-05-08
+Last updated: 2026-05-11
 
 ## Current Priority
-- Finish website UI first.
-- Keep backend integration contract stable while UI is being completed.
+- Stabilize handoff quality for frontend + backend/admin + central platform.
+- Keep architecture contract fixed while expanding tenant UI features.
 
 ## Product Goal
-- Multi-tenant resort website template.
-- Support tenant separation by identity:
+- Single-template, multi-tenant resort website.
+- Tenant separation by identity:
   - `tenantSlug` (routing/public identity)
   - `ownerId` (owner identity)
   - `resortId` (resort identity)
@@ -21,32 +21,39 @@ Last updated: 2026-05-08
   - `x-tenant-id` (mapped from `resortId`)
   - `x-resort-id`
   - `x-owner-id`
+  - `x-internal-secret` (when configured)
 
 ## Non-Negotiables
-- Browser must not send owner identity directly.
+- Browser must not send tenant owner identity directly.
 - No cross-tenant data leakage.
-- UI changes must preserve responsive behavior (mobile/tablet/desktop).
+- Keep fallback chain unchanged: backend -> central -> static.
+- UI must remain responsive on desktop/tablet/mobile.
+
+## i18n Scope (Current)
+- Supported website locales: `th-TH`, `en-US`
+- Default locale: `th-TH`
+- Locale persistence: cookie + localStorage (`NEXT_LOCALE`)
 
 ## Current Status
-- Tenant identity model and BFF headers are in place.
-- Website UI is partially complete and is the active workstream.
-- Homepage Services/Amenities section now supports editable iconKey-based items with backend/central/static fallback integration.
-- Homepage Hotel Information section now supports editable iconKey-based items with backend/central/static fallback integration.
-- Contact/Booking request section has been moved out of homepage into dedicated tenant contact route rendering.
-- Navbar mobile keyboard behavior is now polished (Escape close + focus management) and key interactive focus-visible states were improved for accessibility/contrast.
-- Tenant load-failure surfaces now use a modern status-based customer notice page with safe production messaging and dev-only technical detail support.
-- Homepage now includes a new alternating Room Highlights section between Rooms intro and Featured Room Gallery with tenant/backend/central/static fallback support.
-- Navbar/Header now includes a tenant-scoped clickable phone contact item after language selector, using existing tenant contact data.
-- Full i18n locale switching now supports 17 locales with shared language state (cookie + localStorage), selected-locale live updates, and consistent message fallback order (`selected -> th -> en`).
-- Homepage legacy Gallery block has been redesigned into compact Activities cards (`homepage.activities`) with backend/central/static fallback support and max-6 render behavior.
-- Activities i18n key compatibility now supports both legacy and required nested message paths (`activitiesItems.*` and `activities.items.*`) to prevent missing-message runtime warnings.
-- Homepage i18n stabilization is now in progress with localized tenant text field support (`string | localized object`) across homepage sections while preserving existing backend/central/static fallback architecture.
-- Active language selector scope is temporarily limited to two website languages (`th-TH`, `en-US`) with unsupported stored locales auto-falling back to Thai default.
-- Thai homepage UI key parity has been aligned with English for nav/section labels and media-modal controls so language switching now updates all homepage chrome consistently.
+- Tenant-aware About and Articles routes are active:
+  - `/site/[tenantSlug]/about`
+  - `/site/[tenantSlug]/articles`
+- Top navbar has About submenu with tenant-aware Articles link.
+- Rooms page supports tenant zone model and zone-based listing/filter flow.
+- Contact page map renderer supports Google iframe + Google short links with resolver API fallback.
+- Central alert system is integrated via `home.ui.alerts`:
+  - lock popup: maintenance
+  - lock popup: overdue payment
+  - top banner notice: maintenance window
 
-## Next UI Milestones
-1. Finalize navigation and hero behavior.
-2. Finalize room listing interactions and loading/empty states.
-3. Finalize lead form UX states and error messaging consistency.
-4. Run visual polish pass (spacing, hierarchy, mobile ergonomics).
-5. Verify end-to-end flow with `CONTENT_MODE=api`.
+## Handoff Docs (Latest)
+- `docs/UI-BOOKING-SCHEMA.md`
+- `docs/UI-ALERTS-SCHEMA.md`
+- `docs/schemas/ui.booking.schema.json`
+- `docs/schemas/ui.alerts.schema.json`
+- `docs/HANDOVER-REPORT-2026-05-11.md`
+
+## Next Milestones
+1. Connect real central/backoffice payloads for `aboutPage`, `articlesPage`, and `ui.alerts` in production data paths.
+2. Add browser-level visual regression checks for popup/banner/map behavior.
+3. Final cross-team sign-off for live integration mode (`CONTENT_MODE=api`).
