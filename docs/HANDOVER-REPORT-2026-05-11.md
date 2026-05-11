@@ -4,7 +4,7 @@
 - Repository: `E:\sstinnovationResort-website`
 - Scope: Single Template + Multi-tenant
 - Stack: Next.js 16 App Router + TypeScript + Vercel + BFF
-- Latest commit (HEAD): `8e09b5f`
+- Latest commit (HEAD): `8f3f8e3`
 
 ## Round Scope Completed
 1. Integrated API payload mapping for `CONTENT_MODE=api`:
@@ -62,10 +62,10 @@
 - Production domain verified: `https://sstinnovationresort-website.vercel.app`
 - GitHub Actions:
   - Workflow: `Deploy Vercel (Production)`
-  - Run: #18
-  - Commit: `8e09b5ffdbbf678de5904c9a25c39b63b95a0b25`
+  - Run: #19
+  - Commit: `8f3f8e37a129c2c1dceefe2c61df77a7dd8e85ec`
   - Status: `completed / success`
-  - URL: `https://github.com/sstinnovationbooking-lang/sstinnovationResort-website/actions/runs/25638889886`
+  - URL: `https://github.com/sstinnovationbooking-lang/sstinnovationResort-website/actions/runs/25646463591`
 - Production smoke results:
   - `/` -> `200` (redirect target: `/site/forest-escape`)
   - `/site/demo-resort` -> `200`

@@ -3012,12 +3012,12 @@ npm run build
 ## Latest Update (2026-05-11 Round 3): Production Verification + Handover Refresh
 
 ### Commit and deployment status
-- Latest commit (HEAD): `8e09b5f`
+- Latest commit (HEAD): `8f3f8e3`
 - GitHub Actions:
   - Workflow: `Deploy Vercel (Production)`
-  - Run #18: `success`
-  - Commit SHA: `8e09b5ffdbbf678de5904c9a25c39b63b95a0b25`
-  - Run URL: `https://github.com/sstinnovationbooking-lang/sstinnovationResort-website/actions/runs/25638889886`
+  - Run #19: `success`
+  - Commit SHA: `8f3f8e37a129c2c1dceefe2c61df77a7dd8e85ec`
+  - Run URL: `https://github.com/sstinnovationbooking-lang/sstinnovationResort-website/actions/runs/25646463591`
 
 ### Production smoke test (2026-05-11)
 - Domain used: `https://sstinnovationresort-website.vercel.app`

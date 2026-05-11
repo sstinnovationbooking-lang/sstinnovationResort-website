@@ -148,6 +148,6 @@ Release mode:
 - [x] `/site/forest-escape` -> `200`
 - [x] `/site/forest-escape/rooms` -> `200`
 - [x] `/site/tenant-not-found` -> `404`
-- [x] Latest deploy commit on production workflow: `8e09b5ffdbbf678de5904c9a25c39b63b95a0b25`
-- [x] GitHub Actions run: `Deploy Vercel (Production)` #18 = `success`
+- [x] Latest deploy commit on production workflow: `8f3f8e37a129c2c1dceefe2c61df77a7dd8e85ec`
+- [x] GitHub Actions run: `Deploy Vercel (Production)` #19 = `success`
 - [ ] Pending backend/central final sign-off for live payload population (`home.ui.alerts`, `aboutPage`, `articlesPage`)
