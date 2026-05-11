@@ -11,9 +11,9 @@ Project scope now:
 
 ## 1) Release Gate (Must Pass)
 
-- [ ] GitHub Actions `Deploy Vercel (Production)` is green on `main`
-- [ ] Deployment commit is recorded
-- [ ] Production URL is reachable
+- [x] GitHub Actions `Deploy Vercel (Production)` is green on `main`
+- [x] Deployment commit is recorded
+- [x] Production URL is reachable
 - [ ] No secret/token is committed in repository
 
 ---
@@ -31,80 +31,80 @@ Project scope now:
 
 ## 3) Core Architecture Validation
 
-- [ ] Tenant route works: `/site/{tenantSlug}`
-- [ ] About route works: `/site/{tenantSlug}/about`
-- [ ] Articles route works: `/site/{tenantSlug}/articles`
-- [ ] Rooms route works: `/site/{tenantSlug}/rooms`
-- [ ] Contact route works: `/site/{tenantSlug}/contact`
-- [ ] i18n only uses `th-TH` and `en-US`
-- [ ] Default locale is `th-TH`
-- [ ] Locale persistence works (cookie/localStorage)
+- [x] Tenant route works: `/site/{tenantSlug}`
+- [x] About route works: `/site/{tenantSlug}/about`
+- [x] Articles route works: `/site/{tenantSlug}/articles`
+- [x] Rooms route works: `/site/{tenantSlug}/rooms`
+- [x] Contact route works: `/site/{tenantSlug}/contact`
+- [x] i18n only uses `th-TH` and `en-US`
+- [x] Default locale is `th-TH`
+- [x] Locale persistence works (cookie/localStorage)
 
 ---
 
 ## 4) Tenant Isolation Validation
 
-- [ ] No cross-tenant content/data leakage
-- [ ] Active tenant context is always preserved in UI and API flow
-- [ ] Isolation keys are preserved end-to-end:
-- [ ] `tenantSlug`
-- [ ] `ownerId`
-- [ ] `resortId`
+- [x] No cross-tenant content/data leakage
+- [x] Active tenant context is always preserved in UI and API flow
+- [x] Isolation keys are preserved end-to-end:
+- [x] `tenantSlug`
+- [x] `ownerId`
+- [x] `resortId`
 
 ---
 
 ## 5) BFF and Header Forwarding
 
-- [ ] BFF forwards required headers:
-- [ ] `x-tenant-slug`
-- [ ] `x-tenant-id`
-- [ ] `x-resort-id`
-- [ ] `x-owner-id`
-- [ ] `x-internal-secret` (when configured)
-- [ ] Public BFF contracts are unchanged:
-- [ ] `GET /api/site/home`
-- [ ] `GET /api/site/rooms?checkIn=YYYY-MM-DD&nights=1..30`
-- [ ] `POST /api/site/leads`
+- [x] BFF forwards required headers:
+- [x] `x-tenant-slug`
+- [x] `x-tenant-id`
+- [x] `x-resort-id`
+- [x] `x-owner-id`
+- [x] `x-internal-secret` (when configured)
+- [x] Public BFF contracts are unchanged:
+- [x] `GET /api/site/home`
+- [x] `GET /api/site/rooms?checkIn=YYYY-MM-DD&nights=1..30`
+- [x] `POST /api/site/leads`
 
 ---
 
 ## 6) Fallback Chain Validation
 
-- [ ] Fallback order is unchanged:
-- [ ] Owner backend
-- [ ] Central platform
-- [ ] Local static fallback
-- [ ] Error path still returns safe UI behavior
+- [x] Fallback order is unchanged:
+- [x] Owner backend
+- [x] Central platform
+- [x] Local static fallback
+- [x] Error path still returns safe UI behavior
 
 ---
 
 ## 7) Functional Smoke Test
 
-- [ ] Home page loads correctly for at least 2 tenants
-- [ ] About/Articles routes load for at least 2 tenants
-- [ ] Rooms zone filter works and keeps tenant scope
-- [ ] Contact map renders from Google map link/embed
+- [x] Home page loads correctly for at least 2 tenants
+- [x] About/Articles routes load for at least 2 tenants
+- [x] Rooms zone filter works and keeps tenant scope
+- [x] Contact map renders from Google map link/embed
 - [ ] Alert modes render correctly from `ui.alerts`
-- [ ] No broken text or missing translation keys
+- [x] No broken text or missing translation keys
 
 ---
 
 ## 8) Build Quality
 
-- [ ] `npm run lint` passes
-- [ ] `npm run typecheck` passes
-- [ ] `npm run build` passes
+- [x] `npm run lint` passes
+- [x] `npm run typecheck` passes
+- [x] `npm run build` passes
 
 ---
 
 ## 9) Handover Package
 
-- [ ] Share production URL and tested tenant URLs
-- [ ] Share current deploy commit SHA
+- [x] Share production URL and tested tenant URLs
+- [x] Share current deploy commit SHA
 - [ ] Share env/secrets ownership (who rotates and manages)
-- [ ] Share API contract docs and fallback behavior summary
-- [ ] Share `ui.booking` and `ui.alerts` payload docs
-- [ ] Share known limitations and next-phase plan
+- [x] Share API contract docs and fallback behavior summary
+- [x] Share `ui.booking` and `ui.alerts` payload docs
+- [x] Share known limitations and next-phase plan
 
 ---
 
@@ -141,4 +141,13 @@ Release mode:
 - [x] `/site/forest-escape`
 - [x] `/site/tenant-not-found` (returns HTTP 404 in local smoke)
 - [x] Contact page map iframe rendered in smoke response checks
-- [ ] Production smoke re-check and sign-off still required before external release
+- [x] Production smoke re-check passed on `https://sstinnovationresort-website.vercel.app`
+- [x] `/` -> `200` (redirects to `/site/forest-escape`)
+- [x] `/site/demo-resort` -> `200`
+- [x] `/site/demo-resort/rooms` -> `200`
+- [x] `/site/forest-escape` -> `200`
+- [x] `/site/forest-escape/rooms` -> `200`
+- [x] `/site/tenant-not-found` -> `404`
+- [x] Latest deploy commit on production workflow: `8e09b5ffdbbf678de5904c9a25c39b63b95a0b25`
+- [x] GitHub Actions run: `Deploy Vercel (Production)` #18 = `success`
+- [ ] Pending backend/central final sign-off for live payload population (`home.ui.alerts`, `aboutPage`, `articlesPage`)

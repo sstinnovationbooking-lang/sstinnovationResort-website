@@ -1,9 +1,10 @@
-﻿# Final Handover Readiness Report (2026-05-11 Round 2)
+# Final Handover Readiness Report (2026-05-11 Round 3)
 
 ## Project
 - Repository: `E:\sstinnovationResort-website`
 - Scope: Single Template + Multi-tenant
 - Stack: Next.js 16 App Router + TypeScript + Vercel + BFF
+- Latest commit (HEAD): `8e09b5f`
 
 ## Round Scope Completed
 1. Integrated API payload mapping for `CONTENT_MODE=api`:
@@ -57,6 +58,33 @@
 - `npm run build`: pass
 - `npm run smoke:handoff`: pass
 
+## Production Verification (2026-05-11)
+- Production domain verified: `https://sstinnovationresort-website.vercel.app`
+- GitHub Actions:
+  - Workflow: `Deploy Vercel (Production)`
+  - Run: #18
+  - Commit: `8e09b5ffdbbf678de5904c9a25c39b63b95a0b25`
+  - Status: `completed / success`
+  - URL: `https://github.com/sstinnovationbooking-lang/sstinnovationResort-website/actions/runs/25638889886`
+- Production smoke results:
+  - `/` -> `200` (redirect target: `/site/forest-escape`)
+  - `/site/demo-resort` -> `200`
+  - `/site/demo-resort/rooms` -> `200`
+  - `/site/forest-escape` -> `200`
+  - `/site/forest-escape/rooms` -> `200`
+  - `/site/tenant-not-found` -> `404`
+- Tenant isolation checks:
+  - `demo-resort` response does not include `forest-escape` marker text.
+  - `forest-escape` response does not include `demo-resort` marker text.
+  - Unknown tenant remains `404` and does not fall back to another tenant.
+- API/payload safety checks in production:
+  - `/api/site/{tenantSlug}/home` returns `200` for both `demo-resort` and `forest-escape`.
+  - `home.ui.alerts`, `aboutPage`, `articlesPage` can be absent without frontend crash (safe fallback confirmed).
+- Map embed resolver checks in production:
+  - Google embed URL -> `embedSrc` returned.
+  - `maps.app.goo.gl` short link -> resolved and `embedSrc` returned.
+  - non-Google URL -> `embedSrc: null` (unsafe embed blocked).
+
 ## Tenant Isolation / Headers / Fallback Status
 - Tenant isolation: preserved (`tenantSlug`, `ownerId`, `resortId`)
 - BFF headers: unchanged
@@ -73,6 +101,7 @@
 ## Known Limitations
 - `articles` detail route by slug is not introduced in this round (list page supports slug field and safe fallback link only).
 - Production browser-level visual sign-off for alert modal/banner states is still required.
+- Backend/central live payload has not yet provided populated `home.ui.alerts`, `aboutPage`, `articlesPage` on production APIs.
 
 ## Waiting for Backend/Central Confirmation
 - Final live payload examples per owner for:
@@ -82,5 +111,5 @@
 - Production `CONTENT_MODE=api` credentials and access policy sign-off.
 
 ## Current Readiness
-- Status: **Ready for integration handoff with CI contract/integration coverage**
-- External production release: **pending cross-team sign-off**
+- Status: **Ready for production handoff package (frontend scope)**
+- External production release: **pending backend/central final sign-off**

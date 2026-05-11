@@ -3008,3 +3008,42 @@ npm run build
     - `/site/forest-escape`
     - `/site/forest-escape/rooms`
     - `/site/tenant-not-found` (must be 404)
+
+## Latest Update (2026-05-11 Round 3): Production Verification + Handover Refresh
+
+### Commit and deployment status
+- Latest commit (HEAD): `8e09b5f`
+- GitHub Actions:
+  - Workflow: `Deploy Vercel (Production)`
+  - Run #18: `success`
+  - Commit SHA: `8e09b5ffdbbf678de5904c9a25c39b63b95a0b25`
+  - Run URL: `https://github.com/sstinnovationbooking-lang/sstinnovationResort-website/actions/runs/25638889886`
+
+### Production smoke test (2026-05-11)
+- Domain used: `https://sstinnovationresort-website.vercel.app`
+- Route results:
+  - `/` -> `200` (redirect target `/site/forest-escape`)
+  - `/site/demo-resort` -> `200`
+  - `/site/demo-resort/rooms` -> `200`
+  - `/site/forest-escape` -> `200`
+  - `/site/forest-escape/rooms` -> `200`
+  - `/site/tenant-not-found` -> `404`
+
+### Tenant isolation verification
+- `demo-resort` and `forest-escape` content markers are isolated in production responses.
+- Unknown tenant stays `404` and does not fall back to another tenant.
+- Root `/` only redirects to default tenant route.
+
+### Payload and map safety verification
+- Production `/api/site/{tenantSlug}/home` returns `200` for `demo-resort` and `forest-escape`.
+- If backend/central do not yet provide `home.ui.alerts`, `aboutPage`, `articlesPage`, frontend fallback remains safe and pages still render.
+- Map embed resolver production checks:
+  - Google embed URL -> accepted (`embedSrc` returned)
+  - `maps.app.goo.gl` short URL -> resolved and accepted (`embedSrc` returned)
+  - non-Google URL -> rejected from iframe embed (`embedSrc: null`)
+
+### Remaining cross-team sign-off
+- Waiting backend/central final confirmation for live populated payloads:
+  - `home.ui.alerts`
+  - `aboutPage`
+  - `articlesPage`
