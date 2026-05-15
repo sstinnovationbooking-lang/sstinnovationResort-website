@@ -3,7 +3,7 @@ import type { ContentMode } from "@/lib/types/site";
 const DEFAULT_MODE: ContentMode = "static";
 
 export function getContentMode(): ContentMode {
-  const raw = String(process.env.CONTENT_MODE ?? DEFAULT_MODE).toLowerCase();
+  const raw = String(process.env.CONTENT_MODE ?? DEFAULT_MODE).trim().toLowerCase();
   return raw === "api" ? "api" : "static";
 }
 
@@ -16,7 +16,7 @@ export function getBaseDomain(): string {
 }
 
 export function getTenantFallbackPolicy(): "default" | "404" {
-  const raw = String(process.env.TENANT_FALLBACK_POLICY ?? "default").toLowerCase();
+  const raw = String(process.env.TENANT_FALLBACK_POLICY ?? "default").trim().toLowerCase();
   return raw === "404" ? "404" : "default";
 }
 
