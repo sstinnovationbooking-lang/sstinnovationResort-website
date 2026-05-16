@@ -3047,3 +3047,53 @@ npm run build
   - `home.ui.alerts`
   - `aboutPage`
   - `articlesPage`
+
+## Latest Update (2026-05-16 Round 4): Backend/Central Handoff Refresh
+
+### Backend/Central commits and CI status
+- Owner backend commit: `64b65c3`
+  - CI: `Backend CI` success
+  - URL: `https://github.com/sstinnovationbooking-lang/sstinnovation-backend-owner/actions/runs/25934347600`
+- Central backend commit: `dc204dc`
+  - CI: `Backend CI` success
+  - URL: `https://github.com/sstinnovationbooking-lang/sstinnovation-backend-central/actions/runs/25934336513`
+
+### Frontend deployment status
+- Frontend HEAD: `364ae10`
+- Workflow: `Deploy Vercel (Production)` success
+- URL: `https://github.com/sstinnovationbooking-lang/sstinnovationResort-website/actions/runs/25930611289`
+- Production website: `https://sstinnovationresort-website.vercel.app`
+
+### Production smoke logs (2026-05-16)
+- Website routes:
+  - `/` -> `200`
+  - `/site/demo-resort` -> `200`
+  - `/site/demo-resort/rooms` -> `200`
+  - `/site/forest-escape` -> `200`
+  - `/site/forest-escape/rooms` -> `200`
+  - `/site/tenant-not-found` -> `404`
+- Tenant API checks:
+  - `/api/site/demo-resort/home` -> `200` (`tenantSlug=demo-resort`)
+  - `/api/site/forest-escape/home` -> `200` (`tenantSlug=forest-escape`)
+  - `/api/site/tenant-not-found/home` -> `404`
+- Backend endpoint checks:
+  - Owner: `/health`, `/site/home`, `/site/about`, `/site/articles` -> `200`
+  - Central: `/health`, `/site/home` -> `200`
+
+### Handoff docs updated
+- `docs/HANDOVER-REPORT-2026-05-16.md`
+- `docs/HANDOVER-CHECKLIST.md`
+
+### Guardrails unchanged
+- Single Template + Multi-tenant architecture unchanged
+- BFF headers unchanged:
+  - `x-tenant-slug`
+  - `x-tenant-id`
+  - `x-resort-id`
+  - `x-owner-id`
+  - `x-internal-secret`
+- Fallback chain unchanged:
+  1. owner backend
+  2. central platform
+  3. local static fallback
+- i18n unchanged: `th-TH`, `en-US`

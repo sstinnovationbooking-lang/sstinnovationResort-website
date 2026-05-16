@@ -151,3 +151,34 @@ Release mode:
 - [x] Latest deploy commit on production workflow: `8f3f8e37a129c2c1dceefe2c61df77a7dd8e85ec`
 - [x] GitHub Actions run: `Deploy Vercel (Production)` #19 = `success`
 - [ ] Pending backend/central final sign-off for live payload population (`home.ui.alerts`, `aboutPage`, `articlesPage`)
+
+---
+
+## Final Review Snapshot (2026-05-16)
+
+- [x] Frontend HEAD recorded: `364ae10`
+- [x] Website GitHub Actions is green:
+- [x] `Deploy Vercel (Production)` `success` -> `https://github.com/sstinnovationbooking-lang/sstinnovationResort-website/actions/runs/25930611289`
+- [x] Owner backend latest commit + CI recorded:
+- [x] Commit `64b65c3`
+- [x] `Backend CI` `success` -> `https://github.com/sstinnovationbooking-lang/sstinnovation-backend-owner/actions/runs/25934347600`
+- [x] Central backend latest commit + CI recorded:
+- [x] Commit `dc204dc`
+- [x] `Backend CI` `success` -> `https://github.com/sstinnovationbooking-lang/sstinnovation-backend-central/actions/runs/25934336513`
+- [x] Production smoke re-check passed on `https://sstinnovationresort-website.vercel.app`
+- [x] `/` -> `200`
+- [x] `/site/demo-resort` -> `200`
+- [x] `/site/demo-resort/rooms` -> `200`
+- [x] `/site/forest-escape` -> `200`
+- [x] `/site/forest-escape/rooms` -> `200`
+- [x] `/site/tenant-not-found` -> `404`
+- [x] Tenant API checks passed:
+- [x] `/api/site/demo-resort/home` -> `200` (`tenantSlug=demo-resort`)
+- [x] `/api/site/forest-escape/home` -> `200` (`tenantSlug=forest-escape`)
+- [x] `/api/site/tenant-not-found/home` -> `404`
+- [x] Owner/Central backend route smoke checks passed:
+- [x] owner `/health` `/site/home` `/site/about` `/site/articles` -> `200`
+- [x] central `/health` `/site/home` -> `200`
+- [x] Manual backend/central sign-off package created:
+- [x] `docs/HANDOVER-REPORT-2026-05-16.md`
+- [ ] Pending backend/central live payload sign-off (`home.ui.alerts`, `aboutPage`, `articlesPage`)
