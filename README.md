@@ -3084,6 +3084,24 @@ npm run build
 - `docs/HANDOVER-REPORT-2026-05-16.md`
 - `docs/HANDOVER-CHECKLIST.md`
 
+### Platform E2E smoke (3-project integration)
+- Added unified smoke command for all 3 services:
+  - `npm run smoke:platform-e2e`
+- Covers:
+  - Website production routes (`/`, tenant pages, tenant-not-found 404)
+  - Website BFF tenant API isolation checks (`/api/site/{tenantSlug}/home`)
+  - Owner backend health + site endpoints
+  - Central backend health + site endpoint
+- Optional envs for custom targets:
+  - `WEBSITE_BASE_URL`
+  - `OWNER_BACKEND_BASE_URL`
+  - `CENTRAL_BACKEND_BASE_URL`
+  - `BACKEND_API_SECRET` (required for direct backend `/site/*` smoke)
+  - `E2E_TENANT_A`, `E2E_TENANT_B`, `E2E_TENANT_404`
+- Added CI workflow:
+  - `.github/workflows/platform-e2e-smoke.yml`
+  - Runs after `Deploy Vercel (Production)` succeeds (and supports manual trigger).
+
 ### Guardrails unchanged
 - Single Template + Multi-tenant architecture unchanged
 - BFF headers unchanged:

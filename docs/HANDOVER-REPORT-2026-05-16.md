@@ -91,3 +91,15 @@
 - Production smoke and tenant-isolation checks are passing.
 - Frontend contract/integration suite is passing.
 - Handoff package is ready for backend/central sign-off and live payload population confirmation.
+
+## Round 5 Update (Step 3: Unified Platform E2E)
+- Added single-command smoke for all 3 projects:
+  - `npm run smoke:platform-e2e`
+- Added CI workflow:
+  - `.github/workflows/platform-e2e-smoke.yml`
+  - Triggered automatically after `Deploy Vercel (Production)` success and via manual dispatch.
+- Verification scope in one run:
+  - Website production routes and tenant-not-found behavior
+  - BFF tenant API isolation (`/api/site/{tenantSlug}/home`)
+  - Owner backend health + direct `/site/*` checks
+  - Central backend health + direct `/site/*` checks

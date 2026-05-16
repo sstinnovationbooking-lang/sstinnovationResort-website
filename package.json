@@ -17,7 +17,8 @@
     "test:integration": "node scripts/test-integration-suite.js",
     "test": "npm run test:contracts && npm run test:integration",
     "smoke:rooms-zones": "node scripts/smoke-rooms-zones.js",
-    "smoke:handoff": "node scripts/smoke-handoff.js"
+    "smoke:handoff": "node scripts/smoke-handoff.js",
+    "smoke:platform-e2e": "node scripts/smoke-platform-e2e.js"
   },
   "dependencies": {
     "next": "16.2.4",
